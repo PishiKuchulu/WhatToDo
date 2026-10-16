@@ -1,0 +1,339 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">What ToDo</string>
+    <string name="todo_title">What ToDo</string>
+    <string name="task_title">عنوان المهمة</string>
+    <string name="save">حفظ</string>
+    <string name="back">رجوع</string>
+    <string name="cancel">إلغاء</string>
+    <string name="add_task_button">إضافة مهمة</string>
+    <string name="theme_settings">إعدادات المظهر</string>
+    <string name="settings">الإعدادات</string>
+    <string name="appearance">المظهر</string>
+    <string name="theme_light">فاتح</string>
+    <string name="theme_dark">داكن</string>
+    <string name="theme_follow_system">تلقائي حسب النظام</string>
+
+    <!-- Calendar -->
+    <string name="calendar_title">التقويم</string>
+    <string name="tasks_for_date">المهام ليوم %1$s</string>
+    <string name="no_tasks_day">لا توجد مهام لهذا اليوم</string>
+    <string name="prev_month">الشهر السابق</string>
+    <string name="next_month">الشهر القادم</string>
+
+    <!-- Statistics -->
+    <string name="stats_title">إحصائيات الإنتاجية</string>
+    <string name="overview">نظرة عامة</string>
+    <string name="stat_total">الإجمالي</string>
+    <string name="stat_done">مكتملة</string>
+    <string name="stat_active">نشطة</string>
+    <string name="stat_overdue">متأخرة</string>
+    <string name="completion_rate">نسبة الإنجاز</string>
+    <string name="percent_value">%1$d%%</string>
+    <string name="activity_trends">مؤشرات النشاط</string>
+    <string name="category_distribution">المهام حسب الفئة</string>
+    <string name="category_tasks_count">%1$s: %2$d</string>
+
+    <!-- Task Detail -->
+    <string name="task_details">تفاصيل المهمة</string>
+    <string name="edit">تعديل</string>
+    <string name="delete">حذف</string>
+    <string name="add_subtask">إضافة مهمة فرعية</string>
+    <string name="description_label">الوصف</string>
+    <string name="due_date_label">تاريخ الاستحقاق</string>
+    <string name="attachments_label">المرفقات</string>
+    <string name="subtasks_label">المهام الفرعية (%1$d)</string>
+    <string name="mark_as_done">تحديد كمكتملة</string>
+    <string name="mark_as_pending">تحديد كقيد الانتظار</string>
+    <string name="task_not_found">المهمة غير موجودة</string>
+
+    <!-- Task Editor -->
+    <string name="create_task_title">إنشاء مهمة</string>
+    <string name="edit_task_title">تعديل المهمة</string>
+    <string name="priority_label">الأولوية</string>
+    <string name="organization_label">التنظيم</string>
+    <string name="recurrence_label">التكرار</string>
+    <string name="reminder_label">التذكير</string>
+    <string name="set_label">تعيين</string>
+    <string name="none_label">بدون</string>
+    <string name="recurrence_daily">يوميًا</string>
+    <string name="recurrence_weekly">أسبوعيًا</string>
+    <string name="recurrence_monthly">شهريًا</string>
+    <string name="recurrence_yearly">سنويًا</string>
+    <string name="recurrence_interval">كل %1$d أيام</string>
+    <string name="ok">موافق</string>
+    <string name="no_date_set">لم يتم تحديد تاريخ</string>
+    <string name="not_scheduled">غير مجدول</string>
+
+    <!-- Settings -->
+    <string name="export_tasks">تصدير المهام</string>
+    <string name="export_tasks_desc">حفظ المهام في ملف JSON</string>
+    <string name="import_tasks">استيراد المهام</string>
+    <string name="import_tasks_desc">استعادة المهام من نسخة احتياطية JSON</string>
+    <string name="data_label">البيانات</string>
+    <string name="about_label">حول</string>
+    <string name="application">التطبيق</string>
+    <string name="developer_label">المطور</string>
+    <string name="developer_name">Farzad.Sh</string>
+    <string name="license_label">الترخيص</string>
+    <string name="license_name">MIT</string>
+    <string name="version_label">الإصدار</string>
+    <string name="version_info">1.1.0</string>
+    <string name="search_placeholder">البحث في المهام…</string>
+    <string name="no_tasks_found_title">لم يتم العثور على مهام</string>
+    
+    <string name="status_all">الكل</string>
+    <string name="status_active">نشطة</string>
+    <string name="status_completed">مكتملة</string>
+    <string name="status_overdue">متأخرة</string>
+    <string name="sort_manual">يدوي</string>
+    <string name="sort_creation_date">تاريخ الإنشاء</string>
+    <string name="sort_due_date">تاريخ الاستحقاق</string>
+    <string name="sort_priority">الأولوية</string>
+    <string name="cd_toggle_completion">تبديل حالة إنجاز المهمة</string>
+    <string name="cd_delete_task">حذف المهمة</string>
+    <string name="cd_priority_indicator">الأولوية: %1$s</string>
+    
+    <string name="cd_voice_task">إنشاء مهمة بالصوت</string>
+    <string name="cd_sort">ترتيب المهام</string>
+
+    <!-- Categories -->
+    <string name="category_personal">شخصي</string>
+    <string name="category_work">عمل</string>
+    <string name="category_shopping">تسوق</string>
+    <string name="category_study">دراسة</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">تنبيهات المهام</string>
+    <string name="notification_channel_description">إشعارات مواعيد استحقاق المهام</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_delete">حذف</string>
+    <string name="cd_mic">الميكروفون</string>
+    <string name="cd_calendar_day">يوم التقويم %1$s</string>
+
+    <!-- Misc -->
+    <string name="attached_file">ملف مرفق</string>
+    <string name="success_export">تم تصدير المهام بنجاح</string>
+    <string name="success_import">تم استيراد المهام بنجاح</string>
+    <string name="error_export">فشل تصدير المهام</string>
+    <string name="error_import">فشل استيراد المهام</string>
+    <string name="invalid_backup">ملف النسخة الاحتياطية غير صالح</string>
+    <string name="cancelled">تم الإلغاء</string>
+
+    <!-- Priorities -->
+    <string name="priority_high">عالية</string>
+    <string name="priority_medium">متوسطة</string>
+    <string name="priority_low">منخفضة</string>
+
+    <!-- Voice Recognition -->
+    <string name="voice_listening">جارٍ الاستماع…</string>
+    <string name="voice_ready">اضغط على الميكروفون لبدء التحدث</string>
+    <string name="voice_error">تعذر فهم الصوت. هل ترغب في المحاولة مجددًا؟</string>
+    <string name="voice_permission_denied">إذن الميكروفون مطلوب للإدخال الصوتي.</string>
+    <string name="voice_create_task">إنشاء مهمة بالصوت</string>
+    <string name="voice_confirm">تأكيد المهمة</string>
+
+    <!-- Language Settings -->
+    <string name="language">اللغة</string>
+    <string name="language_settings">إعدادات اللغة</string>
+    <string name="language_system">تلقائي حسب النظام</string>
+    <string name="language_en">الإنجليزية (English)</string>
+    <string name="language_fa">الفارسية (فارسی)</string>
+    <string name="language_es">الإسبانية (Español)</string>
+    <string name="language_fr">الفرنسية (Français)</string>
+    <string name="language_de">الألمانية (Deutsch)</string>
+    <string name="language_it">الإيطالية (Italiano)</string>
+    <string name="language_pt">البرتغالية (Português)</string>
+    <string name="language_ru">الروسية (Русский)</string>
+    <string name="language_ar">العربية</string>
+    <string name="language_tr">التركية (Türkçe)</string>
+    <string name="language_zh_cn">الصينية المبسطة (简体中文)</string>
+    <string name="language_ja">اليابانية (日本語)</string>
+
+    <!-- Tags / Labels -->
+    <string name="tags_label">الوسوم</string>
+    <string name="tag_management">إدارة الوسوم</string>
+    <string name="tag_management_desc">إنشاء الوسوم أو تعديلها أو حذفها</string>
+    <string name="add_tag">إضافة وسم</string>
+    <string name="new_tag">وسم جديد</string>
+    <string name="edit_tag">تعديل الوسم</string>
+    <string name="tag_name">اسم الوسم</string>
+    <string name="delete_tag">حذف الوسم</string>
+    <string name="delete_tag_confirm">هل أنت متأكد من رغبتك في حذف هذا الوسم؟ ستتم إزالته من جميع المهام المرتبطة.</string>
+    <string name="tag_already_exists">يوجد وسم بهذا الاسم بالفعل</string>
+    <string name="no_tags">لا توجد وسوم بعد</string>
+    <string name="tag_filter_all">جميع الوسوم</string>
+    <string name="cd_tag">وسم: %1$s</string>
+    <string name="cd_add_tag">إضافة وسم</string>
+    <string name="cd_delete_tag">حذف الوسم %1$s</string>
+    <string name="tag_color">اللون</string>
+    <string name="tag_name_empty">لا يمكن أن يكون اسم الوسم فارغاً</string>
+    <string name="cd_edit_tag">تعديل الوسم %1$s</string>
+
+    <!-- Smart Recognition -->
+    <string name="smart_add_hint">إضافة ذكية (مثلاً اجتماع غداً في 5 مساءً #عمل)</string>
+    <string name="smart_preview_title">التعرف الذكي</string>
+    <string name="smart_preview_due">الموعد</string>
+    <string name="smart_preview_time">الوقت</string>
+    <string name="smart_preview_priority">الأولوية</string>
+    <string name="smart_preview_tags">الوسوم</string>
+    <string name="smart_preview_recurrence">تكرار</string>
+    <string name="smart_create_task">إنشاء المهمة</string>
+    <string name="smart_open_editor">فتح المحرر</string>
+    <string name="voice_retry">إعادة المحاولة</string>
+
+    <!-- Phase 5.1: Eisenhower Matrix & Productivity Gestures -->
+    <string name="matrix_title">مصفوفة أيزنهاور</string>
+    <string name="matrix_subtitle">%1$d مهام في المصفوفة</string>
+    <string name="matrix_show_all">إظهار كافة الأقسام</string>
+    <string name="matrix_q1_title">ابدأ فوراً</string>
+    <string name="matrix_q1_desc">عاجل ومهم</string>
+    <string name="matrix_q2_title">جدولة</string>
+    <string name="matrix_q2_desc">مهم وغير عاجل</string>
+    <string name="matrix_q3_title">تفويض</string>
+    <string name="matrix_q3_desc">عاجل وغير مهم</string>
+    <string name="matrix_q4_title">إلغاء / استبعاد</string>
+    <string name="matrix_q4_desc">غير عاجل وغير مهم</string>
+    <string name="matrix_empty_quadrant">لا توجد مهام في هذا القسم</string>
+    <string name="action_snooze_1d">تأجيل يوم واحد</string>
+    <string name="task_snoozed">تم تأجيل المهمة يوماً واحداً</string>
+    <string name="task_completed_undo">تم إكمال المهمة</string>
+    <string name="undo">تراجع</string>
+    <string name="smart_filter_all">الكل</string>
+    <string name="smart_filter_today">اليوم</string>
+    <string name="smart_filter_overdue">متأخر</string>
+    <string name="smart_filter_upcoming">القادمة</string>
+    <string name="smart_filter_priority_high">أولوية عالية</string>
+    <string name="smart_filter_recurring">متكررة</string>
+    <string name="shortcut_add_task_short">إضافة مهمة</string>
+    <string name="shortcut_add_task_long">إنشاء مهمة جديدة</string>
+    <string name="shortcut_voice_short">إضافة صوتية</string>
+    <string name="shortcut_voice_long">إضافة مهمة بالصوت</string>
+    <string name="shortcut_matrix_short">المصفوفة</string>
+    <string name="shortcut_matrix_long">مصفوفة أيزنهاور</string>
+
+    <!-- Phase 5.2: Subtasks & Checklist System -->
+    <string name="checklist_title">قائمة التدقيق</string>
+    <string name="checklist_progress">%1$d من %2$d مكتمل</string>
+    <string name="checklist_add_item_hint">إضافة مهمة فرعية…</string>
+    <string name="checklist_empty">لم تتم إضافة أي مهام فرعية بعد</string>
+    <string name="checklist_item_deleted">تم حذف المهمة الفرعية</string>
+    <string name="error_max_depth_exceeded">لا يمكن إضافة مهمة فرعية إلى مهمة فرعية</string>
+
+    <!-- Phase 5.3.1: Smart Task Suggestions & Proactive Triage -->
+    <string name="smart_suggestions_header">اقتراحات ذكية</string>
+    <string name="suggestion_overdue_high_title">مهمة عاجلة متأخرة</string>
+    <string name="suggestion_overdue_high_desc">«%1$s» ذات أولوية عالية ومتأخرة.</string>
+    <string name="suggestion_overdue_cleanup_title">المهام المتأخرة</string>
+    <string name="suggestion_overdue_cleanup_desc">%1$s مهام متأخرة بحاجة إلى انتباهك.</string>
+    <string name="suggestion_unscheduled_high_title">مهمة مهمة غير مجدولة</string>
+    <string name="suggestion_unscheduled_high_desc">«%1$s» ذات أولوية عالية بدون تاريخ استحقاق.</string>
+    <string name="suggestion_stale_title">مراجعة مهمة راكدة</string>
+    <string name="suggestion_stale_desc">«%1$s» لم يتم تحديثها منذ أكثر من أسبوعين.</string>
+    <string name="suggestion_recurring_review_title">مهمة متكررة فائتة</string>
+    <string name="suggestion_recurring_review_desc">«%1$s» فاتت موعد تكرارها المجدول.</string>
+    <string name="suggestion_checklist_title">قائمة مهام قيد الإنجاز</string>
+    <string name="suggestion_checklist_desc">«%1$s»: اكتمل %2$s من %3$s مهام فرعية.</string>
+    <string name="suggestion_daily_triage_title">جدول اليوم</string>
+    <string name="suggestion_daily_triage_desc">%1$s مهام مجدولة لهذا اليوم.</string>
+    <string name="suggestion_action_view">عرض</string>
+    <string name="suggestion_action_schedule">جدولة</string>
+    <string name="suggestion_action_triage">مراجعة</string>
+    <string name="cd_dismiss_suggestion">تجاهل الاقتراح</string>
+
+    <!-- Phase 5.3.2: Advanced Natural Language Smart Search -->
+    <string name="search_chip_important">مهم</string>
+    <string name="search_chip_low_priority">أولوية منخفضة</string>
+    <string name="search_chip_overdue">متأخرة</string>
+    <string name="search_chip_completed">مكتملة</string>
+    <string name="search_chip_incomplete">غير مكتملة</string>
+    <string name="search_chip_today">اليوم</string>
+    <string name="search_chip_tomorrow">غداً</string>
+    <string name="search_chip_this_week">هذا الأسبوع</string>
+    <string name="search_chip_this_month">هذا الشهر</string>
+    <string name="search_chip_recurring">متكررة</string>
+
+    <!-- Phase 5.3.3: Calendar Intelligence & Routine Streaks -->
+    <string name="planning_strip_title">خطة 7 أيام</string>
+    <string name="load_density_none">لا يوجد مهام</string>
+    <string name="load_density_low">حمولة خفيفة</string>
+    <string name="load_density_medium">حمولة متوسطة</string>
+    <string name="load_density_high">حمولة عالية</string>
+    <string name="streak_title">سلاسل العادات</string>
+    <string name="streak_days_count">سلسلة %1$d أيام</string>
+    <string name="streak_best">الأفضل: %1$d</string>
+    <string name="streak_consistency">الانتظام: %1$d%%</string>
+    <string name="no_routines">لا توجد عادات نشطة</string>
+    <string name="category_all">جميع الفئات</string>
+    <string name="category_label">الفئة</string>
+
+
+    <!-- Birthdays -->
+    <string name="birthday_title">أعياد الميلاد</string>
+    <string name="birthday_add">إضافة عيد ميلاد</string>
+    <string name="birthday_edit">تعديل عيد الميلاد</string>
+    <string name="birthday_empty_title">لا توجد أعياد ميلاد بعد</string>
+    <string name="birthday_empty_hint">أضف تاريخ ميلاد يدويًا أو استوردْه من جهات الاتصال.</string>
+    <string name="birthday_name_label">الاسم</string>
+    <string name="birthday_month_label">الشهر</string>
+    <string name="birthday_day_label">اليوم</string>
+    <string name="birthday_year_label">السنة (اختياري)</string>
+    <string name="birthday_notes_label">ملاحظات</string>
+    <string name="birthday_reminder_label">وقت التذكير</string>
+    <string name="birthday_day_before_label">التذكير أيضًا في اليوم السابق</string>
+    <string name="birthday_pick_contact">اختيار من جهات الاتصال</string>
+    <string name="birthday_today">اليوم</string>
+    <string name="birthday_tomorrow">غدًا</string>
+    <string name="birthday_in_days">خلال %1$d يومًا</string>
+    <string name="birthday_turns_age">يبلغ %1$d</string>
+    <string name="birthday_notification_channel_name">تذكيرات أعياد الميلاد</string>
+    <string name="birthday_notification_channel_description">إشعارات لأعياد الميلاد القادمة</string>
+    <string name="birthday_notification_title">🎂 عيد ميلاد %1$s</string>
+    <string name="birthday_notification_text">لا تنسَ أن تهنئه!</string>
+    <string name="birthday_err_name_blank">يرجى إدخال الاسم.</string>
+    <string name="birthday_err_bad_month">يجب أن يكون الشهر بين ١ و ١٢.</string>
+    <string name="birthday_err_bad_day">هذا اليوم غير موجود في الشهر المختار.</string>
+    <string name="birthday_err_bad_year">السنة غير صالحة.</string>
+    <string name="birthday_err_future_date">لا يمكن أن يكون تاريخ الميلاد في المستقبل.</string>
+    <string name="birthday_err_save_failed">تعذّر الحفظ. حاول مرة أخرى.</string>
+
+    <!-- Custom recurrence interval -->
+    <string name="recurrence_custom_interval">فاصل مخصص…</string>
+    <string name="recurrence_interval_days_label">كل N يومًا</string>
+    <string name="recurrence_interval_hint">أدخل رقمًا من ١ إلى ٣٦٥.</string>
+
+
+    <!-- Home screen widget -->
+    <string name="widget_title">What ToDo</string>
+    <string name="widget_description">المهام القادمة على الشاشة الرئيسية</string>
+    <string name="widget_add_task">إضافة مهمة</string>
+    <string name="widget_empty">لا توجد مهام نشطة</string>
+
+    <!-- v1.1 additions -->
+    <string name="settings_appearance_language">المظهر واللغة</string>
+    <string name="settings_organization">التنظيم</string>
+    <string name="settings_notifications">الإشعارات</string>
+    <string name="notification_system_settings">إعدادات الإشعارات</string>
+    <string name="notifications_enabled_state">الإشعارات مفعّلة</string>
+    <string name="notifications_disabled_state">الإشعارات متوقفة — لن تظهر التذكيرات</string>
+    <string name="category_management">إدارة الفئات</string>
+    <string name="category_management_desc">إضافة فئات المهام أو إعادة تسميتها أو تغيير لونها أو حذفها</string>
+    <string name="category_add">إضافة فئة</string>
+    <string name="category_edit">تعديل الفئة</string>
+    <string name="category_empty">لا توجد فئات بعد</string>
+    <string name="category_delete_title">حذف الفئة؟</string>
+    <string name="category_delete_message">لن يتم حذف مهام «%1$s»؛ ستصبح بدون فئة.</string>
+    <string name="category_name_label">اسم الفئة</string>
+    <string name="category_name_duplicate">توجد فئة بهذا الاسم بالفعل</string>
+    <string name="task_notes_label">ملاحظات</string>
+    <string name="delete_task_confirm_title">حذف هذه المهمة؟</string>
+    <string name="delete_task_confirm_message">سيتم حذف المهمة ومهامها الفرعية ومرفقاتها. لا يمكن التراجع عن ذلك.</string>
+    <string name="attachment_open_failed">تعذّر فتح هذا المرفق</string>
+    <string name="birthday_notification_eve_title">🎂 غدًا عيد ميلاد %1$s</string>
+    <string name="calendar_type_title">التقويم</string>
+    <string name="calendar_type_desc">تُعرض تواريخ كل المهام وأعياد الميلاد وفق التقويم المختار. لا تتغير بياناتك أبدًا.</string>
+    <string name="calendar_gregorian">ميلادي</string>
+    <string name="calendar_jalali">جلالي (هجري شمسي)</string>
+    <string name="smart_filter_priority_medium">أولوية متوسطة</string>
+</resources>

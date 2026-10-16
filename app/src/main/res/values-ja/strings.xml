@@ -1,0 +1,339 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">What ToDo</string>
+    <string name="todo_title">What ToDo</string>
+    <string name="task_title">タスク名</string>
+    <string name="save">保存</string>
+    <string name="back">戻る</string>
+    <string name="cancel">キャンセル</string>
+    <string name="add_task_button">タスクを追加</string>
+    <string name="theme_settings">テーマ設定</string>
+    <string name="settings">設定</string>
+    <string name="appearance">外観</string>
+    <string name="theme_light">ライト</string>
+    <string name="theme_dark">ダーク</string>
+    <string name="theme_follow_system">システム設定に従う</string>
+
+    <!-- Calendar -->
+    <string name="calendar_title">カレンダー</string>
+    <string name="tasks_for_date">%1$s のタスク</string>
+    <string name="no_tasks_day">この日のタスクはありません</string>
+    <string name="prev_month">前月</string>
+    <string name="next_month">翌月</string>
+
+    <!-- Statistics -->
+    <string name="stats_title">生産性統計</string>
+    <string name="overview">概要</string>
+    <string name="stat_total">合計</string>
+    <string name="stat_done">完了</string>
+    <string name="stat_active">進行中</string>
+    <string name="stat_overdue">期限切れ</string>
+    <string name="completion_rate">達成率</string>
+    <string name="percent_value">%1$d%%</string>
+    <string name="activity_trends">アクティビティ傾向</string>
+    <string name="category_distribution">カテゴリ別タスク</string>
+    <string name="category_tasks_count">%1$s: %2$d</string>
+
+    <!-- Task Detail -->
+    <string name="task_details">タスク詳細</string>
+    <string name="edit">編集</string>
+    <string name="delete">削除</string>
+    <string name="add_subtask">サブタスクを追加</string>
+    <string name="description_label">説明</string>
+    <string name="due_date_label">期日</string>
+    <string name="attachments_label">添付ファイル</string>
+    <string name="subtasks_label">サブタスク (%1$d)</string>
+    <string name="mark_as_done">完了にする</string>
+    <string name="mark_as_pending">未完了に戻す</string>
+    <string name="task_not_found">タスクが見つかりません</string>
+
+    <!-- Task Editor -->
+    <string name="create_task_title">タスクを作成</string>
+    <string name="edit_task_title">タスクを編集</string>
+    <string name="priority_label">優先度</string>
+    <string name="organization_label">整理</string>
+    <string name="recurrence_label">繰り返し</string>
+    <string name="reminder_label">リマインダー</string>
+    <string name="set_label">設定</string>
+    <string name="none_label">なし</string>
+    <string name="recurrence_daily">毎日</string>
+    <string name="recurrence_weekly">毎週</string>
+    <string name="recurrence_monthly">毎月</string>
+    <string name="recurrence_yearly">毎年</string>
+    <string name="recurrence_interval">%1$d 日ごと</string>
+    <string name="ok">OK</string>
+    <string name="no_date_set">日付未設定</string>
+    <string name="not_scheduled">予定なし</string>
+
+    <!-- Settings -->
+    <string name="export_tasks">タスクをエクスポート</string>
+    <string name="export_tasks_desc">タスクをJSONファイルに保存します</string>
+    <string name="import_tasks">タスクをインポート</string>
+    <string name="import_tasks_desc">JSONバックアップからタスクを復元します</string>
+    <string name="data_label">データ</string>
+    <string name="about_label">アプリについて</string>
+    <string name="application">アプリケーション</string>
+    <string name="developer_label">開発者</string>
+    <string name="developer_name">Farzad.Sh</string>
+    <string name="license_label">ライセンス</string>
+    <string name="license_name">MIT</string>
+    <string name="version_label">バージョン</string>
+    <string name="version_info">1.1.0</string>
+    <string name="search_placeholder">タスクを検索…</string>
+    <string name="no_tasks_found_title">タスクが見つかりません</string>
+    
+    <string name="status_all">すべて</string>
+    <string name="status_active">進行中</string>
+    <string name="status_completed">完了</string>
+    <string name="status_overdue">期限切れ</string>
+    <string name="sort_manual">手動</string>
+    <string name="sort_creation_date">作成日時</string>
+    <string name="sort_due_date">期日</string>
+    <string name="sort_priority">優先度</string>
+    <string name="cd_toggle_completion">タスクの完了状態を切り替え</string>
+    <string name="cd_delete_task">タスクを削除</string>
+    <string name="cd_priority_indicator">優先度: %1$s</string>
+    
+    <string name="cd_voice_task">音声でタスクを作成</string>
+    <string name="cd_sort">タスクを並び替え</string>
+
+    <!-- Categories -->
+    <string name="category_personal">プライベート</string>
+    <string name="category_work">仕事</string>
+    <string name="category_shopping">買い物</string>
+    <string name="category_study">学習</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">タスクリマインダー</string>
+    <string name="notification_channel_description">タスクの期日に関する通知</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_delete">削除</string>
+    <string name="cd_mic">マイク</string>
+    <string name="cd_calendar_day">カレンダーの日 %1$s</string>
+
+    <!-- Misc -->
+    <string name="attached_file">添付ファイル</string>
+    <string name="success_export">タスクを正常にエクスポートしました</string>
+    <string name="success_import">タスクを正常にインポートしました</string>
+    <string name="error_export">タスクのエクスポートに失敗しました</string>
+    <string name="error_import">タスクのインポートに失敗しました</string>
+    <string name="invalid_backup">無効なバックアップファイルです</string>
+    <string name="cancelled">キャンセルしました</string>
+
+    <!-- Priorities -->
+    <string name="priority_high">高</string>
+    <string name="priority_medium">中</string>
+    <string name="priority_low">低</string>
+
+    <!-- Voice Recognition -->
+    <string name="voice_listening">聞き取り中…</string>
+    <string name="voice_ready">マイクをタップして話し始めてください</string>
+    <string name="voice_error">聞き取れませんでした。もう一度お試しください。</string>
+    <string name="voice_permission_denied">音声入力にはマイクの権限が必要です。</string>
+    <string name="voice_create_task">音声でタスクを作成</string>
+    <string name="voice_confirm">タスクを確定</string>
+
+    <!-- Language Settings -->
+    <string name="language">言語</string>
+    <string name="language_settings">言語設定</string>
+    <string name="language_system">システム設定に従う</string>
+    <string name="language_en">英語 (English)</string>
+    <string name="language_fa">ペルシャ語 (فارسی)</string>
+    <string name="language_es">スペイン語 (Español)</string>
+    <string name="language_fr">フランス語 (Français)</string>
+    <string name="language_de">ドイツ語 (Deutsch)</string>
+    <string name="language_it">イタリア語 (Italiano)</string>
+    <string name="language_pt">ポルトガル語 (Português)</string>
+    <string name="language_ru">ロシア語 (Русский)</string>
+    <string name="language_ar">アラビア語 (العربية)</string>
+    <string name="language_tr">トルコ語 (Türkçe)</string>
+    <string name="language_zh_cn">簡体字中国語 (简体中文)</string>
+    <string name="language_ja">日本語</string>
+
+    <!-- Tags / Labels -->
+    <string name="tags_label">タグ</string>
+    <string name="tag_management">タグ管理</string>
+    <string name="tag_management_desc">タグの作成、編集、削除</string>
+    <string name="add_tag">タグを追加</string>
+    <string name="new_tag">新規タグ</string>
+    <string name="edit_tag">タグを編集</string>
+    <string name="tag_name">タグ名</string>
+    <string name="delete_tag">タグを削除</string>
+    <string name="delete_tag_confirm">このタグを削除してもよろしいですか？関連するすべてのタスクから削除されます。</string>
+    <string name="tag_already_exists">この名前のタグは既に存在します</string>
+    <string name="no_tags">タグはまだありません</string>
+    <string name="tag_filter_all">すべてのタグ</string>
+    <string name="cd_tag">タグ: %1$s</string>
+    <string name="cd_add_tag">タグを追加</string>
+    <string name="cd_delete_tag">タグ %1$s を削除</string>
+    <string name="tag_color">色</string>
+    <string name="tag_name_empty">タグ名を空にすることはできません</string>
+    <string name="cd_edit_tag">タグ %1$s を編集</string>
+
+    <!-- Smart Recognition -->
+    <string name="smart_add_hint">タスクを追加 (例: 明日の17時に会議 #仕事)</string>
+    <string name="smart_preview_title">スマート認識</string>
+    <string name="smart_preview_due">期日</string>
+    <string name="smart_preview_time">時間</string>
+    <string name="smart_preview_priority">優先度</string>
+    <string name="smart_preview_tags">タグ</string>
+    <string name="smart_preview_recurrence">繰り返し</string>
+    <string name="smart_create_task">タスクを作成</string>
+    <string name="smart_open_editor">エディタを開く</string>
+    <string name="voice_retry">再試行</string>
+
+    <!-- Phase 5.1: Eisenhower Matrix & Productivity Gestures -->
+    <string name="matrix_title">アイゼンハワーマトリクス</string>
+    <string name="matrix_subtitle">マトリクス内に %1$d 件のタスク</string>
+    <string name="matrix_show_all">すべての象限を表示</string>
+    <string name="matrix_q1_title">最優先で実行</string>
+    <string name="matrix_q1_desc">緊急かつ重要</string>
+    <string name="matrix_q2_title">計画する</string>
+    <string name="matrix_q2_desc">重要・緊急ではない</string>
+    <string name="matrix_q3_title">委任する</string>
+    <string name="matrix_q3_desc">緊急・重要ではない</string>
+    <string name="matrix_q4_title">削除 / 保留</string>
+    <string name="matrix_q4_desc">緊急でも重要でもない</string>
+    <string name="matrix_empty_quadrant">この象限にタスクはありません</string>
+    <string name="action_snooze_1d">1日延期</string>
+    <string name="task_snoozed">タスクを1日延期しました</string>
+    <string name="task_completed_undo">タスクを完了にしました</string>
+    <string name="undo">元に戻す</string>
+    <string name="smart_filter_all">すべて</string>
+    <string name="smart_filter_today">今日</string>
+    <string name="smart_filter_overdue">期限切れ</string>
+    <string name="smart_filter_upcoming">今後の予定</string>
+    <string name="smart_filter_priority_high">高優先度</string>
+    <string name="smart_filter_recurring">繰り返し</string>
+    <string name="shortcut_add_task_short">タスク追加</string>
+    <string name="shortcut_add_task_long">新しいタスクを作成</string>
+    <string name="shortcut_voice_short">音声追加</string>
+    <string name="shortcut_voice_long">音声でタスクを追加</string>
+    <string name="shortcut_matrix_short">マトリクス</string>
+    <string name="shortcut_matrix_long">アイゼンハワーマトリクス</string>
+
+    <!-- Phase 5.2: Subtasks & Checklist System -->
+    <string name="checklist_title">チェックリスト</string>
+    <string name="checklist_progress">%1$d / %2$d 完了</string>
+    <string name="checklist_add_item_hint">サブタスクを追加…</string>
+    <string name="checklist_empty">サブタスクはまだありません</string>
+    <string name="checklist_item_deleted">サブタスクを削除しました</string>
+    <string name="error_max_depth_exceeded">サブタスクにさらにサブタスクを追加することはできません</string>
+
+    <!-- Phase 5.3.1: Smart Task Suggestions & Proactive Triage -->
+    <string name="smart_suggestions_header">スマート提案</string>
+    <string name="suggestion_overdue_high_title">緊急の期限切れタスク</string>
+    <string name="suggestion_overdue_high_desc">「%1$s」は高優先度で期限を過ぎています。</string>
+    <string name="suggestion_overdue_cleanup_title">期限切れタスク</string>
+    <string name="suggestion_overdue_cleanup_desc">%1$s件の期限切れタスクに対応が必要です。</string>
+    <string name="suggestion_unscheduled_high_title">未予定の優先タスク</string>
+    <string name="suggestion_unscheduled_high_desc">「%1$s」は高優先度ですが期限が設定されていません。</string>
+    <string name="suggestion_stale_title">放置タスクの確認</string>
+    <string name="suggestion_stale_desc">「%1$s」は2週間以上更新されていません。</string>
+    <string name="suggestion_recurring_review_title">見逃した繰り返しタスク</string>
+    <string name="suggestion_recurring_review_desc">「%1$s」の定期予定が過ぎています。</string>
+    <string name="suggestion_checklist_title">進行中のチェックリスト</string>
+    <string name="suggestion_checklist_desc">「%1$s」: サブタスク %2$s / %3$s 完了。</string>
+    <string name="suggestion_daily_triage_title">本日の予定</string>
+    <string name="suggestion_daily_triage_desc">本日予定のタスクが %1$s 件あります。</string>
+    <string name="suggestion_action_view">表示</string>
+    <string name="suggestion_action_schedule">予定設定</string>
+    <string name="suggestion_action_triage">確認</string>
+    <string name="cd_dismiss_suggestion">提案を閉じる</string>
+
+    <!-- Phase 5.3.2: Advanced Natural Language Smart Search -->
+    <string name="search_chip_important">重要</string>
+    <string name="search_chip_low_priority">低優先度</string>
+    <string name="search_chip_overdue">期限切れ</string>
+    <string name="search_chip_completed">完了済み</string>
+    <string name="search_chip_incomplete">未完了</string>
+    <string name="search_chip_today">本日</string>
+    <string name="search_chip_tomorrow">明日</string>
+    <string name="search_chip_this_week">今週</string>
+    <string name="search_chip_this_month">今月</string>
+    <string name="search_chip_recurring">繰り返し</string>
+
+    <!-- Phase 5.3.3: Calendar Intelligence & Routine Streaks -->
+    <string name="planning_strip_title">7日間の予定</string>
+    <string name="load_density_none">予定なし</string>
+    <string name="load_density_low">低い負荷</string>
+    <string name="load_density_medium">中程度の負荷</string>
+    <string name="load_density_high">高い負荷</string>
+    <string name="streak_title">習慣の継続記録</string>
+    <string name="streak_days_count">%1$d日連続</string>
+    <string name="streak_best">最高: %1$d</string>
+    <string name="streak_consistency">達成率: %1$d%%</string>
+    <string name="no_routines">有効な習慣はありません</string>
+    <string name="category_all">すべてのカテゴリ</string>
+    <string name="category_label">カテゴリ</string>
+
+
+    <!-- Birthdays -->
+    <string name="birthday_title">誕生日</string>
+    <string name="birthday_add">誕生日を追加</string>
+    <string name="birthday_edit">誕生日を編集</string>
+    <string name="birthday_empty_title">誕生日がまだありません</string>
+    <string name="birthday_empty_hint">誕生日を手動で追加するか、連絡先から取り込んでください。</string>
+    <string name="birthday_name_label">名前</string>
+    <string name="birthday_month_label">月</string>
+    <string name="birthday_day_label">日</string>
+    <string name="birthday_year_label">年（任意）</string>
+    <string name="birthday_notes_label">メモ</string>
+    <string name="birthday_reminder_label">リマインダー時刻</string>
+    <string name="birthday_day_before_label">前日にも通知する</string>
+    <string name="birthday_pick_contact">連絡先から選択</string>
+    <string name="birthday_today">今日</string>
+    <string name="birthday_tomorrow">明日</string>
+    <string name="birthday_in_days">%1$d 日後</string>
+    <string name="birthday_turns_age">%1$d 歳になります</string>
+    <string name="birthday_notification_channel_name">誕生日リマインダー</string>
+    <string name="birthday_notification_channel_description">近日の誕生日の通知</string>
+    <string name="birthday_notification_title">🎂 %1$s さんの誕生日</string>
+    <string name="birthday_notification_text">お祝いを忘れずに！</string>
+    <string name="birthday_err_name_blank">名前を入力してください。</string>
+    <string name="birthday_err_bad_month">月は1〜12の範囲で指定してください。</string>
+    <string name="birthday_err_bad_day">選択した月にその日はありません。</string>
+    <string name="birthday_err_bad_year">年が正しくありません。</string>
+    <string name="birthday_err_future_date">生年月日を未来にすることはできません。</string>
+    <string name="birthday_err_save_failed">保存できませんでした。もう一度お試しください。</string>
+
+    <!-- Custom recurrence interval -->
+    <string name="recurrence_custom_interval">カスタム間隔…</string>
+    <string name="recurrence_interval_days_label">N 日ごと</string>
+    <string name="recurrence_interval_hint">1〜365 の数字を入力してください。</string>
+
+
+    <!-- Home screen widget -->
+    <string name="widget_title">What ToDo</string>
+    <string name="widget_description">ホーム画面に近日のタスクを表示</string>
+    <string name="widget_add_task">タスクを追加</string>
+    <string name="widget_empty">進行中のタスクはありません</string>
+
+    <!-- v1.1 additions -->
+    <string name="settings_appearance_language">外観と言語</string>
+    <string name="settings_organization">整理</string>
+    <string name="settings_notifications">通知</string>
+    <string name="notification_system_settings">通知設定</string>
+    <string name="notifications_enabled_state">通知はオンです</string>
+    <string name="notifications_disabled_state">通知がオフです — リマインダーは表示されません</string>
+    <string name="category_management">カテゴリを管理</string>
+    <string name="category_management_desc">タスクのカテゴリを追加・名前変更・色変更・削除します</string>
+    <string name="category_add">カテゴリを追加</string>
+    <string name="category_edit">カテゴリを編集</string>
+    <string name="category_empty">カテゴリはまだありません</string>
+    <string name="category_delete_title">カテゴリを削除しますか？</string>
+    <string name="category_delete_message">「%1$s」のタスクは削除されず、未分類になります。</string>
+    <string name="category_name_label">カテゴリ名</string>
+    <string name="category_name_duplicate">同じ名前のカテゴリが既にあります</string>
+    <string name="task_notes_label">メモ</string>
+    <string name="delete_task_confirm_title">このタスクを削除しますか？</string>
+    <string name="delete_task_confirm_message">タスク、サブタスク、添付ファイルが削除されます。元に戻せません。</string>
+    <string name="attachment_open_failed">この添付ファイルを開けませんでした</string>
+    <string name="birthday_notification_eve_title">🎂 明日は%1$sさんの誕生日</string>
+    <string name="calendar_type_title">カレンダー</string>
+    <string name="calendar_type_desc">すべてのタスクと誕生日の日付を選択したカレンダーで表示します。データは変更されません。</string>
+    <string name="calendar_gregorian">グレゴリオ暦</string>
+    <string name="calendar_jalali">ジャラーリー暦（ペルシア暦）</string>
+    <string name="smart_filter_priority_medium">中優先度</string>
+</resources>

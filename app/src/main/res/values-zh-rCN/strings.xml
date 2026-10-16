@@ -1,0 +1,339 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">What ToDo</string>
+    <string name="todo_title">What ToDo</string>
+    <string name="task_title">任务标题</string>
+    <string name="save">保存</string>
+    <string name="back">返回</string>
+    <string name="cancel">取消</string>
+    <string name="add_task_button">添加任务</string>
+    <string name="theme_settings">主题设置</string>
+    <string name="settings">设置</string>
+    <string name="appearance">外观</string>
+    <string name="theme_light">浅色</string>
+    <string name="theme_dark">深色</string>
+    <string name="theme_follow_system">跟随系统</string>
+
+    <!-- Calendar -->
+    <string name="calendar_title">日历</string>
+    <string name="tasks_for_date">%1$s 的任务</string>
+    <string name="no_tasks_day">当天无任务</string>
+    <string name="prev_month">上个月</string>
+    <string name="next_month">下个月</string>
+
+    <!-- Statistics -->
+    <string name="stats_title">效率统计</string>
+    <string name="overview">概览</string>
+    <string name="stat_total">总计</string>
+    <string name="stat_done">已完成</string>
+    <string name="stat_active">进行中</string>
+    <string name="stat_overdue">已逾期</string>
+    <string name="completion_rate">完成率</string>
+    <string name="percent_value">%1$d%%</string>
+    <string name="activity_trends">活动趋势</string>
+    <string name="category_distribution">按分类查看任务</string>
+    <string name="category_tasks_count">%1$s: %2$d</string>
+
+    <!-- Task Detail -->
+    <string name="task_details">任务详情</string>
+    <string name="edit">编辑</string>
+    <string name="delete">删除</string>
+    <string name="add_subtask">添加子任务</string>
+    <string name="description_label">描述</string>
+    <string name="due_date_label">截止日期</string>
+    <string name="attachments_label">附件</string>
+    <string name="subtasks_label">子任务 (%1$d)</string>
+    <string name="mark_as_done">标记为已完成</string>
+    <string name="mark_as_pending">标记为待办</string>
+    <string name="task_not_found">未找到任务</string>
+
+    <!-- Task Editor -->
+    <string name="create_task_title">创建任务</string>
+    <string name="edit_task_title">编辑任务</string>
+    <string name="priority_label">优先级</string>
+    <string name="organization_label">分类与整理</string>
+    <string name="recurrence_label">重复</string>
+    <string name="reminder_label">提醒</string>
+    <string name="set_label">设置</string>
+    <string name="none_label">无</string>
+    <string name="recurrence_daily">每天</string>
+    <string name="recurrence_weekly">每周</string>
+    <string name="recurrence_monthly">每月</string>
+    <string name="recurrence_yearly">每年</string>
+    <string name="recurrence_interval">每 %1$d 天</string>
+    <string name="ok">确定</string>
+    <string name="no_date_set">未设置日期</string>
+    <string name="not_scheduled">未安排</string>
+
+    <!-- Settings -->
+    <string name="export_tasks">导出任务</string>
+    <string name="export_tasks_desc">将任务保存为 JSON 文件</string>
+    <string name="import_tasks">导入任务</string>
+    <string name="import_tasks_desc">从 JSON 备份中加载任务</string>
+    <string name="data_label">数据</string>
+    <string name="about_label">关于</string>
+    <string name="application">应用</string>
+    <string name="developer_label">开发者</string>
+    <string name="developer_name">Farzad.Sh</string>
+    <string name="license_label">许可证</string>
+    <string name="license_name">MIT</string>
+    <string name="version_label">版本</string>
+    <string name="version_info">1.1.0</string>
+    <string name="search_placeholder">搜索任务…</string>
+    <string name="no_tasks_found_title">未找到相关任务</string>
+    
+    <string name="status_all">全部</string>
+    <string name="status_active">进行中</string>
+    <string name="status_completed">已完成</string>
+    <string name="status_overdue">已逾期</string>
+    <string name="sort_manual">手动排序</string>
+    <string name="sort_creation_date">创建日期</string>
+    <string name="sort_due_date">截止日期</string>
+    <string name="sort_priority">优先级</string>
+    <string name="cd_toggle_completion">切换任务完成状态</string>
+    <string name="cd_delete_task">删除任务</string>
+    <string name="cd_priority_indicator">优先级：%1$s</string>
+    
+    <string name="cd_voice_task">语音创建任务</string>
+    <string name="cd_sort">排序任务</string>
+
+    <!-- Categories -->
+    <string name="category_personal">个人</string>
+    <string name="category_work">工作</string>
+    <string name="category_shopping">购物</string>
+    <string name="category_study">学习</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">任务提醒</string>
+    <string name="notification_channel_description">任务截止时间通知</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_delete">删除</string>
+    <string name="cd_mic">麦克风</string>
+    <string name="cd_calendar_day">日历日期 %1$s</string>
+
+    <!-- Misc -->
+    <string name="attached_file">附加文件</string>
+    <string name="success_export">任务导出成功</string>
+    <string name="success_import">任务导入成功</string>
+    <string name="error_export">导出任务失败</string>
+    <string name="error_import">导入任务失败</string>
+    <string name="invalid_backup">无效的备份文件</string>
+    <string name="cancelled">已取消</string>
+
+    <!-- Priorities -->
+    <string name="priority_high">高</string>
+    <string name="priority_medium">中</string>
+    <string name="priority_low">低</string>
+
+    <!-- Voice Recognition -->
+    <string name="voice_listening">正在聆听…</string>
+    <string name="voice_ready">点击麦克风开始说话</string>
+    <string name="voice_error">未能识别，请重试</string>
+    <string name="voice_permission_denied">语音输入需要麦克风权限。</string>
+    <string name="voice_create_task">语音创建任务</string>
+    <string name="voice_confirm">确认任务</string>
+
+    <!-- Language Settings -->
+    <string name="language">语言</string>
+    <string name="language_settings">语言设置</string>
+    <string name="language_system">跟随系统</string>
+    <string name="language_en">英语 (English)</string>
+    <string name="language_fa">波斯语 (فارسی)</string>
+    <string name="language_es">西班牙语 (Español)</string>
+    <string name="language_fr">法语 (Français)</string>
+    <string name="language_de">德语 (Deutsch)</string>
+    <string name="language_it">意大利语 (Italiano)</string>
+    <string name="language_pt">葡萄牙语 (Português)</string>
+    <string name="language_ru">俄语 (Русский)</string>
+    <string name="language_ar">阿拉伯语 (العربية)</string>
+    <string name="language_tr">土耳其语 (Türkçe)</string>
+    <string name="language_zh_cn">简体中文</string>
+    <string name="language_ja">日语 (日本語)</string>
+
+    <!-- Tags / Labels -->
+    <string name="tags_label">标签</string>
+    <string name="tag_management">标签管理</string>
+    <string name="tag_management_desc">创建、编辑或删除标签</string>
+    <string name="add_tag">添加标签</string>
+    <string name="new_tag">新建标签</string>
+    <string name="edit_tag">编辑标签</string>
+    <string name="tag_name">标签名称</string>
+    <string name="delete_tag">删除标签</string>
+    <string name="delete_tag_confirm">确定要删除此标签吗？它将从所有关联任务中移除。</string>
+    <string name="tag_already_exists">已存在同名标签</string>
+    <string name="no_tags">暂无标签</string>
+    <string name="tag_filter_all">所有标签</string>
+    <string name="cd_tag">标签：%1$s</string>
+    <string name="cd_add_tag">添加标签</string>
+    <string name="cd_delete_tag">删除标签 %1$s</string>
+    <string name="tag_color">颜色</string>
+    <string name="tag_name_empty">标签名称不能为空</string>
+    <string name="cd_edit_tag">编辑标签 %1$s</string>
+
+    <!-- Smart Recognition -->
+    <string name="smart_add_hint">添加任务 (例如: 明天下午5点开会 #工作)</string>
+    <string name="smart_preview_title">智能识别</string>
+    <string name="smart_preview_due">截止</string>
+    <string name="smart_preview_time">时间</string>
+    <string name="smart_preview_priority">优先级</string>
+    <string name="smart_preview_tags">标签</string>
+    <string name="smart_preview_recurrence">重复</string>
+    <string name="smart_create_task">创建任务</string>
+    <string name="smart_open_editor">打开完整编辑</string>
+    <string name="voice_retry">重试</string>
+
+    <!-- Phase 5.1: Eisenhower Matrix & Productivity Gestures -->
+    <string name="matrix_title">艾森豪威尔矩阵</string>
+    <string name="matrix_subtitle">矩阵中有 %1$d 项任务</string>
+    <string name="matrix_show_all">显示所有象限</string>
+    <string name="matrix_q1_title">立即处理</string>
+    <string name="matrix_q1_desc">紧急且重要</string>
+    <string name="matrix_q2_title">制定计划</string>
+    <string name="matrix_q2_desc">重要不紧急</string>
+    <string name="matrix_q3_title">委派他人</string>
+    <string name="matrix_q3_desc">紧急不重要</string>
+    <string name="matrix_q4_title">消除 / 归档</string>
+    <string name="matrix_q4_desc">不紧急也不重要</string>
+    <string name="matrix_empty_quadrant">该象限中没有任务</string>
+    <string name="action_snooze_1d">推迟 1 天</string>
+    <string name="task_snoozed">任务已推迟 1 天</string>
+    <string name="task_completed_undo">任务已标记为完成</string>
+    <string name="undo">撤销</string>
+    <string name="smart_filter_all">全部</string>
+    <string name="smart_filter_today">今天</string>
+    <string name="smart_filter_overdue">已逾期</string>
+    <string name="smart_filter_upcoming">即将到来</string>
+    <string name="smart_filter_priority_high">高优先级</string>
+    <string name="smart_filter_recurring">重复任务</string>
+    <string name="shortcut_add_task_short">添加任务</string>
+    <string name="shortcut_add_task_long">创建新任务</string>
+    <string name="shortcut_voice_short">语音添加</string>
+    <string name="shortcut_voice_long">通过语音添加任务</string>
+    <string name="shortcut_matrix_short">矩阵</string>
+    <string name="shortcut_matrix_long">艾森豪威尔矩阵</string>
+
+    <!-- Phase 5.2: Subtasks & Checklist System -->
+    <string name="checklist_title">检查清单</string>
+    <string name="checklist_progress">已完成 %1$d / %2$d</string>
+    <string name="checklist_add_item_hint">添加子任务…</string>
+    <string name="checklist_empty">暂无子任务</string>
+    <string name="checklist_item_deleted">子任务已删除</string>
+    <string name="error_max_depth_exceeded">无法在子任务下继续添加子任务</string>
+
+    <!-- Phase 5.3.1: Smart Task Suggestions & Proactive Triage -->
+    <string name="smart_suggestions_header">智能建议</string>
+    <string name="suggestion_overdue_high_title">紧急逾期任务</string>
+    <string name="suggestion_overdue_high_desc">“%1$s”为高优先级且已逾期。</string>
+    <string name="suggestion_overdue_cleanup_title">逾期任务</string>
+    <string name="suggestion_overdue_cleanup_desc">%1$s 个逾期任务需要处理。</string>
+    <string name="suggestion_unscheduled_high_title">未排期重点任务</string>
+    <string name="suggestion_unscheduled_high_desc">“%1$s”为高优先级但未设置截止日期。</string>
+    <string name="suggestion_stale_title">搁置任务检查</string>
+    <string name="suggestion_stale_desc">“%1$s”已有超过2周未更新。</string>
+    <string name="suggestion_recurring_review_title">错过的重复任务</string>
+    <string name="suggestion_recurring_review_desc">“%1$s”错过了预定重复周期。</string>
+    <string name="suggestion_checklist_title">进行中的清单</string>
+    <string name="suggestion_checklist_desc">“%1$s”：已完成 %2$s/%3$s 个子任务。</string>
+    <string name="suggestion_daily_triage_title">今日日程</string>
+    <string name="suggestion_daily_triage_desc">今日安排了 %1$s 个任务。</string>
+    <string name="suggestion_action_view">查看</string>
+    <string name="suggestion_action_schedule">排期</string>
+    <string name="suggestion_action_triage">检查</string>
+    <string name="cd_dismiss_suggestion">忽略建议</string>
+
+    <!-- Phase 5.3.2: Advanced Natural Language Smart Search -->
+    <string name="search_chip_important">重要</string>
+    <string name="search_chip_low_priority">低优先级</string>
+    <string name="search_chip_overdue">逾期</string>
+    <string name="search_chip_completed">已完成</string>
+    <string name="search_chip_incomplete">未完成</string>
+    <string name="search_chip_today">今日</string>
+    <string name="search_chip_tomorrow">明日</string>
+    <string name="search_chip_this_week">本周</string>
+    <string name="search_chip_this_month">本月</string>
+    <string name="search_chip_recurring">重复任务</string>
+
+    <!-- Phase 5.3.3: Calendar Intelligence & Routine Streaks -->
+    <string name="planning_strip_title">7天计划</string>
+    <string name="load_density_none">无负荷</string>
+    <string name="load_density_low">低负荷</string>
+    <string name="load_density_medium">中等负荷</string>
+    <string name="load_density_high">高负荷</string>
+    <string name="streak_title">习惯连续记录</string>
+    <string name="streak_days_count">连续 %1$d 次</string>
+    <string name="streak_best">最高: %1$d</string>
+    <string name="streak_consistency">一致性: %1$d%%</string>
+    <string name="no_routines">无有效习惯</string>
+    <string name="category_all">所有分类</string>
+    <string name="category_label">分类</string>
+
+
+    <!-- Birthdays -->
+    <string name="birthday_title">生日</string>
+    <string name="birthday_add">添加生日</string>
+    <string name="birthday_edit">编辑生日</string>
+    <string name="birthday_empty_title">还没有生日</string>
+    <string name="birthday_empty_hint">手动添加生日，或从联系人导入。</string>
+    <string name="birthday_name_label">姓名</string>
+    <string name="birthday_month_label">月</string>
+    <string name="birthday_day_label">日</string>
+    <string name="birthday_year_label">年（可选）</string>
+    <string name="birthday_notes_label">备注</string>
+    <string name="birthday_reminder_label">提醒时间</string>
+    <string name="birthday_day_before_label">提前一天也提醒</string>
+    <string name="birthday_pick_contact">从联系人选择</string>
+    <string name="birthday_today">今天</string>
+    <string name="birthday_tomorrow">明天</string>
+    <string name="birthday_in_days">%1$d 天后</string>
+    <string name="birthday_turns_age">将满 %1$d 岁</string>
+    <string name="birthday_notification_channel_name">生日提醒</string>
+    <string name="birthday_notification_channel_description">即将到来的生日通知</string>
+    <string name="birthday_notification_title">🎂 %1$s 的生日</string>
+    <string name="birthday_notification_text">别忘了送上祝福！</string>
+    <string name="birthday_err_name_blank">请输入姓名。</string>
+    <string name="birthday_err_bad_month">月份必须在 1 到 12 之间。</string>
+    <string name="birthday_err_bad_day">所选月份中没有这一天。</string>
+    <string name="birthday_err_bad_year">年份无效。</string>
+    <string name="birthday_err_future_date">出生日期不能在未来。</string>
+    <string name="birthday_err_save_failed">无法保存。请重试。</string>
+
+    <!-- Custom recurrence interval -->
+    <string name="recurrence_custom_interval">自定义间隔…</string>
+    <string name="recurrence_interval_days_label">每 N 天</string>
+    <string name="recurrence_interval_hint">请输入 1 到 365 之间的数字。</string>
+
+
+    <!-- Home screen widget -->
+    <string name="widget_title">What ToDo</string>
+    <string name="widget_description">主屏幕上的即将到来的任务</string>
+    <string name="widget_add_task">添加任务</string>
+    <string name="widget_empty">没有进行中的任务</string>
+
+    <!-- v1.1 additions -->
+    <string name="settings_appearance_language">外观与语言</string>
+    <string name="settings_organization">整理</string>
+    <string name="settings_notifications">通知</string>
+    <string name="notification_system_settings">通知设置</string>
+    <string name="notifications_enabled_state">通知已开启</string>
+    <string name="notifications_disabled_state">通知已关闭——提醒将不会显示</string>
+    <string name="category_management">管理分类</string>
+    <string name="category_management_desc">添加、重命名、更改颜色或删除任务分类</string>
+    <string name="category_add">添加分类</string>
+    <string name="category_edit">编辑分类</string>
+    <string name="category_empty">暂无分类</string>
+    <string name="category_delete_title">删除分类？</string>
+    <string name="category_delete_message">“%1$s”中的任务不会被删除，而是变为未分类。</string>
+    <string name="category_name_label">分类名称</string>
+    <string name="category_name_duplicate">已存在同名分类</string>
+    <string name="task_notes_label">备注</string>
+    <string name="delete_task_confirm_title">删除此任务？</string>
+    <string name="delete_task_confirm_message">该任务、其子任务和附件将被删除，且无法恢复。</string>
+    <string name="attachment_open_failed">无法打开此附件</string>
+    <string name="birthday_notification_eve_title">🎂 明天是%1$s的生日</string>
+    <string name="calendar_type_title">日历</string>
+    <string name="calendar_type_desc">所有任务和生日的日期都按所选日历显示，您的数据不会被更改。</string>
+    <string name="calendar_gregorian">公历</string>
+    <string name="calendar_jalali">贾拉利历（波斯历）</string>
+    <string name="smart_filter_priority_medium">中等优先级</string>
+</resources>

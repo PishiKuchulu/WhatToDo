@@ -1,0 +1,59 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 2,
+    "identityHash": "0000000000000000000000000000000000000002",
+    "entities": [
+      {
+        "tableName": "tasks",
+        "createSql": "CREATE TABLE IF NOT EXISTS `tasks` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `title` TEXT NOT NULL, `description` TEXT, `notes` TEXT, `isCompleted` INTEGER NOT NULL, `priority` TEXT NOT NULL, `categoryId` INTEGER, `parentTaskId` INTEGER, `dueDate` INTEGER, `reminderTime` INTEGER, `orderIndex` INTEGER NOT NULL, `recurrenceRule` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, FOREIGN KEY(`categoryId`) REFERENCES `categories`(`id`) ON UPDATE NO ACTION ON DELETE SET NULL , FOREIGN KEY(`parentTaskId`) REFERENCES `tasks`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {"fieldPath": "id", "columnName": "id", "affinity": "INTEGER", "notNull": true},
+          {"fieldPath": "title", "columnName": "title", "affinity": "TEXT", "notNull": true},
+          {"fieldPath": "description", "columnName": "description", "affinity": "TEXT", "notNull": false},
+          {"fieldPath": "notes", "columnName": "notes", "affinity": "TEXT", "notNull": false},
+          {"fieldPath": "isCompleted", "columnName": "isCompleted", "affinity": "INTEGER", "notNull": true},
+          {"fieldPath": "priority", "columnName": "priority", "affinity": "TEXT", "notNull": true},
+          {"fieldPath": "categoryId", "columnName": "categoryId", "affinity": "INTEGER", "notNull": false},
+          {"fieldPath": "parentTaskId", "columnName": "parentTaskId", "affinity": "INTEGER", "notNull": false},
+          {"fieldPath": "dueDate", "columnName": "dueDate", "affinity": "INTEGER", "notNull": false},
+          {"fieldPath": "reminderTime", "columnName": "reminderTime", "affinity": "INTEGER", "notNull": false},
+          {"fieldPath": "orderIndex", "columnName": "orderIndex", "affinity": "INTEGER", "notNull": true},
+          {"fieldPath": "recurrenceRule", "columnName": "recurrenceRule", "affinity": "TEXT", "notNull": true},
+          {"fieldPath": "createdAt", "columnName": "createdAt", "affinity": "INTEGER", "notNull": true},
+          {"fieldPath": "updatedAt", "columnName": "updatedAt", "affinity": "INTEGER", "notNull": true}
+        ],
+        "primaryKey": {"autoGenerate": true, "columnNames": ["id"]},
+        "indices": [
+          {"name": "index_tasks_categoryId", "unique": false, "columnNames": ["categoryId"], "orders": [], "createSql": "CREATE INDEX IF NOT EXISTS `index_tasks_categoryId` ON `tasks` (`categoryId`)"},
+          {"name": "index_tasks_parentTaskId", "unique": false, "columnNames": ["parentTaskId"], "orders": [], "createSql": "CREATE INDEX IF NOT EXISTS `index_tasks_parentTaskId` ON `tasks` (`parentTaskId`)"},
+          {"name": "index_tasks_orderIndex", "unique": false, "columnNames": ["orderIndex"], "orders": [], "createSql": "CREATE INDEX IF NOT EXISTS `index_tasks_orderIndex` ON `tasks` (`orderIndex`)"},
+          {"name": "index_tasks_title", "unique": false, "columnNames": ["title"], "orders": [], "createSql": "CREATE INDEX IF NOT EXISTS `index_tasks_title` ON `tasks` (`title`)"},
+          {"name": "index_tasks_dueDate", "unique": false, "columnNames": ["dueDate"], "orders": [], "createSql": "CREATE INDEX IF NOT EXISTS `index_tasks_dueDate` ON `tasks` (`dueDate`)"}
+        ],
+        "foreignKeys": [
+          {"table": "categories", "onDelete": "SET NULL", "onUpdate": "NO ACTION", "columns": ["categoryId"], "referencedColumns": ["id"]},
+          {"table": "tasks", "onDelete": "CASCADE", "onUpdate": "NO ACTION", "columns": ["parentTaskId"], "referencedColumns": ["id"]}
+        ]
+      },
+      {
+        "tableName": "categories",
+        "createSql": "CREATE TABLE IF NOT EXISTS `categories` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `color` TEXT NOT NULL, `iconName` TEXT NOT NULL)",
+        "fields": [
+          {"fieldPath": "id", "columnName": "id", "affinity": "INTEGER", "notNull": true},
+          {"fieldPath": "name", "columnName": "name", "affinity": "TEXT", "notNull": true},
+          {"fieldPath": "color", "columnName": "color", "affinity": "TEXT", "notNull": true},
+          {"fieldPath": "iconName", "columnName": "iconName", "affinity": "TEXT", "notNull": true}
+        ],
+        "primaryKey": {"autoGenerate": true, "columnNames": ["id"]},
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0000000000000000000000000000000000000002')"
+    ]
+  }
+}

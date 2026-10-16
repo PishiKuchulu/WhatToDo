@@ -1,0 +1,339 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">What ToDo</string>
+    <string name="todo_title">What ToDo</string>
+    <string name="task_title">Titre de la tâche</string>
+    <string name="save">Enregistrer</string>
+    <string name="back">Retour</string>
+    <string name="cancel">Annuler</string>
+    <string name="add_task_button">Ajouter une tâche</string>
+    <string name="theme_settings">Paramètres du thème</string>
+    <string name="settings">Paramètres</string>
+    <string name="appearance">Apparence</string>
+    <string name="theme_light">Clair</string>
+    <string name="theme_dark">Sombre</string>
+    <string name="theme_follow_system">Système par défaut</string>
+
+    <!-- Calendar -->
+    <string name="calendar_title">Calendrier</string>
+    <string name="tasks_for_date">Tâches pour le %1$s</string>
+    <string name="no_tasks_day">Aucune tâche pour ce jour</string>
+    <string name="prev_month">Mois précédent</string>
+    <string name="next_month">Mois suivant</string>
+
+    <!-- Statistics -->
+    <string name="stats_title">Statistiques de productivité</string>
+    <string name="overview">Vue d\'ensemble</string>
+    <string name="stat_total">Total</string>
+    <string name="stat_done">Terminées</string>
+    <string name="stat_active">Actives</string>
+    <string name="stat_overdue">En retard</string>
+    <string name="completion_rate">Taux de réussite</string>
+    <string name="percent_value">%1$d%%</string>
+    <string name="activity_trends">Tendances d\'activité</string>
+    <string name="category_distribution">Tâches par catégorie</string>
+    <string name="category_tasks_count">%1$s : %2$d</string>
+
+    <!-- Task Detail -->
+    <string name="task_details">Détails de la tâche</string>
+    <string name="edit">Modifier</string>
+    <string name="delete">Supprimer</string>
+    <string name="add_subtask">Ajouter une sous-tâche</string>
+    <string name="description_label">Description</string>
+    <string name="due_date_label">Date d\'échéance</string>
+    <string name="attachments_label">Pièces jointes</string>
+    <string name="subtasks_label">Sous-tâches (%1$d)</string>
+    <string name="mark_as_done">Marquer comme terminée</string>
+    <string name="mark_as_pending">Marquer comme en attente</string>
+    <string name="task_not_found">Tâche introuvable</string>
+
+    <!-- Task Editor -->
+    <string name="create_task_title">Créer une tâche</string>
+    <string name="edit_task_title">Modifier la tâche</string>
+    <string name="priority_label">Priorité</string>
+    <string name="organization_label">Organisation</string>
+    <string name="recurrence_label">Répétition</string>
+    <string name="reminder_label">Rappel</string>
+    <string name="set_label">Définir</string>
+    <string name="none_label">Aucun</string>
+    <string name="recurrence_daily">Quotidien</string>
+    <string name="recurrence_weekly">Hebdomadaire</string>
+    <string name="recurrence_monthly">Mensuel</string>
+    <string name="recurrence_yearly">Annuel</string>
+    <string name="recurrence_interval">Tous les %1$d jours</string>
+    <string name="ok">OK</string>
+    <string name="no_date_set">Aucune date définie</string>
+    <string name="not_scheduled">Non planifié</string>
+
+    <!-- Settings -->
+    <string name="export_tasks">Exporter les tâches</string>
+    <string name="export_tasks_desc">Enregistrer vos tâches dans un fichier JSON</string>
+    <string name="import_tasks">Importer des tâches</string>
+    <string name="import_tasks_desc">Charger des tâches depuis une sauvegarde JSON</string>
+    <string name="data_label">Données</string>
+    <string name="about_label">À propos</string>
+    <string name="application">Application</string>
+    <string name="developer_label">Développeur</string>
+    <string name="developer_name">Farzad.Sh</string>
+    <string name="license_label">Licence</string>
+    <string name="license_name">MIT</string>
+    <string name="version_label">Version</string>
+    <string name="version_info">1.1.0</string>
+    <string name="search_placeholder">Rechercher des tâches…</string>
+    <string name="no_tasks_found_title">Aucune tâche trouvée</string>
+    
+    <string name="status_all">Toutes</string>
+    <string name="status_active">Actives</string>
+    <string name="status_completed">Terminées</string>
+    <string name="status_overdue">En retard</string>
+    <string name="sort_manual">Manuel</string>
+    <string name="sort_creation_date">Date de création</string>
+    <string name="sort_due_date">Date d\'échéance</string>
+    <string name="sort_priority">Priorité</string>
+    <string name="cd_toggle_completion">Changer l\'état de la tâche</string>
+    <string name="cd_delete_task">Supprimer la tâche</string>
+    <string name="cd_priority_indicator">Priorité : %1$s</string>
+    
+    <string name="cd_voice_task">Créer une tâche par la voix</string>
+    <string name="cd_sort">Trier les tâches</string>
+
+    <!-- Categories -->
+    <string name="category_personal">Personnel</string>
+    <string name="category_work">Travail</string>
+    <string name="category_shopping">Achats</string>
+    <string name="category_study">Études</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Rappels de tâches</string>
+    <string name="notification_channel_description">Notifications pour les échéances des tâches</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_delete">Supprimer</string>
+    <string name="cd_mic">Microphone</string>
+    <string name="cd_calendar_day">Jour du calendrier %1$s</string>
+
+    <!-- Misc -->
+    <string name="attached_file">Fichier joint</string>
+    <string name="success_export">Tâches exportées avec succès</string>
+    <string name="success_import">Tâches importées avec succès</string>
+    <string name="error_export">Échec de l\'exportation des tâches</string>
+    <string name="error_import">Échec de l\'importation des tâches</string>
+    <string name="invalid_backup">Fichier de sauvegarde invalide</string>
+    <string name="cancelled">Annulé</string>
+
+    <!-- Priorities -->
+    <string name="priority_high">Haute</string>
+    <string name="priority_medium">Moyenne</string>
+    <string name="priority_low">Basse</string>
+
+    <!-- Voice Recognition -->
+    <string name="voice_listening">Écoute en cours…</string>
+    <string name="voice_ready">Appuyez sur le micro pour parler</string>
+    <string name="voice_error">Impossible de comprendre. Réessayer ?</string>
+    <string name="voice_permission_denied">L\'autorisation du microphone est requise pour la saisie vocale.</string>
+    <string name="voice_create_task">Créer une tâche par la voix</string>
+    <string name="voice_confirm">Confirmer la tâche</string>
+
+    <!-- Language Settings -->
+    <string name="language">Langue</string>
+    <string name="language_settings">Paramètres de langue</string>
+    <string name="language_system">Système par défaut</string>
+    <string name="language_en">Anglais (English)</string>
+    <string name="language_fa">Persan (فارسی)</string>
+    <string name="language_es">Espagnol (Español)</string>
+    <string name="language_fr">Français</string>
+    <string name="language_de">Allemand (Deutsch)</string>
+    <string name="language_it">Italien (Italiano)</string>
+    <string name="language_pt">Portugais (Português)</string>
+    <string name="language_ru">Russe (Русский)</string>
+    <string name="language_ar">Arabe (العربية)</string>
+    <string name="language_tr">Turc (Türkçe)</string>
+    <string name="language_zh_cn">Chinois simplifié (简体中文)</string>
+    <string name="language_ja">Japonais (日本語)</string>
+
+    <!-- Tags / Labels -->
+    <string name="tags_label">Étiquettes</string>
+    <string name="tag_management">Gérer les étiquettes</string>
+    <string name="tag_management_desc">Créer, modifier ou supprimer des étiquettes</string>
+    <string name="add_tag">Ajouter une étiquette</string>
+    <string name="new_tag">Nouvelle étiquette</string>
+    <string name="edit_tag">Modifier l\'étiquette</string>
+    <string name="tag_name">Nom de l\'étiquette</string>
+    <string name="delete_tag">Supprimer l\'étiquette</string>
+    <string name="delete_tag_confirm">Voulez-vous vraiment supprimer cette étiquette ? Elle sera retirée de toutes les tâches associées.</string>
+    <string name="tag_already_exists">Une étiquette portant ce nom existe déjà</string>
+    <string name="no_tags">Aucune étiquette pour le moment</string>
+    <string name="tag_filter_all">Toutes les étiquettes</string>
+    <string name="cd_tag">Étiquette : %1$s</string>
+    <string name="cd_add_tag">Ajouter une étiquette</string>
+    <string name="cd_delete_tag">Supprimer l\'étiquette %1$s</string>
+    <string name="tag_color">Couleur</string>
+    <string name="tag_name_empty">Le nom de l\'étiquette ne peut pas être vide</string>
+    <string name="cd_edit_tag">Modifier l\'étiquette %1$s</string>
+
+    <!-- Smart Recognition -->
+    <string name="smart_add_hint">Ajouter une tâche (ex. Réunion demain à 17h #Travail)</string>
+    <string name="smart_preview_title">Reconnaissance Intelligente</string>
+    <string name="smart_preview_due">Échéance</string>
+    <string name="smart_preview_time">Heure</string>
+    <string name="smart_preview_priority">Priorité</string>
+    <string name="smart_preview_tags">Étiquettes</string>
+    <string name="smart_preview_recurrence">Répéter</string>
+    <string name="smart_create_task">Créer la tâche</string>
+    <string name="smart_open_editor">Ouvrir l\'éditeur</string>
+    <string name="voice_retry">Réessayer</string>
+
+    <!-- Phase 5.1: Eisenhower Matrix & Productivity Gestures -->
+    <string name="matrix_title">Matrice d\'Eisenhower</string>
+    <string name="matrix_subtitle">%1$d tâches dans la matrice</string>
+    <string name="matrix_show_all">Afficher tous les quadrants</string>
+    <string name="matrix_q1_title">À faire en premier</string>
+    <string name="matrix_q1_desc">Urgent et important</string>
+    <string name="matrix_q2_title">Planifier</string>
+    <string name="matrix_q2_desc">Important, non urgent</string>
+    <string name="matrix_q3_title">Déléguer</string>
+    <string name="matrix_q3_desc">Urgent, non important</string>
+    <string name="matrix_q4_title">Éliminer</string>
+    <string name="matrix_q4_desc">Ni urgent ni important</string>
+    <string name="matrix_empty_quadrant">Aucune tâche dans ce quadrant</string>
+    <string name="action_snooze_1d">Reporter d\'1 jour</string>
+    <string name="task_snoozed">Tâche reportée d\'1 jour</string>
+    <string name="task_completed_undo">Tâche marquée comme terminée</string>
+    <string name="undo">Annuler</string>
+    <string name="smart_filter_all">Toutes</string>
+    <string name="smart_filter_today">Aujourd\'hui</string>
+    <string name="smart_filter_overdue">En retard</string>
+    <string name="smart_filter_upcoming">À venir</string>
+    <string name="smart_filter_priority_high">Priorité haute</string>
+    <string name="smart_filter_recurring">Récurrent</string>
+    <string name="shortcut_add_task_short">Ajouter tâche</string>
+    <string name="shortcut_add_task_long">Créer une nouvelle tâche</string>
+    <string name="shortcut_voice_short">Vocal</string>
+    <string name="shortcut_voice_long">Ajouter une tâche par la voix</string>
+    <string name="shortcut_matrix_short">Matrice</string>
+    <string name="shortcut_matrix_long">Matrice d\'Eisenhower</string>
+
+    <!-- Phase 5.2: Subtasks & Checklist System -->
+    <string name="checklist_title">Liste de contrôle</string>
+    <string name="checklist_progress">%1$d sur %2$d terminées</string>
+    <string name="checklist_add_item_hint">Ajouter une sous-tâche…</string>
+    <string name="checklist_empty">Aucune sous-tâche ajoutée pour le moment</string>
+    <string name="checklist_item_deleted">Sous-tâche supprimée</string>
+    <string name="error_max_depth_exceeded">Impossible d\'ajouter une sous-tâche à une sous-tâche</string>
+
+    <!-- Phase 5.3.1: Smart Task Suggestions & Proactive Triage -->
+    <string name="smart_suggestions_header">Suggestions intelligentes</string>
+    <string name="suggestion_overdue_high_title">Tâche urgente en retard</string>
+    <string name="suggestion_overdue_high_desc">%1$s est prioritaire et en retard.</string>
+    <string name="suggestion_overdue_cleanup_title">Tâches en retard</string>
+    <string name="suggestion_overdue_cleanup_desc">%1$s tâches en retard nécessitent votre attention.</string>
+    <string name="suggestion_unscheduled_high_title">Tâche prioritaire non planifiée</string>
+    <string name="suggestion_unscheduled_high_desc">%1$s a une priorité élevée sans date d\'échéance.</string>
+    <string name="suggestion_stale_title">Réviser la tâche inactive</string>
+    <string name="suggestion_stale_desc">%1$s n\'a pas été mise à jour depuis plus de 2 semaines.</string>
+    <string name="suggestion_recurring_review_title">Tâche récurrente manquée</string>
+    <string name="suggestion_recurring_review_desc">%1$s a manqué sa récurrence prévue.</string>
+    <string name="suggestion_checklist_title">Liste en cours</string>
+    <string name="suggestion_checklist_desc">%1$s : %2$s sur %3$s sous-tâches terminées.</string>
+    <string name="suggestion_daily_triage_title">Programme d\'aujourd\'hui</string>
+    <string name="suggestion_daily_triage_desc">%1$s tâches prévues pour aujourd\'hui.</string>
+    <string name="suggestion_action_view">Afficher</string>
+    <string name="suggestion_action_schedule">Planifier</string>
+    <string name="suggestion_action_triage">Examiner</string>
+    <string name="cd_dismiss_suggestion">Ignorer la suggestion</string>
+
+    <!-- Phase 5.3.2: Advanced Natural Language Smart Search -->
+    <string name="search_chip_important">Important</string>
+    <string name="search_chip_low_priority">Priorité basse</string>
+    <string name="search_chip_overdue">En retard</string>
+    <string name="search_chip_completed">Terminée</string>
+    <string name="search_chip_incomplete">Incomplète</string>
+    <string name="search_chip_today">Aujourd\'hui</string>
+    <string name="search_chip_tomorrow">Demain</string>
+    <string name="search_chip_this_week">Cette semaine</string>
+    <string name="search_chip_this_month">Ce mois-ci</string>
+    <string name="search_chip_recurring">Récurrente</string>
+
+    <!-- Phase 5.3.3: Calendar Intelligence & Routine Streaks -->
+    <string name="planning_strip_title">Planification sur 7 jours</string>
+    <string name="load_density_none">Aucune charge</string>
+    <string name="load_density_low">Charge légère</string>
+    <string name="load_density_medium">Charge moyenne</string>
+    <string name="load_density_high">Forte charge</string>
+    <string name="streak_title">Séries d\'habitudes</string>
+    <string name="streak_days_count">Série de %1$d</string>
+    <string name="streak_best">Meilleur : %1$d</string>
+    <string name="streak_consistency">Régularité : %1$d%%</string>
+    <string name="no_routines">Aucune habitude active</string>
+    <string name="category_all">Toutes les catégories</string>
+    <string name="category_label">Catégorie</string>
+
+
+    <!-- Birthdays -->
+    <string name="birthday_title">Anniversaires</string>
+    <string name="birthday_add">Ajouter un anniversaire</string>
+    <string name="birthday_edit">Modifier l’anniversaire</string>
+    <string name="birthday_empty_title">Aucun anniversaire</string>
+    <string name="birthday_empty_hint">Ajoutez un anniversaire manuellement ou importez-le depuis vos contacts.</string>
+    <string name="birthday_name_label">Nom</string>
+    <string name="birthday_month_label">Mois</string>
+    <string name="birthday_day_label">Jour</string>
+    <string name="birthday_year_label">Année (facultatif)</string>
+    <string name="birthday_notes_label">Notes</string>
+    <string name="birthday_reminder_label">Heure du rappel</string>
+    <string name="birthday_day_before_label">Rappeler aussi la veille</string>
+    <string name="birthday_pick_contact">Choisir dans les contacts</string>
+    <string name="birthday_today">Aujourd’hui</string>
+    <string name="birthday_tomorrow">Demain</string>
+    <string name="birthday_in_days">Dans %1$d jours</string>
+    <string name="birthday_turns_age">fête ses %1$d ans</string>
+    <string name="birthday_notification_channel_name">Rappels d’anniversaire</string>
+    <string name="birthday_notification_channel_description">Notifications pour les anniversaires à venir</string>
+    <string name="birthday_notification_title">🎂 Anniversaire de %1$s</string>
+    <string name="birthday_notification_text">N’oubliez pas de lui souhaiter !</string>
+    <string name="birthday_err_name_blank">Veuillez saisir un nom.</string>
+    <string name="birthday_err_bad_month">Le mois doit être compris entre 1 et 12.</string>
+    <string name="birthday_err_bad_day">Ce jour n’existe pas dans le mois choisi.</string>
+    <string name="birthday_err_bad_year">L’année n’est pas valide.</string>
+    <string name="birthday_err_future_date">La date de naissance ne peut pas être future.</string>
+    <string name="birthday_err_save_failed">Échec de l’enregistrement. Réessayez.</string>
+
+    <!-- Custom recurrence interval -->
+    <string name="recurrence_custom_interval">Intervalle personnalisé…</string>
+    <string name="recurrence_interval_days_label">Tous les N jours</string>
+    <string name="recurrence_interval_hint">Saisissez un nombre de 1 à 365.</string>
+
+
+    <!-- Home screen widget -->
+    <string name="widget_title">What ToDo</string>
+    <string name="widget_description">Tâches à venir sur votre écran d’accueil</string>
+    <string name="widget_add_task">Ajouter une tâche</string>
+    <string name="widget_empty">Aucune tâche active</string>
+
+    <!-- v1.1 additions -->
+    <string name="settings_appearance_language">Apparence et langue</string>
+    <string name="settings_organization">Organisation</string>
+    <string name="settings_notifications">Notifications</string>
+    <string name="notification_system_settings">Paramètres de notification</string>
+    <string name="notifications_enabled_state">Les notifications sont activées</string>
+    <string name="notifications_disabled_state">Les notifications sont désactivées : les rappels ne s’afficheront pas</string>
+    <string name="category_management">Gérer les catégories</string>
+    <string name="category_management_desc">Ajouter, renommer, recolorer ou supprimer des catégories de tâches</string>
+    <string name="category_add">Ajouter une catégorie</string>
+    <string name="category_edit">Modifier la catégorie</string>
+    <string name="category_empty">Aucune catégorie pour le moment</string>
+    <string name="category_delete_title">Supprimer la catégorie ?</string>
+    <string name="category_delete_message">Les tâches de « %1$s » ne seront pas supprimées ; elles n’auront plus de catégorie.</string>
+    <string name="category_name_label">Nom de la catégorie</string>
+    <string name="category_name_duplicate">Une catégorie portant ce nom existe déjà</string>
+    <string name="task_notes_label">Notes</string>
+    <string name="delete_task_confirm_title">Supprimer cette tâche ?</string>
+    <string name="delete_task_confirm_message">La tâche, ses sous-tâches et ses pièces jointes seront supprimées. Cette action est irréversible.</string>
+    <string name="attachment_open_failed">Impossible d’ouvrir cette pièce jointe</string>
+    <string name="birthday_notification_eve_title">🎂 Demain, c’est l’anniversaire de %1$s</string>
+    <string name="calendar_type_title">Calendrier</string>
+    <string name="calendar_type_desc">Les dates de toutes les tâches et anniversaires s’affichent dans le calendrier choisi. Vos données ne changent pas.</string>
+    <string name="calendar_gregorian">Grégorien</string>
+    <string name="calendar_jalali">Jalali (hégirien solaire)</string>
+    <string name="smart_filter_priority_medium">Priorité moyenne</string>
+</resources>

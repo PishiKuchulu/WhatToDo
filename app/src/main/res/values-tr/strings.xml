@@ -1,0 +1,339 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">What ToDo</string>
+    <string name="todo_title">What ToDo</string>
+    <string name="task_title">Görev Başlığı</string>
+    <string name="save">Kaydet</string>
+    <string name="back">Geri</string>
+    <string name="cancel">İptal</string>
+    <string name="add_task_button">Görev Ekle</string>
+    <string name="theme_settings">Tema Ayarları</string>
+    <string name="settings">Ayarlar</string>
+    <string name="appearance">Görünüm</string>
+    <string name="theme_light">Açık</string>
+    <string name="theme_dark">Koyu</string>
+    <string name="theme_follow_system">Sistem Varsayılanı</string>
+
+    <!-- Calendar -->
+    <string name="calendar_title">Takvim</string>
+    <string name="tasks_for_date">%1$s Görevleri</string>
+    <string name="no_tasks_day">Bu gün için görev yok</string>
+    <string name="prev_month">Önceki Ay</string>
+    <string name="next_month">Sonraki Ay</string>
+
+    <!-- Statistics -->
+    <string name="stats_title">Verimlilik İstatistikleri</string>
+    <string name="overview">Genel Bakış</string>
+    <string name="stat_total">Toplam</string>
+    <string name="stat_done">Tamamlanan</string>
+    <string name="stat_active">Aktif</string>
+    <string name="stat_overdue">Gecikmiş</string>
+    <string name="completion_rate">Tamamlanma Oranı</string>
+    <string name="percent_value">%%%1$d</string>
+    <string name="activity_trends">Aktivite Eğilimleri</string>
+    <string name="category_distribution">Kategoriye Göre Görevler</string>
+    <string name="category_tasks_count">%1$s: %2$d</string>
+
+    <!-- Task Detail -->
+    <string name="task_details">Görev Detayları</string>
+    <string name="edit">Düzenle</string>
+    <string name="delete">Sil</string>
+    <string name="add_subtask">Alt Görev Ekle</string>
+    <string name="description_label">Açıklama</string>
+    <string name="due_date_label">Bitiş Tarihi</string>
+    <string name="attachments_label">Ekler</string>
+    <string name="subtasks_label">Alt Görevler (%1$d)</string>
+    <string name="mark_as_done">Tamamlandı olarak işaretle</string>
+    <string name="mark_as_pending">Beklemede olarak işaretle</string>
+    <string name="task_not_found">Görev bulunamadı</string>
+
+    <!-- Task Editor -->
+    <string name="create_task_title">Görev Oluştur</string>
+    <string name="edit_task_title">Görevi Düzenle</string>
+    <string name="priority_label">Öncelik</string>
+    <string name="organization_label">Düzenleme</string>
+    <string name="recurrence_label">Yineleme</string>
+    <string name="reminder_label">Hatırlatıcı</string>
+    <string name="set_label">Ayarla</string>
+    <string name="none_label">Yok</string>
+    <string name="recurrence_daily">Günlük</string>
+    <string name="recurrence_weekly">Haftalık</string>
+    <string name="recurrence_monthly">Aylık</string>
+    <string name="recurrence_yearly">Yıllık</string>
+    <string name="recurrence_interval">Her %1$d günde bir</string>
+    <string name="ok">Tamam</string>
+    <string name="no_date_set">Tarih ayarlanmadı</string>
+    <string name="not_scheduled">Planlanmadı</string>
+
+    <!-- Settings -->
+    <string name="export_tasks">Görevleri Dışa Aktar</string>
+    <string name="export_tasks_desc">Görevlerinizi bir JSON dosyasına kaydedin</string>
+    <string name="import_tasks">Görevleri İçe Aktar</string>
+    <string name="import_tasks_desc">Görevleri bir JSON yedeğinden yükleyin</string>
+    <string name="data_label">Veri</string>
+    <string name="about_label">Hakkında</string>
+    <string name="application">Uygulama</string>
+    <string name="developer_label">Geliştirici</string>
+    <string name="developer_name">Farzad.Sh</string>
+    <string name="license_label">Lisans</string>
+    <string name="license_name">MIT</string>
+    <string name="version_label">Sürüm</string>
+    <string name="version_info">1.1.0</string>
+    <string name="search_placeholder">Görevlerde ara…</string>
+    <string name="no_tasks_found_title">Görev bulunamadı</string>
+    
+    <string name="status_all">Tümü</string>
+    <string name="status_active">Aktif</string>
+    <string name="status_completed">Tamamlandı</string>
+    <string name="status_overdue">Gecikmiş</string>
+    <string name="sort_manual">Manuel</string>
+    <string name="sort_creation_date">Oluşturulma Tarihi</string>
+    <string name="sort_due_date">Bitiş Tarihi</string>
+    <string name="sort_priority">Öncelik</string>
+    <string name="cd_toggle_completion">Görev durumunu değiştir</string>
+    <string name="cd_delete_task">Görevi sil</string>
+    <string name="cd_priority_indicator">Öncelik: %1$s</string>
+    
+    <string name="cd_voice_task">Sesle görev oluştur</string>
+    <string name="cd_sort">Görevleri sırala</string>
+
+    <!-- Categories -->
+    <string name="category_personal">Kişisel</string>
+    <string name="category_work">İş</string>
+    <string name="category_shopping">Alışveriş</string>
+    <string name="category_study">Eğitim</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">Görev Hatırlatıcıları</string>
+    <string name="notification_channel_description">Görev bitiş tarihleri için bildirimler</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_delete">Sil</string>
+    <string name="cd_mic">Mikrofon</string>
+    <string name="cd_calendar_day">Takvim günü %1$s</string>
+
+    <!-- Misc -->
+    <string name="attached_file">Ekli Dosya</string>
+    <string name="success_export">Görevler başarıyla dışa aktarıldı</string>
+    <string name="success_import">Görevler başarıyla içe aktarıldı</string>
+    <string name="error_export">Görevler dışa aktarılamadı</string>
+    <string name="error_import">Görevler içe aktarılamadı</string>
+    <string name="invalid_backup">Geçersiz yedekleme dosyası</string>
+    <string name="cancelled">İptal edildi</string>
+
+    <!-- Priorities -->
+    <string name="priority_high">Yüksek</string>
+    <string name="priority_medium">Orta</string>
+    <string name="priority_low">Düşük</string>
+
+    <!-- Voice Recognition -->
+    <string name="voice_listening">Dinleniyor…</string>
+    <string name="voice_ready">Konuşmak için mikrofona dokunun</string>
+    <string name="voice_error">Anlaşılamadı. Tekrar deneyin?</string>
+    <string name="voice_permission_denied">Sesli giriş için mikrofon izni gereklidir.</string>
+    <string name="voice_create_task">Sesle görev oluştur</string>
+    <string name="voice_confirm">Görevi Onayla</string>
+
+    <!-- Language Settings -->
+    <string name="language">Dil</string>
+    <string name="language_settings">Dil Ayarları</string>
+    <string name="language_system">Sistem Varsayılanı</string>
+    <string name="language_en">İngilizce (English)</string>
+    <string name="language_fa">Farsça (فارسی)</string>
+    <string name="language_es">İspanyolca (Español)</string>
+    <string name="language_fr">Fransızca (Français)</string>
+    <string name="language_de">Almanca (Deutsch)</string>
+    <string name="language_it">İtalyanca (Italiano)</string>
+    <string name="language_pt">Portekizce (Português)</string>
+    <string name="language_ru">Rusça (Русский)</string>
+    <string name="language_ar">Arapça (العربية)</string>
+    <string name="language_tr">Türkçe</string>
+    <string name="language_zh_cn">Basitleştirilmiş Çince (简体中文)</string>
+    <string name="language_ja">Japonca (日本語)</string>
+
+    <!-- Tags / Labels -->
+    <string name="tags_label">Etiketler</string>
+    <string name="tag_management">Etiketleri Yönet</string>
+    <string name="tag_management_desc">Etiket oluşturun, düzenleyin veya silin</string>
+    <string name="add_tag">Etiket Ekle</string>
+    <string name="new_tag">Yeni Etiket</string>
+    <string name="edit_tag">Etiketi Düzenle</string>
+    <string name="tag_name">Etiket Adı</string>
+    <string name="delete_tag">Etiketi Sil</string>
+    <string name="delete_tag_confirm">Bu etiketi silmek istediğinizden emin misiniz? İlişkili tüm görevlerden kaldırılacaktır.</string>
+    <string name="tag_already_exists">Bu isimde bir etiket zaten var</string>
+    <string name="no_tags">Henüz etiket yok</string>
+    <string name="tag_filter_all">Tüm Etiketler</string>
+    <string name="cd_tag">Etiket: %1$s</string>
+    <string name="cd_add_tag">Etiket ekle</string>
+    <string name="cd_delete_tag">%1$s etiketini sil</string>
+    <string name="tag_color">Renk</string>
+    <string name="tag_name_empty">Etiket adı boş olamaz</string>
+    <string name="cd_edit_tag">Etiketi düzenle %1$s</string>
+
+    <!-- Smart Recognition -->
+    <string name="smart_add_hint">Görev ekle (örn. Yarın saat 17:00 toplantı #İş)</string>
+    <string name="smart_preview_title">Akıllı Tanıma</string>
+    <string name="smart_preview_due">Bitiş</string>
+    <string name="smart_preview_time">Saat</string>
+    <string name="smart_preview_priority">Öncelik</string>
+    <string name="smart_preview_tags">Etiketler</string>
+    <string name="smart_preview_recurrence">Tekrar</string>
+    <string name="smart_create_task">Görev Oluştur</string>
+    <string name="smart_open_editor">Düzenleyiciyi Aç</string>
+    <string name="voice_retry">Tekrar Dene</string>
+
+    <!-- Phase 5.1: Eisenhower Matrix & Productivity Gestures -->
+    <string name="matrix_title">Eisenhower Matrisi</string>
+    <string name="matrix_subtitle">Matriste %1$d görev</string>
+    <string name="matrix_show_all">Tüm kadranları göster</string>
+    <string name="matrix_q1_title">Önce Yap</string>
+    <string name="matrix_q1_desc">Acil ve Önemli</string>
+    <string name="matrix_q2_title">Planla</string>
+    <string name="matrix_q2_desc">Önemli, Acil Değil</string>
+    <string name="matrix_q3_title">Devret</string>
+    <string name="matrix_q3_desc">Acil, Önemli Değil</string>
+    <string name="matrix_q4_title">Ele / Arşivle</string>
+    <string name="matrix_q4_desc">Ne Acil Ne Önemli</string>
+    <string name="matrix_empty_quadrant">Bu kadranda görev yok</string>
+    <string name="action_snooze_1d">1 gün ertele</string>
+    <string name="task_snoozed">Görev 1 gün ertelendi</string>
+    <string name="task_completed_undo">Görev tamamlandı olarak işaretlendi</string>
+    <string name="undo">Geri al</string>
+    <string name="smart_filter_all">Tümü</string>
+    <string name="smart_filter_today">Bugün</string>
+    <string name="smart_filter_overdue">Gecikmiş</string>
+    <string name="smart_filter_upcoming">Yaklaşan</string>
+    <string name="smart_filter_priority_high">Yüksek Öncelik</string>
+    <string name="smart_filter_recurring">Yinelenen</string>
+    <string name="shortcut_add_task_short">Görev Ekle</string>
+    <string name="shortcut_add_task_long">Yeni bir görev oluştur</string>
+    <string name="shortcut_voice_short">Sesli Ekle</string>
+    <string name="shortcut_voice_long">Sesle görev ekle</string>
+    <string name="shortcut_matrix_short">Matris</string>
+    <string name="shortcut_matrix_long">Eisenhower Matrisi</string>
+
+    <!-- Phase 5.2: Subtasks & Checklist System -->
+    <string name="checklist_title">Kontrol Listesi</string>
+    <string name="checklist_progress">%1$d / %2$d tamamlandı</string>
+    <string name="checklist_add_item_hint">Alt görev ekle…</string>
+    <string name="checklist_empty">Henüz alt görev eklenmedi</string>
+    <string name="checklist_item_deleted">Alt görev silindi</string>
+    <string name="error_max_depth_exceeded">Bir alt göreve başka bir alt görev eklenemez</string>
+
+    <!-- Phase 5.3.1: Smart Task Suggestions & Proactive Triage -->
+    <string name="smart_suggestions_header">Akıllı Öneriler</string>
+    <string name="suggestion_overdue_high_title">Acil Gecikmiş Görev</string>
+    <string name="suggestion_overdue_high_desc">\"%1$s\" yüksek öncelikli ve gecikmiş.</string>
+    <string name="suggestion_overdue_cleanup_title">Gecikmiş Görevler</string>
+    <string name="suggestion_overdue_cleanup_desc">%1$s gecikmiş görev ilgi bekliyor.</string>
+    <string name="suggestion_unscheduled_high_title">Tarihsiz Öncelikli Görev</string>
+    <string name="suggestion_unscheduled_high_desc">\"%1$s\" yüksek öncelikli ancak bitiş tarihi yok.</string>
+    <string name="suggestion_stale_title">Hareketsiz Görev İncelemesi</string>
+    <string name="suggestion_stale_desc">\"%1$s\" 2 haftadan uzun süredir güncellenmedi.</string>
+    <string name="suggestion_recurring_review_title">Kaçırılan Tekrarlayan Görev</string>
+    <string name="suggestion_recurring_review_desc">\"%1$s\" planlanan tekrarını kaçırdı.</string>
+    <string name="suggestion_checklist_title">Devam Eden Kontrol Listesi</string>
+    <string name="suggestion_checklist_desc">\"%1$s\": %2$s / %3$s alt görev tamamlandı.</string>
+    <string name="suggestion_daily_triage_title">Bugünün Gündemi</string>
+    <string name="suggestion_daily_triage_desc">Bugün için %1$s görev planlandı.</string>
+    <string name="suggestion_action_view">Görüntüle</string>
+    <string name="suggestion_action_schedule">Planla</string>
+    <string name="suggestion_action_triage">İncele</string>
+    <string name="cd_dismiss_suggestion">Öneriyi kapat</string>
+
+    <!-- Phase 5.3.2: Advanced Natural Language Smart Search -->
+    <string name="search_chip_important">Önemli</string>
+    <string name="search_chip_low_priority">Düşük Öncelik</string>
+    <string name="search_chip_overdue">Gecikmiş</string>
+    <string name="search_chip_completed">Tamamlandı</string>
+    <string name="search_chip_incomplete">Tamamlanmadı</string>
+    <string name="search_chip_today">Bugün</string>
+    <string name="search_chip_tomorrow">Yarın</string>
+    <string name="search_chip_this_week">Bu Hafta</string>
+    <string name="search_chip_this_month">Bu Ay</string>
+    <string name="search_chip_recurring">Tekrarlayan</string>
+
+    <!-- Phase 5.3.3: Calendar Intelligence & Routine Streaks -->
+    <string name="planning_strip_title">7 Günlük Planlama</string>
+    <string name="load_density_none">İş yükü yok</string>
+    <string name="load_density_low">Düşük iş yükü</string>
+    <string name="load_density_medium">Orta iş yükü</string>
+    <string name="load_density_high">Yüksek iş yükü</string>
+    <string name="streak_title">Alışkanlık Serileri</string>
+    <string name="streak_days_count">%1$d seri</string>
+    <string name="streak_best">En iyi: %1$d</string>
+    <string name="streak_consistency">Düzenlilik: %%%1$d</string>
+    <string name="no_routines">Aktif alışkanlık yok</string>
+    <string name="category_all">Tüm Kategoriler</string>
+    <string name="category_label">Kategori</string>
+
+
+    <!-- Birthdays -->
+    <string name="birthday_title">Doğum günleri</string>
+    <string name="birthday_add">Doğum günü ekle</string>
+    <string name="birthday_edit">Doğum gününü düzenle</string>
+    <string name="birthday_empty_title">Henüz doğum günü yok</string>
+    <string name="birthday_empty_hint">Bir doğum gününü elle ekleyin veya kişilerinizden içe aktarın.</string>
+    <string name="birthday_name_label">Ad</string>
+    <string name="birthday_month_label">Ay</string>
+    <string name="birthday_day_label">Gün</string>
+    <string name="birthday_year_label">Yıl (isteğe bağlı)</string>
+    <string name="birthday_notes_label">Notlar</string>
+    <string name="birthday_reminder_label">Hatırlatma saati</string>
+    <string name="birthday_day_before_label">Bir gün önce de hatırlat</string>
+    <string name="birthday_pick_contact">Kişilerden seç</string>
+    <string name="birthday_today">Bugün</string>
+    <string name="birthday_tomorrow">Yarın</string>
+    <string name="birthday_in_days">%1$d gün sonra</string>
+    <string name="birthday_turns_age">%1$d yaşına giriyor</string>
+    <string name="birthday_notification_channel_name">Doğum günü hatırlatıcıları</string>
+    <string name="birthday_notification_channel_description">Yaklaşan doğum günleri için bildirimler</string>
+    <string name="birthday_notification_title">🎂 %1$s adlı kişinin doğum günü</string>
+    <string name="birthday_notification_text">Kutlamayı unutma!</string>
+    <string name="birthday_err_name_blank">Lütfen bir ad girin.</string>
+    <string name="birthday_err_bad_month">Ay 1 ile 12 arasında olmalıdır.</string>
+    <string name="birthday_err_bad_day">Bu gün seçilen ayda yok.</string>
+    <string name="birthday_err_bad_year">Yıl geçerli değil.</string>
+    <string name="birthday_err_future_date">Doğum tarihi gelecekte olamaz.</string>
+    <string name="birthday_err_save_failed">Kaydedilemedi. Lütfen tekrar deneyin.</string>
+
+    <!-- Custom recurrence interval -->
+    <string name="recurrence_custom_interval">Özel aralık…</string>
+    <string name="recurrence_interval_days_label">Her N günde</string>
+    <string name="recurrence_interval_hint">1 ile 365 arasında bir sayı girin.</string>
+
+
+    <!-- Home screen widget -->
+    <string name="widget_title">What ToDo</string>
+    <string name="widget_description">Ana ekranınızda yaklaşan görevler</string>
+    <string name="widget_add_task">Görev ekle</string>
+    <string name="widget_empty">Etkin görev yok</string>
+
+    <!-- v1.1 additions -->
+    <string name="settings_appearance_language">Görünüm ve dil</string>
+    <string name="settings_organization">Düzenleme</string>
+    <string name="settings_notifications">Bildirimler</string>
+    <string name="notification_system_settings">Bildirim ayarları</string>
+    <string name="notifications_enabled_state">Bildirimler açık</string>
+    <string name="notifications_disabled_state">Bildirimler kapalı — hatırlatıcılar görünmeyecek</string>
+    <string name="category_management">Kategorileri yönet</string>
+    <string name="category_management_desc">Görev kategorilerini ekleyin, yeniden adlandırın, renklendirin veya silin</string>
+    <string name="category_add">Kategori ekle</string>
+    <string name="category_edit">Kategoriyi düzenle</string>
+    <string name="category_empty">Henüz kategori yok</string>
+    <string name="category_delete_title">Kategori silinsin mi?</string>
+    <string name="category_delete_message">“%1$s” içindeki görevler silinmez; kategorisiz kalır.</string>
+    <string name="category_name_label">Kategori adı</string>
+    <string name="category_name_duplicate">Bu adda bir kategori zaten var</string>
+    <string name="task_notes_label">Notlar</string>
+    <string name="delete_task_confirm_title">Bu görev silinsin mi?</string>
+    <string name="delete_task_confirm_message">Görev, alt görevleri ve ekleri silinecek. Bu işlem geri alınamaz.</string>
+    <string name="attachment_open_failed">Bu ek açılamadı</string>
+    <string name="birthday_notification_eve_title">🎂 Yarın %1$s’in doğum günü</string>
+    <string name="calendar_type_title">Takvim</string>
+    <string name="calendar_type_desc">Tüm görev ve doğum günü tarihleri seçilen takvimde gösterilir. Verileriniz değişmez.</string>
+    <string name="calendar_gregorian">Miladi</string>
+    <string name="calendar_jalali">Celali (Güneş Hicri)</string>
+    <string name="smart_filter_priority_medium">Orta öncelik</string>
+</resources>

@@ -1,0 +1,370 @@
+{
+  "schemaVersion": "1.0.0",
+  "project": {
+    "id": "pishitodo",
+    "name": "WToDo",
+    "type": "android-application"
+  },
+  "finalStatus": "NEEDS MORE WORK",
+  "limitations": [
+    "Runtime behavior not verified: no device/emulator in this environment.",
+    "Full lint could not run offline (androidTest deps unavailable); lintVitalRelease ran clean during assembleRelease.",
+    "Instrumented tests not executed."
+  ],
+  "gates": {
+    "security": {
+      "status": "NOT_VERIFIED",
+      "verificationLevel": "STATIC_VERIFIED",
+      "evidenceRefs": [
+        "ev-sec-scope"
+      ],
+      "reason": "Static secret scan clean; no secret exists to exercise at runtime."
+    },
+    "buildRuntime": {
+      "status": "NOT_VERIFIED",
+      "verificationLevel": "BUILD_VERIFIED",
+      "evidenceRefs": [
+        "ev-clean-build",
+        "ev-debug-build",
+        "ev-release-build",
+        "ev-unit-tests"
+      ],
+      "reason": "Builds and unit tests verified; runtime execution not performed."
+    },
+    "artifactHygiene": {
+      "status": "PASS",
+      "verificationLevel": "STATIC_VERIFIED",
+      "evidenceRefs": [
+        "ev-artifact-hygiene"
+      ]
+    },
+    "noFalseCompliance": {
+      "status": "NOT_VERIFIED",
+      "verificationLevel": "STATIC_VERIFIED",
+      "evidenceRefs": [
+        "ev-artifact-hygiene"
+      ],
+      "reason": "Claim chains documented but not runtime-verified."
+    }
+  },
+  "securityContext": {
+    "legacyPlaintextDetected": false,
+    "secretTypes": []
+  },
+  "evidence": [
+    {
+      "id": "ev-artifact-hygiene",
+      "claim": "No build output, cache, or stray tool files are added to the source tree.",
+      "verificationLevel": "STATIC_VERIFIED",
+      "status": "PASS",
+      "command": "ls *.py; grep -n build .gitignore",
+      "result": "no stray scripts; .gradle/, build/, app/build/, local.properties are gitignored",
+      "artifact": ".gitignore"
+    },
+    {
+      "id": "ev-sec-scope",
+      "claim": "secret_handling_scope",
+      "verificationLevel": "STATIC_VERIFIED",
+      "status": "PASS",
+      "command": "static secret scan over source tree",
+      "result": "0 findings; the app stores no credentials, so at-rest/logging/runtime secret handling is out of scope",
+      "artifact": "PFP_PRODUCTION_COMPLIANCE.json"
+    },
+    {
+      "id": "ev-clean-build",
+      "claim": "clean_build",
+      "verificationLevel": "BUILD_VERIFIED",
+      "status": "PASS",
+      "command": "./gradlew :app:compileDebugKotlin --offline",
+      "result": "compiled with no errors",
+      "artifact": "app/build"
+    },
+    {
+      "id": "ev-debug-build",
+      "claim": "debug_build",
+      "verificationLevel": "BUILD_VERIFIED",
+      "status": "PASS",
+      "command": "./gradlew :app:assembleDebug --offline",
+      "result": "BUILD SUCCESSFUL; app-debug.apk 24.6 MB",
+      "artifact": "app/build/outputs/apk/debug"
+    },
+    {
+      "id": "ev-release-build",
+      "claim": "release_build",
+      "verificationLevel": "BUILD_VERIFIED",
+      "status": "PASS",
+      "command": "./gradlew :app:assembleRelease --offline",
+      "result": "BUILD SUCCESSFUL; R8+shrink; 4.24 MB",
+      "artifact": "app/build/outputs/apk/release"
+    },
+    {
+      "id": "ev-unit-tests",
+      "claim": "unit_tests",
+      "verificationLevel": "BUILD_VERIFIED",
+      "status": "PASS",
+      "command": "./gradlew :app:testDebugUnitTest --offline",
+      "result": "186 tests, 0 failures",
+      "artifact": "app/build/test-results"
+    },
+    {
+      "id": "ev-static-analysis",
+      "claim": "static_analysis",
+      "verificationLevel": "BUILD_VERIFIED",
+      "status": "PASS",
+      "command": "./gradlew :app:assembleRelease --offline",
+      "result": "lintVitalRelease executed as part of the release build and reported no fatal issues; R8/shrink succeeded",
+      "artifact": "app/build/outputs/apk/release/app-release-unsigned.apk"
+    }
+  ],
+  "notApplicable": [
+    {
+      "claim": "at_rest",
+      "reason": "The app persists no secret: Room holds tasks/birthdays; DataStore holds theme+language only."
+    },
+    {
+      "claim": "logging_redaction",
+      "reason": "No sensitive value exists to redact; nothing sensitive is logged."
+    },
+    {
+      "claim": "runtime_secret_use",
+      "reason": "The app performs no provider calls and consumes no runtime secret."
+    },
+    {
+      "claim": "android_keystore",
+      "reason": "With no secret at rest, Keystore-backed storage is not applicable."
+    },
+    {
+      "claim": "integration_tests",
+      "reason": "No integration-test harness; unit + instrumented suites are the coverage model."
+    },
+    {
+      "claim": "instrumentation_tests",
+      "reason": "androidTest deps unavailable offline and no device/emulator in this environment."
+    },
+    {
+      "claim": "install",
+      "reason": "No device or emulator available to install and launch the APK."
+    },
+    {
+      "claim": "critical_runtime_paths",
+      "reason": "No device/emulator available for runtime path verification."
+    },
+    {
+      "claim": "persistence_restart",
+      "reason": "Requires a device to exercise process restart; unavailable here."
+    },
+    {
+      "claim": "ui_theme_runtime",
+      "reason": "Requires a running app to verify runtime theme application."
+    }
+  ],
+  "artifactHygiene": [
+    {
+      "path": "app/src/main/java/com/example/pfptodo",
+      "disposition": "KEEP",
+      "reason": "Production source.",
+      "scope": "production-source"
+    },
+    {
+      "path": "app/src/test",
+      "disposition": "KEEP",
+      "reason": "Host-JVM unit tests.",
+      "scope": "test-development"
+    },
+    {
+      "path": "app/src/main/res",
+      "disposition": "KEEP",
+      "reason": "Resources and localized strings.",
+      "scope": "production-source"
+    },
+    {
+      "path": "gradle",
+      "disposition": "KEEP",
+      "reason": "Gradle wrapper + version catalog.",
+      "scope": "production-source"
+    }
+  ],
+  "implementationClaims": [
+    {
+      "id": "CLM-BIRTHDAY-TAB",
+      "status": "PARTIAL",
+      "chain": {
+        "uiInput": "BirthdayScreen — add/edit sheet, manual entry and system contact picker",
+        "state": "BirthdayViewModel (upcoming StateFlow, editorState)",
+        "persistence": "Room v7 birthdays table via BirthdayDao/BirthdayRepositoryImpl",
+        "domainLogic": "Birthday.nextOccurrence/ageAt + GetUpcomingBirthdays projection",
+        "actualSubsystem": "Monthly/Yearly projection on LocalDate",
+        "runtimeBehavior": "Not runtime-verified (no device in this environment)",
+        "verification": "BirthdayTest unit tests + compileDebugKotlin + assembleRelease"
+      },
+      "evidenceRefs": [
+        "ev-clean-build"
+      ]
+    },
+    {
+      "id": "CLM-BIRTHDAY-REMINDER",
+      "status": "PARTIAL",
+      "chain": {
+        "uiInput": "Reminder time + 'day before' toggle in the birthday editor",
+        "state": "Birthday.reminderMinutesOfDay / notifyOnDayBefore",
+        "persistence": "persisted in birthdays table",
+        "domainLogic": "BirthdayReminderManagerImpl computes next occurrence instant",
+        "actualSubsystem": "WorkManager OneTimeWorkRequest + NotificationHelper birthday channel",
+        "runtimeBehavior": "Not runtime-verified (no device in this environment)",
+        "verification": "compileDebugKotlin + assembleRelease"
+      },
+      "evidenceRefs": [
+        "ev-clean-build"
+      ]
+    },
+    {
+      "id": "CLM-CUSTOM-INTERVAL",
+      "status": "PARTIAL",
+      "chain": {
+        "uiInput": "Custom interval item + numeric dialog in TaskEditorScreen",
+        "state": "TaskEditorViewModel.onRecurrenceChange(Interval)",
+        "persistence": "recurrenceRule TEXT column (INTERVAL=N)",
+        "domainLogic": "RecurrenceRule.Interval already existed in the engine",
+        "actualSubsystem": "existing recurrence engine",
+        "runtimeBehavior": "Not runtime-verified (no device in this environment)",
+        "verification": "compileDebugKotlin + assembleRelease"
+      },
+      "evidenceRefs": [
+        "ev-clean-build"
+      ]
+    },
+    {
+      "id": "CLM-WIDGET",
+      "status": "PARTIAL",
+      "chain": {
+        "uiInput": "Home-screen widget with add-task and open-list actions",
+        "state": "TodoWidgetProvider reads the task repository",
+        "persistence": "reads Room via existing repository",
+        "domainLogic": "Sorting by dueDate then priority",
+        "actualSubsystem": "AppWidgetProvider + RemoteViews",
+        "runtimeBehavior": "Not runtime-verified (no device in this environment)",
+        "verification": "compileDebugKotlin + assembleRelease"
+      },
+      "evidenceRefs": [
+        "ev-clean-build"
+      ]
+    },
+    {
+      "id": "CLM-DEAD-CODE-REMOVED",
+      "status": "PARTIAL",
+      "chain": {
+        "uiInput": "n/a — removal of unreachable action variant",
+        "state": "n/a",
+        "persistence": "n/a",
+        "domainLogic": "SuggestionAction.SnoozeToday was never produced by GetSmartSuggestionsUseCase",
+        "actualSubsystem": "n/a",
+        "runtimeBehavior": "n/a",
+        "verification": "compileDebugKotlin; 186 unit tests pass"
+      },
+      "evidenceRefs": [
+        "ev-clean-build"
+      ]
+    }
+  ],
+  "matrix": [
+    {
+      "category": "Security",
+      "status": "LIMITED",
+      "evidence": [
+        "ev-sec-scope"
+      ],
+      "verificationLevel": "STATIC_VERIFIED"
+    },
+    {
+      "category": "Build",
+      "status": "PASS",
+      "evidence": [
+        "ev-clean-build",
+        "ev-debug-build",
+        "ev-release-build"
+      ],
+      "verificationLevel": "BUILD_VERIFIED"
+    },
+    {
+      "category": "Runtime",
+      "status": "NOT_VERIFIED",
+      "evidence": [
+        "ev-clean-build"
+      ],
+      "verificationLevel": "NOT_VERIFIED"
+    },
+    {
+      "category": "Architecture",
+      "status": "PASS",
+      "evidence": [
+        "ev-artifact-hygiene"
+      ],
+      "verificationLevel": "STATIC_VERIFIED"
+    },
+    {
+      "category": "Data/Persistence",
+      "status": "PASS",
+      "evidence": [
+        "ev-sec-scope"
+      ],
+      "verificationLevel": "STATIC_VERIFIED"
+    },
+    {
+      "category": "UI/UX",
+      "status": "PASS",
+      "evidence": [
+        "ev-unit-tests"
+      ],
+      "verificationLevel": "BUILD_VERIFIED"
+    },
+    {
+      "category": "Accessibility",
+      "status": "LIMITED",
+      "evidence": [
+        "ev-unit-tests"
+      ],
+      "verificationLevel": "BUILD_VERIFIED"
+    },
+    {
+      "category": "Testing",
+      "status": "PASS",
+      "evidence": [
+        "ev-unit-tests"
+      ],
+      "verificationLevel": "BUILD_VERIFIED"
+    },
+    {
+      "category": "Performance",
+      "status": "NOT_VERIFIED",
+      "evidence": [
+        "ev-clean-build"
+      ],
+      "verificationLevel": "NOT_VERIFIED"
+    },
+    {
+      "category": "Artifact Hygiene",
+      "status": "PASS",
+      "evidence": [
+        "ev-artifact-hygiene"
+      ],
+      "verificationLevel": "STATIC_VERIFIED"
+    },
+    {
+      "category": "Documentation",
+      "status": "PASS",
+      "evidence": [
+        "ev-artifact-hygiene"
+      ],
+      "verificationLevel": "STATIC_VERIFIED"
+    }
+  ],
+  "evidencePolicy": {
+    "requiredForFinalization": true,
+    "allowedVerificationLevels": [
+      "NOT_VERIFIED",
+      "STATIC_VERIFIED",
+      "BUILD_VERIFIED",
+      "RUNTIME_VERIFIED"
+    ]
+  }
+}

@@ -1,0 +1,359 @@
+<resources>
+    <string name="app_name">What ToDo</string>
+    <string name="todo_title">What ToDo</string>
+    <string name="task_title">عنوان کار</string>
+    <string name="save">ذخیره</string>
+    <string name="back">بازگشت</string>
+    <string name="cancel">لغو</string>
+    <string name="add_task_button">افزودن کار</string>
+    <string name="theme_settings">تنظیمات تم</string>
+    <string name="settings">تنظیمات</string>
+    <string name="appearance">ظاهر</string>
+    <string name="theme_light">روشن</string>
+    <string name="theme_dark">تاریک</string>
+    <string name="theme_follow_system">هماهنگ با سیستم</string>
+
+    <!-- Calendar -->
+    <string name="calendar_title">تقویم</string>
+    <string name="tasks_for_date">کارها برای %1$s</string>
+    <string name="no_tasks_day">کاری برای این روز وجود ندارد</string>
+    <string name="prev_month">ماه قبل</string>
+    <string name="next_month">ماه بعد</string>
+
+    <!-- Statistics -->
+    <string name="stats_title">آمار بهره‌وری</string>
+    <string name="overview">نمای کلی</string>
+    <string name="stat_total">کل</string>
+    <string name="stat_done">انجام شده</string>
+    <string name="stat_active">فعال</string>
+    <string name="stat_overdue">معوقه</string>
+    <string name="completion_rate">نرخ تکمیل</string>
+    <string name="percent_value">٪%1$d</string>
+    <string name="activity_trends">روند فعالیت‌ها</string>
+    <string name="category_distribution">کارها بر اساس دسته</string>
+    <string name="category_tasks_count">%1$s: %2$d</string>
+
+    <!-- Task Detail -->
+    <string name="task_details">جزئیات کار</string>
+    <string name="edit">ویرایش</string>
+    <string name="delete">حذف</string>
+    <string name="add_subtask">افزودن زیرکار</string>
+    <string name="description_label">توضیحات</string>
+    <string name="due_date_label">تاریخ سررسید</string>
+    <string name="attachments_label">پیوست‌ها</string>
+    <string name="subtasks_label">زیرکارها (%1$d)</string>
+    <string name="mark_as_done">علامت‌گذاری به عنوان انجام شده</string>
+    <string name="mark_as_pending">علامت‌گذاری به عنوان در انتظار</string>
+    <string name="task_not_found">کار پیدا نشد</string>
+
+    <!-- Task Editor -->
+    <string name="create_task_title">ایجاد کار</string>
+    <string name="edit_task_title">ویرایش کار</string>
+    <string name="priority_label">اولویت</string>
+    <string name="organization_label">سازماندهی</string>
+    <string name="recurrence_label">تکرار</string>
+    <string name="reminder_label">یادآوری</string>
+    <string name="set_label">تنظیم</string>
+    <string name="none_label">هیچ</string>
+    <string name="recurrence_daily">روزانه</string>
+    <string name="recurrence_weekly">هفتگی</string>
+    <string name="recurrence_monthly">ماهانه</string>
+    <string name="recurrence_yearly">سالانه</string>
+    <string name="recurrence_interval">هر %1$d روز</string>
+    <string name="ok">تایید</string>
+    <string name="no_date_set">تاریخی تنظیم نشده</string>
+    <string name="not_scheduled">برنامه‌ریزی نشده</string>
+
+    <!-- Settings -->
+    <string name="export_tasks">خروجی گرفتن از کارها</string>
+    <string name="export_tasks_desc">ذخیره کارها در یک فایل JSON</string>
+    <string name="import_tasks">وارد کردن کارها</string>
+    <string name="import_tasks_desc">بارگذاری کارها از یک فایل پشتیبان JSON</string>
+    <string name="data_label">داده‌ها</string>
+    <string name="about_label">درباره</string>
+    <string name="application">اپلیکیشن</string>
+    <string name="developer_label">توسعه‌دهنده</string>
+    <string name="developer_name">فرزاد.ش</string>
+    <string name="license_label">مجوز</string>
+    <string name="license_name">MIT</string>
+    <string name="version_label">نسخه</string>
+    <string name="version_info">1.1.0</string>
+    <string name="search_placeholder">جستجوی کارها&#8230;</string>
+    <string name="no_tasks_found_title">کاری پیدا نشد</string>
+    
+    <string name="status_all">همه</string>
+    <string name="status_active">فعال</string>
+    <string name="status_completed">انجام شده</string>
+    <string name="status_overdue">معوقه</string>
+    <string name="sort_manual">دستی</string>
+    <string name="sort_creation_date">تاریخ ایجاد</string>
+    <string name="sort_due_date">تاریخ سررسید</string>
+    <string name="sort_priority">اولویت</string>
+    <string name="cd_toggle_completion">تغییر وضعیت انجام کار</string>
+    <string name="cd_delete_task">حذف کار</string>
+    <string name="cd_priority_indicator">اولویت: %1$s</string>
+    
+    
+    <string name="cd_voice_task">ایجاد کار با صدا</string>
+    <string name="cd_sort">مرتب‌سازی کارها</string>
+
+    <!-- Categories -->
+    <string name="category_all">همه دسته‌ها</string>
+    <string name="category_label">دسته‌بندی</string>
+    <string name="category_personal">شخصی</string>
+    <string name="category_work">کاری</string>
+    <string name="category_shopping">خرید</string>
+    <string name="category_study">مطالعه</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_name">یادآوری کارها</string>
+    <string name="notification_channel_description">اعلان‌ها برای تاریخ سررسید کارها</string>
+
+    <!-- Content Descriptions -->
+    <string name="cd_delete">حذف</string>
+    
+    
+    
+    <string name="cd_mic">میکروفون</string>
+    <string name="cd_calendar_day">روز تقویم %1$s</string>
+
+    <!-- Misc -->
+    <string name="attached_file">فایل پیوست شده</string>
+    <string name="success_export">خروجی با موفقیت گرفته شد</string>
+    <string name="success_import">وارد کردن داده‌ها با موفقیت انجام شد</string>
+    <string name="error_export">خطا در خروجی گرفتن</string>
+    <string name="error_import">خطا در وارد کردن داده‌ها</string>
+    <string name="invalid_backup">فایل پشتیبان نامعتبر است</string>
+    <string name="cancelled">انجام نشد</string>
+
+    <!-- Priorities -->
+    <string name="priority_high">بالا</string>
+    <string name="priority_medium">متوسط</string>
+    <string name="priority_low">پایین</string>
+
+    <!-- Voice Recognition -->
+    <string name="voice_listening">در حال گوش دادن&#8230;</string>
+    <string name="voice_ready">برای شروع صحبت، روی میکروفون بزنید</string>
+    <string name="voice_error">متوجه نشدم. دوباره تلاش کنید؟</string>
+    <string name="voice_permission_denied">دسترسی به میکروفون برای ورودی صوتی لازم است.</string>
+    <string name="voice_create_task">ایجاد کار با صدا</string>
+    <string name="voice_confirm">تایید کار</string>
+
+    <!-- Language Settings -->
+    <string name="language">زبان</string>
+    <string name="language_settings">تنظیمات زبان</string>
+    <string name="language_system">هماهنگ با سیستم</string>
+    <string name="language_en">انگلیسی (English)</string>
+    <string name="language_fa">فارسی</string>
+    <string name="language_es">اسپانیایی (Español)</string>
+    <string name="language_fr">فرانسوی (Français)</string>
+    <string name="language_de">آلمانی (Deutsch)</string>
+    <string name="language_it">ایتالیایی (Italiano)</string>
+    <string name="language_pt">پرتغالی (Português)</string>
+    <string name="language_ru">روسی (Русский)</string>
+    <string name="language_ar">عربی (العربية)</string>
+    <string name="language_tr">ترکی (Türkçe)</string>
+    <string name="language_zh_cn">چینی ساده‌شده (简体中文)</string>
+    <string name="language_ja">ژاپنی (日本語)</string>
+
+    <!-- Tags / Labels -->
+    <string name="tags_label">برچسب‌ها</string>
+    <string name="tag_management">مدیریت برچسب‌ها</string>
+    <string name="tag_management_desc">ایجاد، ویرایش یا حذف برچسب‌ها</string>
+    <string name="add_tag">افزودن برچسب</string>
+    <string name="new_tag">برچسب جدید</string>
+    <string name="edit_tag">ویرایش برچسب</string>
+    <string name="tag_name">نام برچسب</string>
+    <string name="delete_tag">حذف برچسب</string>
+    <string name="delete_tag_confirm">آیا از حذف این برچسب مطمئن هستید؟ این برچسب از تمام کارهای مرتبط حذف خواهد شد.</string>
+    <string name="tag_already_exists">برچسبی با این نام از قبل وجود دارد</string>
+    <string name="no_tags">هنوز برچسبی وجود ندارد</string>
+    <string name="tag_filter_all">همه برچسب‌ها</string>
+    <string name="cd_tag">برچسب: %1$s</string>
+    <string name="cd_add_tag">افزودن برچسب</string>
+    <string name="cd_delete_tag">حذف برچسب %1$s</string>
+    <string name="tag_color">رنگ</string>
+    <string name="tag_name_empty">نام برچسب نمی‌تواند خالی باشد</string>
+    <string name="cd_edit_tag">ویرایش برچسب %1$s</string>
+
+    <!-- Smart Recognition -->
+    <string name="smart_add_hint">افزودن هوشمند (مثلاً جلسه فردا ساعت ۵ #کار)</string>
+    <string name="smart_preview_title">تشخیص هوشمند</string>
+    <string name="smart_preview_due">موعد</string>
+    <string name="smart_preview_time">ساعت</string>
+    <string name="smart_preview_priority">اولویت</string>
+    <string name="smart_preview_tags">برچسب‌ها</string>
+    <string name="smart_preview_recurrence">تکرار</string>
+    <string name="smart_create_task">ایجاد کار</string>
+    <string name="smart_open_editor">ویرایشگر کامل</string>
+    <string name="voice_retry">تلاش مجدد</string>
+
+    <!-- Phase 5.1: Eisenhower Matrix & Productivity Gestures -->
+    <string name="matrix_title">ماتریس آیزنهاور</string>
+    <string name="matrix_subtitle">%1$d کار در ماتریس</string>
+    <string name="matrix_show_all">نمایش همه بخش‌ها</string>
+    <string name="matrix_q1_title">انجام فوری</string>
+    <string name="matrix_q1_desc">فوری و مهم</string>
+    <string name="matrix_q2_title">برنامه‌ریزی</string>
+    <string name="matrix_q2_desc">مهم، غیرفوری</string>
+    <string name="matrix_q3_title">واگذاری</string>
+    <string name="matrix_q3_desc">فوری، غیرمهم</string>
+    <string name="matrix_q4_title">حذف / بایگانی</string>
+    <string name="matrix_q4_desc">نه فوری و نه مهم</string>
+    <string name="matrix_empty_quadrant">کاری در این بخش وجود ندارد</string>
+    <string name="action_snooze_1d">تعویق ۱ روزه</string>
+    <string name="task_snoozed">کار ۱ روز به تعویق افتاد</string>
+    <string name="task_completed_undo">کار انجام شد</string>
+    <string name="undo">لغو</string>
+    <string name="smart_filter_all">همه</string>
+    <string name="smart_filter_today">امروز</string>
+    <string name="smart_filter_overdue">معوق</string>
+    <string name="smart_filter_upcoming">آینده</string>
+    <string name="smart_filter_priority_high">اولویت بالا</string>
+    <string name="smart_filter_recurring">تکرارشونده</string>
+    <string name="shortcut_add_task_short">افزودن کار</string>
+    <string name="shortcut_add_task_long">ایجاد کار جدید</string>
+    <string name="shortcut_voice_short">کار صوتی</string>
+    <string name="shortcut_voice_long">افزودن کار با صدا</string>
+    <string name="shortcut_matrix_short">ماتریس</string>
+    <string name="shortcut_matrix_long">ماتریس آیزنهاور</string>
+
+    <!-- Phase 5.2: Subtasks & Checklist System -->
+    <string name="checklist_title">چک‌لیست</string>
+    <string name="checklist_progress">%1$d از %2$d انجام شد</string>
+    <string name="checklist_add_item_hint">افزودن زیرکار…</string>
+    <string name="checklist_empty">هنوز زیرکاری افزوده نشده است</string>
+    <string name="checklist_item_deleted">زیرکار حذف شد</string>
+    <string name="error_max_depth_exceeded">نمی‌توان به یک زیرکار، زیرکار دیگری افزود</string>
+
+    <!-- Phase 5.3.1: Smart Task Suggestions & Proactive Triage -->
+    <string name="smart_suggestions_header">پیشنهادهای هوشمند</string>
+    <string name="suggestion_overdue_high_title">کار معوق با اولویت بالا</string>
+    <string name="suggestion_overdue_high_desc">«%1$s» اولویت بالا دارد و موعد آن گذشته است.</string>
+    <string name="suggestion_overdue_cleanup_title">کارهای معوق</string>
+    <string name="suggestion_overdue_cleanup_desc">%1$s کار معوق نیازمند بررسی شماست.</string>
+    <string name="suggestion_unscheduled_high_title">کار مهم بدون تاریخ</string>
+    <string name="suggestion_unscheduled_high_desc">«%1$s» اولویت بالا دارد ولی تاریخی برای آن ثبت نشده است.</string>
+    <string name="suggestion_stale_title">بررسی کار راکد</string>
+    <string name="suggestion_stale_desc">«%1$s» بیش از ۲ هفته است که تغییری نکرده است.</string>
+    <string name="suggestion_recurring_review_title">کار تکرارشونده معوق</string>
+    <string name="suggestion_recurring_review_desc">موعد تکرار «%1$s» سپری شده است.</string>
+    <string name="suggestion_checklist_title">چک‌لیست در حال انجام</string>
+    <string name="suggestion_checklist_desc">«%1$s»: %2$s از %3$s زیرکار انجام شد.</string>
+    <string name="suggestion_daily_triage_title">برنامه امروز</string>
+    <string name="suggestion_daily_triage_desc">%1$s کار برای امروز برنامه‌ریزی شده است.</string>
+    <string name="suggestion_action_view">مشاهده</string>
+    <string name="suggestion_action_schedule">زمان‌بندی</string>
+    <string name="suggestion_action_triage">بررسی</string>
+    <string name="cd_dismiss_suggestion">رد پیشنهاد</string>
+
+    <!-- Phase 5.3.2: Advanced Natural Language Smart Search -->
+    <string name="search_chip_important">مهم</string>
+    <string name="search_chip_low_priority">اولویت پایین</string>
+    <string name="search_chip_overdue">معوق</string>
+    <string name="search_chip_completed">انجام شده</string>
+    <string name="search_chip_incomplete">انجام نشده</string>
+    <string name="search_chip_today">امروز</string>
+    <string name="search_chip_tomorrow">فردا</string>
+    <string name="search_chip_this_week">این هفته</string>
+    <string name="search_chip_this_month">این ماه</string>
+    <string name="search_chip_recurring">تکرارشونده</string>
+
+    <!-- Phase 5.3.3: Calendar Intelligence & Routine Streaks -->
+    <string name="planning_strip_title">برنامه ۷ روز آینده</string>
+    <string name="load_density_none">بدون بار کاری</string>
+    <string name="load_density_low">بار کاری سبک</string>
+    <string name="load_density_medium">بار کاری متوسط</string>
+    <string name="load_density_high">بار کاری سنگین</string>
+    <string name="streak_title">استمرار عادت‌ها</string>
+    <string name="streak_days_count">استمرار %1$d روزه</string>
+    <string name="streak_best">بهترین: %1$d</string>
+    <string name="streak_consistency">پایداری: %1$d٪</string>
+    <string name="no_routines">عادت تکرارشونده‌ای ثبت نشده است</string>
+
+    <!-- Birthdays -->
+    <string name="birthday_title">تولدها</string>
+    <string name="birthday_add">افزودن تولد</string>
+    <string name="birthday_edit">ویرایش تولد</string>
+    <string name="birthday_empty_title">هنوز تولدی ثبت نشده است</string>
+    <string name="birthday_empty_hint">تاریخ تولد را دستی وارد کنید یا از مخاطبین انتخاب کنید.</string>
+    <string name="birthday_name_label">نام</string>
+    <string name="birthday_month_label">ماه</string>
+    <string name="birthday_day_label">روز</string>
+    <string name="birthday_year_label">سال (اختیاری)</string>
+    <string name="birthday_notes_label">یادداشت</string>
+    <string name="birthday_reminder_label">ساعت یادآوری</string>
+    <string name="birthday_day_before_label">روز قبل هم یادآوری شود</string>
+    <string name="birthday_pick_contact">انتخاب از مخاطبین</string>
+    <string name="birthday_today">امروز</string>
+    <string name="birthday_tomorrow">فردا</string>
+    <string name="birthday_in_days">%1$d روز دیگر</string>
+    <string name="birthday_turns_age">%1$d ساله می‌شود</string>
+    <string name="birthday_notification_channel_name">یادآوری تولد</string>
+    <string name="birthday_notification_channel_description">اعلان برای تولدهای پیش‌رو</string>
+    <string name="birthday_notification_title">🎂 تولد %1$s</string>
+    <string name="birthday_notification_text">یادت نره تولدش را تبریک بگی!</string>
+    <string name="birthday_err_name_blank">لطفاً نام را وارد کنید.</string>
+    <string name="birthday_err_bad_month">ماه باید بین ۱ تا ۱۲ باشد.</string>
+    <string name="birthday_err_bad_day">این روز در ماه انتخاب‌شده وجود ندارد.</string>
+    <string name="birthday_err_bad_year">سال معتبر نیست.</string>
+    <string name="birthday_err_future_date">تاریخ تولد نمی‌تواند در آینده باشد.</string>
+    <string name="birthday_err_save_failed">ذخیره نشد. دوباره تلاش کنید.</string>
+
+    <!-- Custom recurrence interval -->
+    <string name="recurrence_custom_interval">بازه دلخواه…</string>
+    <string name="recurrence_interval_days_label">هر چند روز</string>
+    <string name="recurrence_interval_hint">عددی بین ۱ تا ۳۶۵ وارد کنید.</string>
+
+
+    <!-- Home screen widget -->
+    <string name="widget_title">What ToDo</string>
+    <string name="widget_description">کارهای پیش‌رو روی صفحه اصلی</string>
+    <string name="widget_add_task">افزودن کار</string>
+    <string name="widget_empty">کار فعالی نیست</string>
+
+    <!-- v1.1 additions -->
+    <string name="settings_appearance_language">ظاهر و زبان</string>
+    <string name="settings_organization">سازمان‌دهی</string>
+    <string name="settings_notifications">اعلان‌ها</string>
+    <string name="notification_system_settings">تنظیمات اعلان</string>
+    <string name="notifications_enabled_state">اعلان‌ها روشن است</string>
+    <string name="notifications_disabled_state">اعلان‌ها خاموش است — یادآورها نمایش داده نمی‌شوند</string>
+    <string name="category_management">مدیریت دسته‌بندی‌ها</string>
+    <string name="category_management_desc">افزودن، تغییر نام، تغییر رنگ یا حذف دسته‌بندی کارها</string>
+    <string name="category_add">افزودن دسته‌بندی</string>
+    <string name="category_edit">ویرایش دسته‌بندی</string>
+    <string name="category_empty">هنوز دسته‌بندی‌ای وجود ندارد</string>
+    <string name="category_delete_title">دسته‌بندی حذف شود؟</string>
+    <string name="category_delete_message">کارهای «%1$s» حذف نمی‌شوند؛ فقط بدون دسته‌بندی می‌شوند.</string>
+    <string name="category_name_label">نام دسته‌بندی</string>
+    <string name="category_name_duplicate">دسته‌بندی‌ای با این نام وجود دارد</string>
+    <string name="task_notes_label">یادداشت</string>
+    <string name="delete_task_confirm_title">این کار حذف شود؟</string>
+    <string name="delete_task_confirm_message">کار، زیرکارها و پیوست‌های آن حذف می‌شوند. این عمل قابل بازگشت نیست.</string>
+    <string name="attachment_open_failed">باز کردن این پیوست ممکن نشد</string>
+    <string name="birthday_notification_eve_title">🎂 فردا تولد %1$s است</string>
+    <string name="calendar_type_title">تقویم</string>
+    <string name="calendar_type_desc">تاریخ همه‌ی کارها و تولدها با تقویم انتخابی نمایش داده می‌شود. داده‌های شما تغییر نمی‌کنند.</string>
+    <string name="calendar_gregorian">میلادی</string>
+    <string name="calendar_jalali">شمسی (جلالی)</string>
+    <string name="smart_filter_priority_medium">اولویت متوسط</string>
+    <string name="save_task_failed">ذخیرهٔ کار ناموفق بود</string>
+    <string name="error_saving_task">خطا در ذخیرهٔ کار</string>
+    <string name="tag_filter_mode_or">یا</string>
+    <string name="tag_filter_mode_and">و</string>
+    <string name="cd_move_up">انتقال به بالا</string>
+    <string name="cd_move_down">انتقال به پایین</string>
+    <string name="recurrence_interval_abbrev">%1$d روز</string>
+    <string name="cd_clear_search">پاک کردن جستجو</string>
+    <string name="cd_attach_file">پیوست فایل</string>
+    <string name="cd_set_time">تنظیم ساعت</string>
+    <string name="cd_clear_due_date">پاک کردن سررسید</string>
+    <string name="cd_expand_quadrant">باز کردن بخش</string>
+    <string name="cd_collapse_quadrant">بستن بخش</string>
+    <string name="cd_previous_year">سال قبل</string>
+    <string name="cd_next_year">سال بعد</string>
+    <string name="cd_previous_month">ماه قبل</string>
+    <string name="cd_next_month">ماه بعد</string>
+    <string name="cd_color_swatch">رنگ %1$s</string>
+</resources>
