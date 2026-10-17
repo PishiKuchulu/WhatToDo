@@ -308,6 +308,7 @@ fun TagEditorDialog(
                     items(PRESET_TAG_COLORS) { hexColor ->
                         val color = parseTagColor(hexColor)
                         val isSelected = selectedColor.equals(hexColor, ignoreCase = true)
+                        val swatchDesc = stringResource(R.string.cd_color_swatch, hexColor)
 
                         Box(
                             contentAlignment = Alignment.Center,
@@ -317,7 +318,7 @@ fun TagEditorDialog(
                                 .clickable(role = Role.RadioButton) { selectedColor = hexColor }
                                 .semantics {
                                     selected = isSelected
-                                    contentDescription = stringResource(R.string.cd_color_swatch, hexColor)
+                                    contentDescription = swatchDesc
                                 }
                         ) {
                             Box(

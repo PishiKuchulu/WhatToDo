@@ -132,6 +132,10 @@ fun JalaliDatePickerDialog(
                                 if (day in 1..length) {
                                     val date = shownMonth.plusDays((day - 1).toLong())
                                     val isSelected = date == selected
+                                    val dayDesc = stringResource(
+                                        R.string.cd_calendar_day,
+                                        AppDateFormat.number(day, locale)
+                                    )
                                     Box(
                                         modifier = Modifier
                                             .fillMaxSize()
@@ -140,10 +144,7 @@ fun JalaliDatePickerDialog(
                                             .clickable(role = Role.Button) { selected = date }
                                             .semantics {
                                                 this.selected = isSelected
-                                                contentDescription = stringResource(
-                                                    R.string.cd_calendar_day,
-                                                    AppDateFormat.number(day, locale)
-                                                )
+                                                contentDescription = dayDesc
                                             },
                                         contentAlignment = Alignment.Center
                                     ) {

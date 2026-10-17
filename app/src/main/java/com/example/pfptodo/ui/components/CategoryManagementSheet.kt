@@ -204,6 +204,7 @@ private fun CategoryEditorDialog(
                     PRESET_TAG_COLORS.forEach { hex ->
                         val c = parseCategoryColor(hex, Color.Gray)
                         val isSelectedColor = hex == color
+                        val swatchDesc = stringResource(R.string.cd_color_swatch, hex)
                         Box(
                             modifier = Modifier
                                 .size(48.dp)
@@ -211,7 +212,7 @@ private fun CategoryEditorDialog(
                                 .clickable(role = Role.RadioButton) { color = hex }
                                 .semantics {
                                     selected = isSelectedColor
-                                    contentDescription = stringResource(R.string.cd_color_swatch, hex)
+                                    contentDescription = swatchDesc
                                 },
                             contentAlignment = Alignment.Center
                         ) {
