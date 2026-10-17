@@ -78,6 +78,8 @@ dependencies {
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.gson)
+    // Required: Theme.WToDo's parent Theme.Material3.DayNight.NoActionBar lives here (XML theme, not Compose)
+    implementation("com.google.android.material:material:1.12.0")
 
     // Navigation
     implementation(libs.androidx.navigation.compose)

@@ -336,4 +336,22 @@
     <string name="calendar_gregorian">Miladi</string>
     <string name="calendar_jalali">Celali (Güneş Hicri)</string>
     <string name="smart_filter_priority_medium">Orta öncelik</string>
+    <string name="save_task_failed">Failed to save task</string>
+    <string name="error_saving_task">Error saving task</string>
+    <string name="tag_filter_mode_or">OR</string>
+    <string name="tag_filter_mode_and">AND</string>
+    <string name="cd_move_up">Move up</string>
+    <string name="cd_move_down">Move down</string>
+    <string name="recurrence_interval_abbrev">%1$dd</string>
+    <string name="cd_clear_search">Clear search</string>
+    <string name="cd_attach_file">Attach file</string>
+    <string name="cd_set_time">Set time</string>
+    <string name="cd_clear_due_date">Clear due date</string>
+    <string name="cd_expand_quadrant">Expand quadrant</string>
+    <string name="cd_collapse_quadrant">Collapse quadrant</string>
+    <string name="cd_previous_year">Previous year</string>
+    <string name="cd_next_year">Next year</string>
+    <string name="cd_previous_month">Previous month</string>
+    <string name="cd_next_month">Next month</string>
+    <string name="cd_color_swatch">Color %1$s</string>
 </resources>

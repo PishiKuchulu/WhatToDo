@@ -207,7 +207,7 @@ class TaskListViewModelRecurrenceTest {
             assertEquals("next due date comes from the real engine", expectedNextDue, spawned.dueDate)
             assertEquals(
                 "reminder offset is preserved on the next occurrence",
-                expectedNextDue.minusSeconds(3600),
+                expectedNextDue!!.minusSeconds(3600),
                 spawned.reminderTime
             )
             assertEquals("series anchor must be preserved", anchor, spawned.recurrenceAnchor)
