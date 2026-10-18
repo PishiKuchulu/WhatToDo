@@ -167,9 +167,9 @@ fun TaskItem(
 
     val containerColor by animateColorAsState(
         targetValue = if (task.isCompleted) {
-            MaterialTheme.colorScheme.surfaceContainerLowest
-        } else {
             MaterialTheme.colorScheme.surfaceContainerLow
+        } else {
+            MaterialTheme.colorScheme.surfaceContainerHigh
         },
         label = "CardContainerColor"
     )
@@ -185,7 +185,7 @@ fun TaskItem(
     ) {
         Row(
             modifier = Modifier
-                .padding(horizontal = 12.dp, vertical = 10.dp)
+                .padding(horizontal = 16.dp, vertical = 12.dp)
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-10-19
+
+### Changed
+- Full visual restyle inspired by the "Todo App" Figma design: near-black dark theme (`#0E0E12`) with vivid purple accent (`#8B5CF6`); light theme is a clean lavender-gray with the same purple primary. Style-only change — every feature, screen, and string works as before.
+- Task rows are now rounded 20dp cards (`surfaceContainerHigh`); completed tasks are dimmed with strikethrough titles; checkbox tinted by the purple primary.
+- Quick-add input is a rounded filled field echoing the design (rounded container + purple focus ring).
+- Card corner radius scale bumped: `Shapes.medium` 16dp → 20dp.
+
 ## [1.1.1] - 2026-10-17
 
 ### Fixed
