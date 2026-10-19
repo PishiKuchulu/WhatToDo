@@ -123,7 +123,7 @@ fun TaskListScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Column {
-                LargeTopAppBar(
+                TopAppBar(
                     title = {
                         Text(
                             text = stringResource(R.string.todo_title),
