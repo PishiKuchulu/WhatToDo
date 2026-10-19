@@ -18,7 +18,7 @@ import java.time.Instant
 import com.example.pfptodo.R
 
 sealed class Screen(val route: String, val titleRes: Int? = null, val icon: ImageVector? = null) {
-    object TaskList : Screen("task_list", R.string.todo_title, Icons.Default.Checklist)
+    object TaskList : Screen("task_list", R.string.nav_tasks_title, Icons.Default.Checklist)
     object Calendar : Screen("calendar", R.string.calendar_title, Icons.Default.CalendarMonth)
     object Birthdays : Screen("birthdays", R.string.birthday_title, Icons.Default.Cake)
     object Statistics : Screen("statistics", R.string.stats_title, Icons.Default.PieChart)

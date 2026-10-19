@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">What ToDo</string>
     <string name="todo_title">What ToDo</string>
+    <string name="nav_tasks_title">کارها</string>
     <string name="task_title">عنوان کار</string>
     <string name="save">ذخیره</string>
     <string name="back">بازگشت</string>
@@ -21,7 +22,7 @@
     <string name="next_month">ماه بعد</string>
 
     <!-- Statistics -->
-    <string name="stats_title">آمار بهره‌وری</string>
+    <string name="stats_title">آمار</string>
     <string name="overview">نمای کلی</string>
     <string name="stat_total">کل</string>
     <string name="stat_done">انجام شده</string>

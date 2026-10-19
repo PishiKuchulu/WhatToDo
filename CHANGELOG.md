@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-10-19
+
+### Fixed
+- Empty state no longer hides behind the "+ Add Task" FAB: the empty-state content now has 96dp bottom clearance.
+- Bottom navigation labels are single-line; the "Productivity Stats" tab is shortened to "Stats" («آمار») and the first tab is renamed from "What ToDo" to "Tasks" («کارها»).
+- Removed the duplicate microphone button from the task-list top bar (it triggered the same voice input as the mic inside the quick-add field); the remaining top-bar icons already carry proper content descriptions.
+
 ## [1.2.0] - 2026-10-19
 
 ### Changed

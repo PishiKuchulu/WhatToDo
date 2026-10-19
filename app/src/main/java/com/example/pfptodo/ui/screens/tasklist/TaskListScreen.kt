@@ -137,9 +137,6 @@ fun TaskListScreen(
                                 contentDescription = stringResource(R.string.matrix_title)
                             )
                         }
-                        IconButton(onClick = { showVoiceInput = true }) {
-                            Icon(Icons.Default.Mic, contentDescription = stringResource(R.string.cd_voice_task))
-                        }
                         IconButton(onClick = { showSortMenu = true }) {
                             Icon(Icons.AutoMirrored.Filled.Sort, contentDescription = stringResource(R.string.cd_sort))
                             DropdownMenu(
@@ -976,7 +973,7 @@ fun EmptyState(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(32.dp),
+            .padding(start = 32.dp, end = 32.dp, top = 32.dp, bottom = 96.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

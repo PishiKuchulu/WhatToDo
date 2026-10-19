@@ -99,7 +99,7 @@ class MainActivity : AppCompatActivity() {
                                     val isSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
                                     NavigationBarItem(
                                         icon = { screen.icon?.let { Icon(it, contentDescription = null) } },
-                                        label = { screen.titleRes?.let { Text(stringResource(it)) } },
+                                        label = { screen.titleRes?.let { Text(stringResource(it), maxLines = 1, softWrap = false) } },
                                         selected = isSelected,
                                         onClick = {
                                             if (!isSelected) {
