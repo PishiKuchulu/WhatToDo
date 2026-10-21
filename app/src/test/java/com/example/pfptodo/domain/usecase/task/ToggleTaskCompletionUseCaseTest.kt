@@ -196,13 +196,15 @@ class ToggleTaskCompletionUseCaseTest {
         assertTrue(result is Result.Success)
         // One insert for the occurrence + one per copied subtask.
         verify(taskRepository, times(3)).insertTask(any())
-        verify(taskRepository).insertTask(check { copied ->
-            if (copied.title == "Sub A" || copied.title == "Sub B") {
-                assertEquals(0L, copied.id)
-                assertEquals(150L, copied.parentTaskId)
-                assertFalse(copied.isCompleted)
-                assertNull(copied.completedAt)
-            }
+        // The two copied subtasks: fresh id, reparented to the spawned
+        // occurrence (150), reset to uncompleted. The strict title assertion
+        // keeps the occurrence's own insert from matching this verify.
+        verify(taskRepository, times(2)).insertTask(check { copied ->
+            assertTrue(copied.title == "Sub A" || copied.title == "Sub B")
+            assertEquals(0L, copied.id)
+            assertEquals(150L, copied.parentTaskId)
+            assertFalse(copied.isCompleted)
+            assertNull(copied.completedAt)
         })
     }
 
