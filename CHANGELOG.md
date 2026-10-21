@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.1] - 2026-10-21
+
+### Fixed
+- Task-list header merged into a single top app bar: the orange date label and the app title now live in the app bar's title slot, removing the empty app-bar band and the oversized gap above the search bar (search now sits directly under the bar).
+- The extended "+ Add Task" FAB no longer permanently covers task cards: the task list (both sorted and manual-reorder modes) now has 88dp bottom content padding so every item can scroll clear of the FAB.
+- Android 13+ system per-app language picker now lists the app's 12 languages (added `res/xml/locales_config.xml` + `android:localeConfig`).
+
+### Internal
+- CI (Build APK workflow) now runs the unit-test suite (`testDebugUnitTest`) before building; previously no workflow executed the tests at all.
+
 ## [1.3.0] - 2026-10-21
 
 ### Changed

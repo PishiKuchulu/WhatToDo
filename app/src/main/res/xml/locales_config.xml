@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Languages offered by the system per-app language picker (Android 13+).
+    Must stay in sync with the values-* string folders and the in-app
+    language list in SettingsScreen (supportedLanguages).
+-->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en-US" />
+    <locale android:name="fa" />
+    <locale android:name="es" />
+    <locale android:name="fr" />
+    <locale android:name="de" />
+    <locale android:name="it" />
+    <locale android:name="pt" />
+    <locale android:name="ru" />
+    <locale android:name="ar" />
+    <locale android:name="tr" />
+    <locale android:name="zh-CN" />
+    <locale android:name="ja" />
+</locale-config>

@@ -123,8 +123,32 @@ fun TaskListScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Column {
+                // "Productive Day" header: small orange date label above the big title,
+                // rendered inside the app bar title slot (single bar — no wasted band).
+                val todayLabel = remember {
+                    val formatter = java.time.format.DateTimeFormatter.ofPattern("EEEE, MMM d", Locale.getDefault())
+                    AppDateFormat.localizeDigits(
+                        java.time.LocalDate.now().format(formatter),
+                        Locale.getDefault()
+                    ).uppercase(Locale.getDefault())
+                }
                 TopAppBar(
-                    title = {},
+                    title = {
+                        Column {
+                            Text(
+                                text = todayLabel,
+                                style = MaterialTheme.typography.labelMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = com.example.pfptodo.ui.theme.PDOrange
+                            )
+                            Text(
+                                text = stringResource(R.string.todo_title),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Black,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    },
                     actions = {
                         IconButton(onClick = onOpenMatrix) {
                             Icon(
@@ -171,34 +195,6 @@ fun TaskListScreen(
                     scrollBehavior = scrollBehavior
                 )
 
-                // "Productive Day" header: small orange date label above the big title.
-                val todayLabel = remember {
-                    val formatter = java.time.format.DateTimeFormatter.ofPattern("EEEE, MMM d", Locale.getDefault())
-                    AppDateFormat.localizeDigits(
-                        java.time.LocalDate.now().format(formatter),
-                        Locale.getDefault()
-                    ).uppercase(Locale.getDefault())
-                }
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(top = 2.dp, bottom = 10.dp)
-                ) {
-                    Text(
-                        text = todayLabel,
-                        style = MaterialTheme.typography.labelMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = com.example.pfptodo.ui.theme.PDOrange
-                    )
-                    Text(
-                        text = stringResource(R.string.todo_title),
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Black,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                }
-
                 SearchBar(
                     inputField = {
                         SearchBarDefaults.InputField(
@@ -225,8 +221,7 @@ fun TaskListScreen(
                     ),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
-                        .padding(bottom = 8.dp)
+                        .padding(start = 16.dp, end = 16.dp, bottom = 8.dp)
                 ) {}
 
                 // Natural Language Search Intent Chips
@@ -484,6 +479,8 @@ fun TaskListScreen(
                             viewModel.onMoveTask(itemA.id, itemB.id)
                         },
                         modifier = Modifier.fillMaxSize(),
+                        // Bottom padding lets the last items scroll clear of the extended FAB.
+                        contentPadding = PaddingValues(bottom = 88.dp),
                         key = { it.id }
                     ) { task, isDragging ->
                         val taskCategory = uiState.availableCategories.find { it.id == task.categoryId }
@@ -530,7 +527,8 @@ fun TaskListScreen(
                     LazyColumn(
                         state = listState,
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(vertical = 8.dp),
+                        // Bottom padding lets the last items scroll clear of the extended FAB.
+                        contentPadding = PaddingValues(top = 8.dp, bottom = 88.dp),
                         verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         items(uiState.tasks, key = { it.id }) { task ->

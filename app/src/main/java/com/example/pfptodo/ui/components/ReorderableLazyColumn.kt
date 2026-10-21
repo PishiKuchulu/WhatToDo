@@ -3,6 +3,7 @@ package com.example.pfptodo.ui.components
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -21,6 +22,7 @@ fun <T> ReorderableLazyColumn(
     onReorder: (Int, Int) -> Unit,
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
     key: (T) -> Any = { it as Any },
     itemContent: @Composable (T, Boolean) -> Unit
 ) {
@@ -69,7 +71,8 @@ fun <T> ReorderableLazyColumn(
                 }
             )
         },
-        state = state
+        state = state,
+        contentPadding = contentPadding
     ) {
         itemsIndexed(items, key = { _, item -> key(item) }) { index, item ->
             val isDragging = index == draggedItemIndex
