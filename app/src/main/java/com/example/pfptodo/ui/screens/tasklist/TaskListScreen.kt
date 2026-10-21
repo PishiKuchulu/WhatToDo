@@ -125,12 +125,39 @@ fun TaskListScreen(
             Column {
                 // "Productive Day" header: small orange date label above the big title,
                 // rendered inside the app bar title slot (single bar — no wasted band).
-                val todayLabel = remember {
-                    val formatter = java.time.format.DateTimeFormatter.ofPattern("EEEE, MMM d", Locale.getDefault())
-                    AppDateFormat.localizeDigits(
-                        java.time.LocalDate.now().format(formatter),
-                        Locale.getDefault()
-                    ).uppercase(Locale.getDefault())
+                // The label follows the app's calendar system: Jalali when the calendar
+                // type is JALALI (default for Persian), Hijri for Arabic locales,
+                // Gregorian otherwise.
+                val calendarType = com.example.pfptodo.ui.theme.LocalCalendarType.current
+                val todayLabel = remember(calendarType) {
+                    val locale = Locale.getDefault()
+                    val today = java.time.LocalDate.now()
+                    when {
+                        calendarType == com.example.pfptodo.core.util.CalendarType.JALALI -> {
+                            val weekday = today.dayOfWeek.getDisplayName(
+                                java.time.format.TextStyle.FULL, locale
+                            )
+                            val day = AppDateFormat.dayOfMonth(today, calendarType)
+                            val month = AppDateFormat.monthName(
+                                AppDateFormat.month(today, calendarType), calendarType, locale
+                            )
+                            val label = AppDateFormat.localizeDigits("$weekday $day $month", locale)
+                            if (locale.language.equals("fa", ignoreCase = true)) label
+                            else label.uppercase(Locale.getDefault())
+                        }
+                        locale.language.equals("ar", ignoreCase = true) -> {
+                            val hijri = java.time.chrono.HijrahDate.from(today)
+                            java.time.format.DateTimeFormatter
+                                .ofPattern("EEEE d MMMM", locale)
+                                .format(hijri)
+                        }
+                        else -> {
+                            val formatter = java.time.format.DateTimeFormatter
+                                .ofPattern("EEEE, MMM d", locale)
+                            AppDateFormat.localizeDigits(today.format(formatter), locale)
+                                .uppercase(Locale.getDefault())
+                        }
+                    }
                 }
                 TopAppBar(
                     title = {
