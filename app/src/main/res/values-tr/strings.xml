@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">What ToDo</string>
     <string name="todo_title">What ToDo</string>
+    <string name="nav_tasks_title">Tasks</string>
     <string name="task_title">Görev Başlığı</string>
     <string name="save">Kaydet</string>
     <string name="back">Geri</string>
@@ -354,4 +355,8 @@
     <string name="cd_previous_month">Previous month</string>
     <string name="cd_next_month">Next month</string>
     <string name="cd_color_swatch">Color %1$s</string>
+    <string name="hero_today_title">Today\'s Plan</string>
+    <string name="hero_tasks_completed">%1$d of %2$d tasks completed</string>
+    <string name="hero_no_tasks_today">No tasks scheduled for today</string>
+    <string name="hero_view_task">View Task</string>
 </resources>

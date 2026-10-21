@@ -33,3 +33,10 @@ app/build/
 *.aar
 *.jks
 *.keystore
+
+# Signing keystores — never commit
+*.jks
+*.keystore
+*.p12
+*.pfx
+release.p12

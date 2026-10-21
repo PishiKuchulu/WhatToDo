@@ -4,9 +4,11 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -165,11 +167,16 @@ fun TaskItem(
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
 
+    // "Productive Day" card tint: tasks due today get the peach container
+    // (primaryContainer — peach in light theme, deep warm brown in dark).
+    val cardZone = ZoneId.systemDefault()
+    val isDueToday = task.dueDate?.atZone(cardZone)?.toLocalDate() == LocalDate.now(cardZone)
+
     val containerColor by animateColorAsState(
-        targetValue = if (task.isCompleted) {
-            MaterialTheme.colorScheme.surfaceContainerLow
-        } else {
-            MaterialTheme.colorScheme.surfaceContainerHigh
+        targetValue = when {
+            task.isCompleted -> MaterialTheme.colorScheme.surfaceContainerLow
+            isDueToday -> MaterialTheme.colorScheme.primaryContainer
+            else -> MaterialTheme.colorScheme.surfaceContainerHigh
         },
         label = "CardContainerColor"
     )
@@ -179,7 +186,7 @@ fun TaskItem(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .alpha(alpha),
-        shape = MaterialTheme.shapes.medium,
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = containerColor),
         elevation = CardDefaults.cardElevation(defaultElevation = if (task.isCompleted) 0.dp else 1.dp)
     ) {
@@ -194,7 +201,9 @@ fun TaskItem(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            // Checkbox with minimum 48dp touch target
+            // Rounded-square checkbox (Productive Day) with minimum 48dp touch target:
+            // orange fill + white check when completed, outlined square otherwise.
+            val toggleDescription = stringResource(R.string.cd_toggle_completion)
             Box(
                 modifier = Modifier
                     .size(44.dp)
@@ -203,19 +212,37 @@ fun TaskItem(
                         haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                         onToggleCompletion()
                     }
-                    .semantics { selected = task.isCompleted },
+                    .semantics {
+                        contentDescription = toggleDescription
+                        selected = task.isCompleted
+                    },
                 contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = if (task.isCompleted) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
-                    contentDescription = stringResource(R.string.cd_toggle_completion),
-                    tint = if (task.isCompleted) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.outline
-                    },
-                    modifier = Modifier.size(22.dp)
-                )
+                Box(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(RoundedCornerShape(7.dp))
+                        .background(
+                            if (task.isCompleted) MaterialTheme.colorScheme.primary
+                            else Color.Transparent
+                        )
+                        .border(
+                            width = 1.5.dp,
+                            color = if (task.isCompleted) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.outline,
+                            shape = RoundedCornerShape(7.dp)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (task.isCompleted) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(16.dp)
+                        )
+                    }
+                }
             }
 
             // Main Content Area
@@ -242,14 +269,11 @@ fun TaskItem(
                         modifier = Modifier.padding(top = 4.dp)
                     ) {
                         if (category != null) {
-                            val catColor = try {
-                                Color(android.graphics.Color.parseColor(category.color))
-                            } catch (e: Exception) {
-                                MaterialTheme.colorScheme.primary
-                            }
+                            // Productive Day category chip: peach-light container,
+                            // orange dot, ink text (roles map to warm brown/orange in dark).
                             Surface(
                                 shape = MaterialTheme.shapes.small,
-                                color = catColor.copy(alpha = 0.12f)
+                                color = MaterialTheme.colorScheme.secondaryContainer
                             ) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
@@ -259,12 +283,12 @@ fun TaskItem(
                                     Box(
                                         modifier = Modifier
                                             .size(6.dp)
-                                            .background(catColor, CircleShape)
+                                            .background(MaterialTheme.colorScheme.primary, CircleShape)
                                     )
                                     Text(
                                         text = category.getDisplayName(context),
                                         style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
-                                        color = catColor
+                                        color = MaterialTheme.colorScheme.onSecondaryContainer
                                     )
                                 }
                             }

@@ -13,27 +13,32 @@ android {
         applicationId = "com.example.pfptodo"
         minSdk = 24
         targetSdk = 35
-        versionCode = 6
-        versionName = "1.2.2"
+        versionCode = 7
+        versionName = "1.3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    // Release signing is intentionally NOT configured here.
-    // To sign release builds, uncomment the template below and provide the
-    // keystore details via gradle.properties or environment variables.
-    // Never commit real keystore passwords to version control.
-    // signingConfigs {
-    //     create("release") {
-    //         storeFile = file(project.findProperty("RELEASE_STORE_FILE") as String? ?: "release.keystore")
-    //         storePassword = project.findProperty("RELEASE_STORE_PASSWORD") as String?
-    //         keyAlias = project.findProperty("RELEASE_KEY_ALIAS") as String?
-    //         keyPassword = project.findProperty("RELEASE_KEY_PASSWORD") as String?
-    //     }
-    // }
+    // Release signing comes from environment variables (CI secrets) — never
+    // commit a keystore or passwords to version control. The keystore is a
+    // PKCS#12 file decoded from the KEYSTORE_BASE64 GitHub secret by the
+    // release workflow into $KEYSTORE_FILE. When the env vars are absent
+    // (local dev), the release build type simply stays unsigned.
+    signingConfigs {
+        create("release") {
+            storeFile = file(System.getenv("KEYSTORE_FILE") ?: "release.p12")
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
+            storeType = "PKCS12"
+        }
+    }
 
     buildTypes {
         release {
+            if (System.getenv("KEYSTORE_FILE") != null) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(

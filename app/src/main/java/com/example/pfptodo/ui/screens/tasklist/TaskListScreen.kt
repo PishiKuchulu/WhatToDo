@@ -124,12 +124,7 @@ fun TaskListScreen(
         topBar = {
             Column {
                 TopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(R.string.todo_title),
-                            fontWeight = FontWeight.Black
-                        )
-                    },
+                    title = {},
                     actions = {
                         IconButton(onClick = onOpenMatrix) {
                             Icon(
@@ -175,7 +170,35 @@ fun TaskListScreen(
                     },
                     scrollBehavior = scrollBehavior
                 )
-                
+
+                // "Productive Day" header: small orange date label above the big title.
+                val todayLabel = remember {
+                    val formatter = java.time.format.DateTimeFormatter.ofPattern("EEEE, MMM d", Locale.getDefault())
+                    AppDateFormat.localizeDigits(
+                        java.time.LocalDate.now().format(formatter),
+                        Locale.getDefault()
+                    ).uppercase(Locale.getDefault())
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 2.dp, bottom = 10.dp)
+                ) {
+                    Text(
+                        text = todayLabel,
+                        style = MaterialTheme.typography.labelMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = com.example.pfptodo.ui.theme.PDOrange
+                    )
+                    Text(
+                        text = stringResource(R.string.todo_title),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Black,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+
                 SearchBar(
                     inputField = {
                         SearchBarDefaults.InputField(
@@ -197,6 +220,9 @@ fun TaskListScreen(
                     },
                     expanded = false,
                     onExpandedChange = { },
+                    colors = SearchBarDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainer
+                    ),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
@@ -323,9 +349,9 @@ fun TaskListScreen(
                         ),
                         shape = MaterialTheme.shapes.medium,
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                            unfocusedBorderColor = Color.Transparent,
+                            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
                             focusedBorderColor = MaterialTheme.colorScheme.primary
                         ),
                         modifier = Modifier.fillMaxWidth()
@@ -401,8 +427,8 @@ fun TaskListScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = onAddTask,
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
                 shape = MaterialTheme.shapes.large,
                 icon = { Icon(Icons.Default.Add, contentDescription = null) },
                 text = { Text(text = stringResource(R.string.add_task_button), fontWeight = FontWeight.Bold) },
@@ -410,11 +436,27 @@ fun TaskListScreen(
             )
         }
     ) { paddingValues ->
-        Box(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
+            TodayHeroCard(
+                counts = uiState.smartFilterCounts,
+                onViewTasks = {
+                    viewModel.onFilterChange(
+                        uiState.filter.copy(
+                            status = TaskFilter.Status.ACTIVE,
+                            dateFilter = TaskFilter.DateFilter.TODAY,
+                            priorities = emptySet(),
+                            isRecurringOnly = false
+                        )
+                    )
+                },
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+
+            Box(modifier = Modifier.weight(1f)) {
             AnimatedContent(
                 targetState = uiState.tasks.isEmpty(),
                 transitionSpec = {
@@ -534,6 +576,7 @@ fun TaskListScreen(
                     }
                 }
             }
+            }
         }
 
         if (uiState.isSettingsSheetOpen) {
@@ -560,6 +603,98 @@ fun TaskListScreen(
                 },
                 onDismiss = { showVoiceInput = false }
             )
+        }
+    }
+}
+
+/**
+ * "Productive Day" hero card: teal card with today's completion ring.
+ * Data comes from the existing [SmartFilterCounts] (computed from all tasks
+ * in TaskListViewModel) — no separate data path.
+ */
+@Composable
+private fun TodayHeroCard(
+    counts: SmartFilterCounts,
+    onViewTasks: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val total = counts.todayTotal
+    val done = counts.todayCompleted
+    val percent = if (total > 0) (done * 100) / total else 0
+    val progress = if (total > 0) done.toFloat() / total.toFloat() else 0f
+    val percentText = AppDateFormat.localizeDigits("$percent%", Locale.getDefault())
+    val statusText = if (total == 0) {
+        stringResource(R.string.hero_no_tasks_today)
+    } else {
+        AppDateFormat.localizeDigits(
+            stringResource(R.string.hero_tasks_completed, done, total),
+            Locale.getDefault()
+        )
+    }
+
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = MaterialTheme.colorScheme.onSecondary
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.hero_today_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSecondary
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = statusText,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSecondary.copy(alpha = 0.8f)
+                )
+                Spacer(modifier = Modifier.height(14.dp))
+                Button(
+                    onClick = onViewTasks,
+                    shape = RoundedCornerShape(50),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.hero_view_task),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            Box(
+                modifier = Modifier.size(84.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    progress = { progress },
+                    modifier = Modifier.size(84.dp),
+                    color = com.example.pfptodo.ui.theme.PDOrange,
+                    trackColor = Color.White.copy(alpha = 0.2f),
+                    strokeWidth = 8.dp
+                )
+                Text(
+                    text = percentText,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Black,
+                    color = Color.White
+                )
+            }
         }
     }
 }
@@ -600,6 +735,7 @@ fun SmartFilterRow(
     ) {
         item {
             FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary, selectedLabelColor = MaterialTheme.colorScheme.onPrimary, selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary, selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary),
                 selected = currentType == SmartFilterType.ALL,
                 onClick = {
                     onFilterChange(
@@ -624,6 +760,7 @@ fun SmartFilterRow(
 
         item {
             FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary, selectedLabelColor = MaterialTheme.colorScheme.onPrimary, selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary, selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary),
                 selected = currentType == SmartFilterType.TODAY,
                 onClick = {
                     onFilterChange(
@@ -676,6 +813,7 @@ fun SmartFilterRow(
 
         item {
             FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary, selectedLabelColor = MaterialTheme.colorScheme.onPrimary, selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary, selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary),
                 selected = currentType == SmartFilterType.TOMORROW,
                 onClick = {
                     onFilterChange(
@@ -693,6 +831,7 @@ fun SmartFilterRow(
 
         item {
             FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary, selectedLabelColor = MaterialTheme.colorScheme.onPrimary, selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary, selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary),
                 selected = currentType == SmartFilterType.THIS_WEEK,
                 onClick = {
                     onFilterChange(
@@ -710,6 +849,7 @@ fun SmartFilterRow(
 
         item {
             FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary, selectedLabelColor = MaterialTheme.colorScheme.onPrimary, selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary, selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary),
                 selected = currentType == SmartFilterType.THIS_MONTH,
                 onClick = {
                     onFilterChange(
@@ -727,6 +867,7 @@ fun SmartFilterRow(
 
         item {
             FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary, selectedLabelColor = MaterialTheme.colorScheme.onPrimary, selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary, selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary),
                 selected = currentType == SmartFilterType.UPCOMING,
                 onClick = {
                     onFilterChange(
@@ -751,6 +892,7 @@ fun SmartFilterRow(
 
         item {
             FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary, selectedLabelColor = MaterialTheme.colorScheme.onPrimary, selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary, selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary),
                 selected = currentType == SmartFilterType.HIGH_PRIORITY,
                 onClick = {
                     onFilterChange(
@@ -775,6 +917,7 @@ fun SmartFilterRow(
 
         item {
             FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary, selectedLabelColor = MaterialTheme.colorScheme.onPrimary, selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary, selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary),
                 selected = currentType == SmartFilterType.MEDIUM_PRIORITY,
                 onClick = {
                     onFilterChange(
@@ -792,6 +935,7 @@ fun SmartFilterRow(
 
         item {
             FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary, selectedLabelColor = MaterialTheme.colorScheme.onPrimary, selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary, selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary),
                 selected = currentType == SmartFilterType.LOW_PRIORITY,
                 onClick = {
                     onFilterChange(
@@ -809,6 +953,7 @@ fun SmartFilterRow(
 
         item {
             FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary, selectedLabelColor = MaterialTheme.colorScheme.onPrimary, selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary, selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary),
                 selected = currentType == SmartFilterType.RECURRING,
                 onClick = {
                     onFilterChange(
@@ -833,6 +978,7 @@ fun SmartFilterRow(
 
         item {
             FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary, selectedLabelColor = MaterialTheme.colorScheme.onPrimary, selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary, selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary),
                 selected = currentType == SmartFilterType.COMPLETED,
                 onClick = {
                     onFilterChange(
@@ -876,6 +1022,7 @@ fun TagFilterRow(
     ) {
         item {
             FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary, selectedLabelColor = MaterialTheme.colorScheme.onPrimary, selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary, selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary),
                 selected = selectedTagIds.isEmpty(),
                 onClick = onClearTags,
                 label = { Text(stringResource(R.string.tag_filter_all)) }
@@ -928,6 +1075,7 @@ fun CategoryFilterRow(
     ) {
         item {
             FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary, selectedLabelColor = MaterialTheme.colorScheme.onPrimary, selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary, selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary),
                 selected = selectedCategoryIds.isEmpty(),
                 onClick = onClearCategories,
                 label = { Text(stringResource(R.string.category_all)) },
@@ -948,6 +1096,7 @@ fun CategoryFilterRow(
                 MaterialTheme.colorScheme.primary
             }
             FilterChip(
+                colors = FilterChipDefaults.filterChipColors(selectedContainerColor = MaterialTheme.colorScheme.primary, selectedLabelColor = MaterialTheme.colorScheme.onPrimary, selectedTrailingIconColor = MaterialTheme.colorScheme.onPrimary, selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimary),
                 selected = isSelected,
                 onClick = { onCategoryToggle(category.id) },
                 label = { Text(category.getDisplayName(context)) },

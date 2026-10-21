@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2026-10-21
+
+### Changed
+- Full "Productive Day" restyle (design built in Penpot): teal `#0F3D4E` + orange `#F5A83B` + peach `#FCE7C8` palette replaces Violet Pulse in both light and teal-tinted dark themes.
+- Bundled typefaces: Poppins for Latin locales, Vazirmatn for Persian (fa) — selected automatically by locale in the theme.
+- Home header: small orange date label above the big app-title heading.
+- New hero card at the top of the task list: teal card with today's completion ring (orange), "X of Y tasks completed" status and a "View Task" button that applies the Today filter.
+- Task cards: 24dp corners; tasks due today get the peach container (deep warm brown in dark); category chip is peach-light with an orange dot; checkbox is now a rounded square — orange fill with a white check when completed.
+- Orange FAB, orange selected filter chips and bottom-nav selection, white search/quick-add fields, teal calendar header with an orange selected day.
+
+### Fixed
+- String parity: added the missing `nav_tasks_title` key to the 10 non-fa locales so all 12 locales match the base strings exactly.
+
 ## [1.2.2] - 2026-10-19
 
 ### Fixed

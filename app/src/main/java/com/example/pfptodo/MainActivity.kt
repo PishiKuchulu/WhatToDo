@@ -101,6 +101,13 @@ class MainActivity : AppCompatActivity() {
                                         icon = { screen.icon?.let { Icon(it, contentDescription = null) } },
                                         label = { screen.titleRes?.let { Text(stringResource(it), maxLines = 1, softWrap = false) } },
                                         selected = isSelected,
+                                        colors = NavigationBarItemDefaults.colors(
+                                            selectedIconColor = MaterialTheme.colorScheme.primary,
+                                            selectedTextColor = MaterialTheme.colorScheme.primary,
+                                            indicatorColor = MaterialTheme.colorScheme.primaryContainer,
+                                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                        ),
                                         onClick = {
                                             if (!isSelected) {
                                                 haptic.performHapticFeedback(androidx.compose.ui.hapticfeedback.HapticFeedbackType.TextHandleMove)

@@ -8,6 +8,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
@@ -99,9 +100,13 @@ fun WToDoTheme(
         else -> LightColorScheme
     }
 
+    // "Productive Day" typefaces: Vazirmatn for Persian, Poppins for other locales.
+    val language = LocalConfiguration.current.locales.get(0)?.language
+    val typography = if (language == "fa") VazirmatnTypography else PoppinsTypography
+
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = typography,
         shapes = Shapes,
         content = content
     )

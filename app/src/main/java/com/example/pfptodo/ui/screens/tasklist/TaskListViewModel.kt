@@ -112,10 +112,13 @@ class TaskListViewModel(
 
         val activeTasks = tasks.filter { !it.isCompleted }
         val completedTasks = tasks.filter { it.isCompleted }
+        val todayTasks = tasks.filter { it.dueDate != null && it.dueDate >= startOfToday && it.dueDate < startOfTomorrow }
 
         SmartFilterCounts(
             all = activeTasks.size,
             today = activeTasks.count { it.dueDate != null && it.dueDate >= startOfToday && it.dueDate < startOfTomorrow },
+            todayTotal = todayTasks.size,
+            todayCompleted = todayTasks.count { it.isCompleted },
             overdue = activeTasks.count { it.dueDate != null && it.dueDate.isBefore(startOfToday) },
             upcoming = activeTasks.count { it.dueDate != null && it.dueDate >= startOfTomorrow },
             highPriority = activeTasks.count { it.priority == com.example.pfptodo.domain.model.Priority.HIGH },
@@ -322,6 +325,8 @@ class TaskListViewModel(
 data class SmartFilterCounts(
     val all: Int = 0,
     val today: Int = 0,
+    val todayTotal: Int = 0,
+    val todayCompleted: Int = 0,
     val overdue: Int = 0,
     val upcoming: Int = 0,
     val highPriority: Int = 0,
