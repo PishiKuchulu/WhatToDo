@@ -262,7 +262,9 @@ class ParseNaturalLanguageSearchUseCaseTest {
         val zwnj = useCase("کارهای پس‌فردا")
         assertEquals(TaskFilter.DateFilter.DAY_AFTER_TOMORROW, zwnj.filter.dateFilter)
         assertEquals("", zwnj.keyword)
-        assertEquals("پس‌فردا", zwnj.chips.single { it.type == SearchChipType.DATE }.matchedPhrase)
+        // PersianNormalizer canonicalizes ZWNJ to a plain space before matching,
+        // so the recorded matched phrase is the spaced form even for ZWNJ input.
+        assertEquals("پس فردا", zwnj.chips.single { it.type == SearchChipType.DATE }.matchedPhrase)
 
         // Plain فردا still maps to TOMORROW
         val tomorrow = useCase("کارهای فردا")
