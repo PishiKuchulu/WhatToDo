@@ -31,7 +31,9 @@ class BootReminderReceiver : BroadcastReceiver() {
         when (intent.action) {
             Intent.ACTION_BOOT_COMPLETED,
             Intent.ACTION_TIMEZONE_CHANGED,
-            Intent.ACTION_TIME_SET -> Unit
+            // The broadcast for a manually set clock is "android.intent.action.TIME_SET";
+            // its Intent constant is named ACTION_TIME_CHANGED (there is no ACTION_TIME_SET).
+            Intent.ACTION_TIME_CHANGED -> Unit
             else -> return
         }
         val pendingResult = goAsync()
