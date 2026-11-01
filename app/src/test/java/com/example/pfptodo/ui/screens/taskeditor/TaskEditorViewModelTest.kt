@@ -103,6 +103,62 @@ class TaskEditorViewModelTest {
     }
 
     @Test
+    fun `subtask batch failure keeps isSaved false and sets saveErrorRes`() = runTest {
+        whenever(taskUseCases.addTask).thenReturn(mock())
+        whenever(taskUseCases.addTask.invoke(any())).thenReturn(Result.Success(100L))
+        whenever(taskUseCases.createSubtasksBatch).thenReturn(mock())
+        whenever(taskUseCases.createSubtasksBatch.invoke(any(), any()))
+            .thenReturn(Result.Error(RuntimeException("batch failed")))
+        whenever(tagUseCases.setTaskTags).thenReturn(mock())
+        whenever(tagUseCases.setTaskTags.invoke(any(), any())).thenReturn(Result.Success(Unit))
+
+        val viewModel = TaskEditorViewModel(
+            taskId = null,
+            parentTaskId = null,
+            taskUseCases = taskUseCases,
+            tagUseCases = tagUseCases,
+            reminderManager = reminderManager
+        )
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.onTitleChange("Task With Subtask")
+        viewModel.onAddSubtask("Sub 1")
+        viewModel.onSave()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isSaved)
+        assertFalse(viewModel.uiState.value.isSaving)
+        assertNotNull(viewModel.uiState.value.saveErrorRes)
+        verify(tagUseCases.setTaskTags, org.mockito.Mockito.never()).invoke(any(), any())
+    }
+
+    @Test
+    fun `tag assignment failure keeps isSaved false and sets saveErrorRes`() = runTest {
+        whenever(taskUseCases.addTask).thenReturn(mock())
+        whenever(taskUseCases.addTask.invoke(any())).thenReturn(Result.Success(100L))
+        whenever(tagUseCases.setTaskTags).thenReturn(mock())
+        whenever(tagUseCases.setTaskTags.invoke(any(), any()))
+            .thenReturn(Result.Error(RuntimeException("tags failed")))
+
+        val viewModel = TaskEditorViewModel(
+            taskId = null,
+            parentTaskId = null,
+            taskUseCases = taskUseCases,
+            tagUseCases = tagUseCases,
+            reminderManager = reminderManager
+        )
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.onTitleChange("Task With Tags")
+        viewModel.onSave()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertFalse(viewModel.uiState.value.isSaved)
+        assertFalse(viewModel.uiState.value.isSaving)
+        assertNotNull(viewModel.uiState.value.saveErrorRes)
+    }
+
+    @Test
     fun `blank title does not trigger save`() = runTest {
         val viewModel = TaskEditorViewModel(
             taskId = null,

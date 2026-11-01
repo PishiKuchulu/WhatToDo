@@ -51,6 +51,13 @@ class TaskListViewModel(
      * and a rapid undo could otherwise race the snooze write.
      */
     private val dueDateMutex = Mutex()
+
+    /**
+     * Serializes completion toggles: each toggle launches its own coroutine, and a rapid
+     * tap / undo pair could otherwise interleave one toggle's completion write with the
+     * previous toggle's occurrence spawn.
+     */
+    private val toggleMutex = Mutex()
     val filter = _filter.asStateFlow()
 
     private val _sortOrder = MutableStateFlow(SortOrder.MANUAL)
@@ -205,7 +212,9 @@ class TaskListViewModel(
 
     fun onToggleTaskCompletion(task: Task) {
         viewModelScope.launch {
-            taskUseCases.toggleTaskCompletion(task)
+            toggleMutex.withLock {
+                taskUseCases.toggleTaskCompletion(task)
+            }
         }
     }
 

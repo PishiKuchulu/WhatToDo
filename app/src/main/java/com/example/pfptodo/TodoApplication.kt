@@ -50,5 +50,18 @@ class TodoApplication : Application() {
                 // Best effort.
             }
         }
+
+        // Self-heal task reminders at startup. The boot receiver covers reboots and the
+        // import callback covers restores, but neither re-arms reminders lost any other
+        // way (e.g. WorkManager state cleared). rescheduleAllReminders is idempotent —
+        // scheduleReminder replaces any existing delivery for a task — so running it on
+        // every cold start is safe.
+        appScope.launch {
+            try {
+                container.rescheduleAllReminders()
+            } catch (e: Exception) {
+                // Best effort.
+            }
+        }
     }
 }

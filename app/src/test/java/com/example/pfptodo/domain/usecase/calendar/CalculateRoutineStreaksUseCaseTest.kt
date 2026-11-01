@@ -56,11 +56,13 @@ class CalculateRoutineStreaksUseCaseTest {
 
     @Test
     fun `daily routine with consecutive completions ending today calculates active streak`() {
-        // Completed Aug 17, Aug 18, and Aug 19 (today)
-        val c1 = Task(id = 1, title = "Meditation", recurrenceRule = RecurrenceRule.Daily, isCompleted = true, completedAt = Instant.parse("2026-08-17T07:00:00Z"))
-        val c2 = Task(id = 2, title = "Meditation", recurrenceRule = RecurrenceRule.Daily, isCompleted = true, completedAt = Instant.parse("2026-08-18T07:00:00Z"))
-        val c3 = Task(id = 3, title = "Meditation", recurrenceRule = RecurrenceRule.Daily, isCompleted = true, completedAt = Instant.parse("2026-08-19T07:00:00Z"))
-        val active = Task(id = 4, title = "Meditation", recurrenceRule = RecurrenceRule.Daily, isCompleted = false)
+        // Completed Aug 17, Aug 18, and Aug 19 (today). Occurrences of one series
+        // share the same recurrenceAnchor.
+        val anchor = Instant.parse("2026-08-17T07:00:00Z")
+        val c1 = Task(id = 1, title = "Meditation", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-17T07:00:00Z"))
+        val c2 = Task(id = 2, title = "Meditation", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-18T07:00:00Z"))
+        val c3 = Task(id = 3, title = "Meditation", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-19T07:00:00Z"))
+        val active = Task(id = 4, title = "Meditation", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchor, isCompleted = false)
 
         val summary = useCase(listOf(c1, c2, c3, active))
         assertEquals(1, summary.totalActiveRoutines)
@@ -74,9 +76,10 @@ class CalculateRoutineStreaksUseCaseTest {
     @Test
     fun `daily routine completed yesterday but not yet today maintains current streak`() {
         // Completed Aug 17, Aug 18 (yesterday). Today Aug 19 is pending.
-        val c1 = Task(id = 1, title = "Reading", recurrenceRule = RecurrenceRule.Daily, isCompleted = true, completedAt = Instant.parse("2026-08-17T07:00:00Z"))
-        val c2 = Task(id = 2, title = "Reading", recurrenceRule = RecurrenceRule.Daily, isCompleted = true, completedAt = Instant.parse("2026-08-18T07:00:00Z"))
-        val active = Task(id = 3, title = "Reading", recurrenceRule = RecurrenceRule.Daily, isCompleted = false)
+        val anchor = Instant.parse("2026-08-17T07:00:00Z")
+        val c1 = Task(id = 1, title = "Reading", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-17T07:00:00Z"))
+        val c2 = Task(id = 2, title = "Reading", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-18T07:00:00Z"))
+        val active = Task(id = 3, title = "Reading", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchor, isCompleted = false)
 
         val summary = useCase(listOf(c1, c2, active))
         val routine = summary.routines[0]
@@ -88,11 +91,12 @@ class CalculateRoutineStreaksUseCaseTest {
     @Test
     fun `broken daily streak sets current streak to 0 while preserving best streak`() {
         // Completed Aug 10, 11, 12, 13 (4 days streak), then gap, completed Aug 16 (missed Aug 17, 18, 19)
-        val c1 = Task(id = 1, title = "Guitar", recurrenceRule = RecurrenceRule.Daily, isCompleted = true, completedAt = Instant.parse("2026-08-10T07:00:00Z"))
-        val c2 = Task(id = 2, title = "Guitar", recurrenceRule = RecurrenceRule.Daily, isCompleted = true, completedAt = Instant.parse("2026-08-11T07:00:00Z"))
-        val c3 = Task(id = 3, title = "Guitar", recurrenceRule = RecurrenceRule.Daily, isCompleted = true, completedAt = Instant.parse("2026-08-12T07:00:00Z"))
-        val c4 = Task(id = 4, title = "Guitar", recurrenceRule = RecurrenceRule.Daily, isCompleted = true, completedAt = Instant.parse("2026-08-13T07:00:00Z"))
-        val c5 = Task(id = 5, title = "Guitar", recurrenceRule = RecurrenceRule.Daily, isCompleted = true, completedAt = Instant.parse("2026-08-16T07:00:00Z"))
+        val anchor = Instant.parse("2026-08-10T07:00:00Z")
+        val c1 = Task(id = 1, title = "Guitar", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-10T07:00:00Z"))
+        val c2 = Task(id = 2, title = "Guitar", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-11T07:00:00Z"))
+        val c3 = Task(id = 3, title = "Guitar", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-12T07:00:00Z"))
+        val c4 = Task(id = 4, title = "Guitar", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-13T07:00:00Z"))
+        val c5 = Task(id = 5, title = "Guitar", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-16T07:00:00Z"))
 
         val summary = useCase(listOf(c1, c2, c3, c4, c5))
         val routine = summary.routines[0]
@@ -104,9 +108,10 @@ class CalculateRoutineStreaksUseCaseTest {
     @Test
     fun `weekly routine streak calculation`() {
         // Completed Aug 5 (2 weeks ago), Aug 12 (1 week ago), Aug 19 (today)
-        val c1 = Task(id = 1, title = "Weekly Review", recurrenceRule = RecurrenceRule.Weekly, isCompleted = true, completedAt = Instant.parse("2026-08-05T07:00:00Z"))
-        val c2 = Task(id = 2, title = "Weekly Review", recurrenceRule = RecurrenceRule.Weekly, isCompleted = true, completedAt = Instant.parse("2026-08-12T07:00:00Z"))
-        val c3 = Task(id = 3, title = "Weekly Review", recurrenceRule = RecurrenceRule.Weekly, isCompleted = true, completedAt = Instant.parse("2026-08-19T07:00:00Z"))
+        val anchor = Instant.parse("2026-08-05T07:00:00Z")
+        val c1 = Task(id = 1, title = "Weekly Review", recurrenceRule = RecurrenceRule.Weekly, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-05T07:00:00Z"))
+        val c2 = Task(id = 2, title = "Weekly Review", recurrenceRule = RecurrenceRule.Weekly, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-12T07:00:00Z"))
+        val c3 = Task(id = 3, title = "Weekly Review", recurrenceRule = RecurrenceRule.Weekly, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-19T07:00:00Z"))
 
         val summary = useCase(listOf(c1, c2, c3))
         val routine = summary.routines[0]
@@ -117,13 +122,38 @@ class CalculateRoutineStreaksUseCaseTest {
 
     @Test
     fun `multiple routine series aggregate overall best and current streaks`() {
-        val r1c1 = Task(id = 1, title = "Habit A", recurrenceRule = RecurrenceRule.Daily, isCompleted = true, completedAt = Instant.parse("2026-08-19T07:00:00Z"))
-        val r2c1 = Task(id = 2, title = "Habit B", recurrenceRule = RecurrenceRule.Daily, isCompleted = true, completedAt = Instant.parse("2026-08-18T07:00:00Z"))
-        val r2c2 = Task(id = 3, title = "Habit B", recurrenceRule = RecurrenceRule.Daily, isCompleted = true, completedAt = Instant.parse("2026-08-19T07:00:00Z"))
+        val anchorA = Instant.parse("2026-08-19T07:00:00Z")
+        val anchorB = Instant.parse("2026-08-18T07:00:00Z")
+        val r1c1 = Task(id = 1, title = "Habit A", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchorA, isCompleted = true, completedAt = Instant.parse("2026-08-19T07:00:00Z"))
+        val r2c1 = Task(id = 2, title = "Habit B", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchorB, isCompleted = true, completedAt = Instant.parse("2026-08-18T07:00:00Z"))
+        val r2c2 = Task(id = 3, title = "Habit B", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchorB, isCompleted = true, completedAt = Instant.parse("2026-08-19T07:00:00Z"))
 
         val summary = useCase(listOf(r1c1, r2c1, r2c2))
         assertEquals(2, summary.totalActiveRoutines)
         assertEquals(2, summary.overallBestStreak)
         assertEquals(2, summary.overallCurrentStreak)
+    }
+
+    @Test
+    fun `tasks sharing an anchor but with different titles are separate series`() {
+        // Same anchor instant, different routines: must not merge into one series.
+        val anchor = Instant.parse("2026-08-19T07:00:00Z")
+        val a = Task(id = 1, title = "Habit A", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-19T07:00:00Z"))
+        val b = Task(id = 2, title = "Habit B", recurrenceRule = RecurrenceRule.Daily, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-19T07:00:00Z"))
+
+        val summary = useCase(listOf(a, b))
+        assertEquals(2, summary.totalActiveRoutines)
+        assertTrue(summary.routines.all { it.totalCompleted == 1 })
+    }
+
+    @Test
+    fun `anchorless recurring tasks with same title and rule do not merge`() {
+        // No anchor = no shared series identity, even when title and rule match.
+        val c1 = Task(id = 1, title = "Meditation", recurrenceRule = RecurrenceRule.Daily, isCompleted = true, completedAt = Instant.parse("2026-08-18T07:00:00Z"))
+        val c2 = Task(id = 2, title = "Meditation", recurrenceRule = RecurrenceRule.Daily, isCompleted = true, completedAt = Instant.parse("2026-08-19T07:00:00Z"))
+
+        val summary = useCase(listOf(c1, c2))
+        assertEquals(2, summary.totalActiveRoutines)
+        assertTrue(summary.routines.all { it.totalCompleted == 1 })
     }
 }

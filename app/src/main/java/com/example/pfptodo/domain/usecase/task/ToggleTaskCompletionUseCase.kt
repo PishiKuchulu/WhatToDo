@@ -21,7 +21,9 @@ import java.time.Instant
  *    and reschedules them if an uncompleted task has an active reminderTime.
  * 3. Spawns the next recurring occurrence via [RecurrenceEngine] when a recurring task
  *    is completed, preserving the series anchor, subtasks (checklist), tags, and reminder preferences.
- * 4. Persists changes to [TaskRepository].
+ * 4. Persists changes to [TaskRepository]. Completing a recurring task is atomic: the
+ *    completion update and the occurrence spawn commit together (or the completion is
+ *    rolled back), and reminder side effects run only after the commit.
  */
 class ToggleTaskCompletionUseCase(
     private val repository: TaskRepository,
@@ -38,6 +40,14 @@ class ToggleTaskCompletionUseCase(
             updatedAt = now
         )
 
+        val isRecurring = updatedTask.recurrenceRule !is RecurrenceRule.None
+
+        if (!wasCompleted && updatedTask.isCompleted && isRecurring) {
+            // Completing a recurring task also spawns the next occurrence; the two
+            // writes must commit together (see completeRecurringTask).
+            return completeRecurringTask(task, updatedTask)
+        }
+
         val updateResult = repository.updateTask(updatedTask)
         if (updateResult is Result.Error) {
             return updateResult
@@ -51,21 +61,58 @@ class ToggleTaskCompletionUseCase(
             if (updatedTask.reminderTime != null) {
                 reminderManager.scheduleReminder(updatedTask)
             }
-        }
-
-        if (updatedTask.recurrenceRule !is RecurrenceRule.None) {
-            if (updatedTask.isCompleted) {
-                val spawnResult = generateNextOccurrence(updatedTask)
-                if (spawnResult is Result.Error) {
-                    return spawnResult
-                }
-            } else if (wasCompleted) {
+            if (isRecurring) {
                 // Undo / un-complete: the occurrence spawned by the earlier completion is
                 // now redundant — remove it so completing again does not create a duplicate.
                 removeSpawnedOccurrence(updatedTask)
             }
         }
 
+        return Result.Success(Unit)
+    }
+
+    /**
+     * Completes a recurring task and spawns its next occurrence atomically.
+     *
+     * Previously the completion was committed first and the spawn ran afterwards, so a
+     * spawn failure stranded the task as completed — reminder already cancelled, no next
+     * occurrence. Now, when a [TransactionRunner] is available, the completion update and
+     * [spawnNextOccurrenceInDb] run in one transaction and commit or roll back together.
+     * Without one, a spawn failure restores the original task row before the error is
+     * returned (its reminder has not been cancelled yet, so nothing else needs undoing).
+     * Reminder side effects run only after the database writes have committed.
+     */
+    private suspend fun completeRecurringTask(originalTask: Task, updatedTask: Task): Result<Unit> {
+        val spawned: Task?
+        try {
+            val runner = transactionRunner
+            spawned = if (runner != null) {
+                runner.inTransaction {
+                    repository.updateTask(updatedTask).unwrap()
+                    spawnNextOccurrenceInDb(updatedTask)
+                }
+            } else {
+                val updateResult = repository.updateTask(updatedTask)
+                if (updateResult is Result.Error) {
+                    return updateResult
+                }
+                try {
+                    spawnNextOccurrenceInDb(updatedTask)
+                } catch (e: Exception) {
+                    repository.updateTask(originalTask)
+                    throw e
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to complete recurring task ${originalTask.id}", e)
+            return Result.Error(e)
+        }
+
+        // Database writes committed — now the reminder side effects.
+        reminderManager.cancelReminder(originalTask.id)
+        if (spawned != null && spawned.reminderTime != null) {
+            reminderManager.scheduleReminder(spawned)
+        }
         return Result.Success(Unit)
     }
 
@@ -102,11 +149,19 @@ class ToggleTaskCompletionUseCase(
         reminderManager.cancelReminder(spawned.id)
     }
 
-    private suspend fun generateNextOccurrence(task: Task): Result<Unit> {
+    /**
+     * Persists the next occurrence of the completed recurring [task] — the task row, its
+     * copied subtasks and its tags — and returns it with its real id, or null when no
+     * occurrence should be spawned (no next due date, or one was already spawned).
+     * Throws on any persistence failure: callers either run this inside a transaction or
+     * roll back manually. Reminder scheduling is left to the caller so it only happens
+     * after the database writes have committed.
+     */
+    private suspend fun spawnNextOccurrenceInDb(task: Task): Task? {
         val nextDueDate = nextDueDateFor(task)
         // Completing a series task twice (complete -> undo -> complete) must not stack copies.
         if (nextDueDate == null || findSpawnedOccurrence(task) != null) {
-            return Result.Success(Unit)
+            return null
         }
 
         // Preserve the user's reminder offset (e.g. "2h before due"): only the
@@ -132,53 +187,29 @@ class ToggleTaskCompletionUseCase(
             updatedAt = Instant.now()
         )
 
-        return try {
-            // All DB writes for the spawned occurrence (task + subtasks + tags) run in
-            // one transaction: a failure anywhere rolls everything back instead of
-            // leaving a half-copied occurrence behind.
-            suspend fun spawnInDb(): Long {
-                val newTaskId = repository.insertTask(nextTask).unwrap()
+        val newTaskId = repository.insertTask(nextTask).unwrap()
 
-                // 1. Copy subtasks (checklist items) to the new occurrence
-                val existingSubtasks = repository.getSubtasksForTask(task.id).firstOrNull() ?: emptyList()
-                for (subtask in existingSubtasks) {
-                    repository.insertTask(
-                        subtask.copy(
-                            id = 0,
-                            parentTaskId = newTaskId,
-                            isCompleted = false,
-                            completedAt = null,
-                            createdAt = Instant.now(),
-                            updatedAt = Instant.now()
-                        )
-                    ).unwrap()
-                }
-
-                // 2. Preserve tags for the new occurrence
-                if (task.tags.isNotEmpty() && tagRepository != null) {
-                    tagRepository.setTaskTags(newTaskId, task.tags.map { it.id }).unwrap()
-                }
-
-                return newTaskId
-            }
-
-            val newTaskId = if (transactionRunner != null) {
-                transactionRunner.inTransaction { spawnInDb() }
-            } else {
-                spawnInDb()
-            }
-
-            // 3. Schedule the reminder only after the DB writes committed — it is a
-            // side effect outside the transaction, so a rollback never leaves an
-            // orphaned reminder for a task that was not persisted.
-            if (nextTask.reminderTime != null) {
-                reminderManager.scheduleReminder(nextTask.copy(id = newTaskId))
-            }
-            Result.Success(Unit)
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to spawn next occurrence of recurring task ${task.id}", e)
-            Result.Error(e)
+        // 1. Copy subtasks (checklist items) to the new occurrence
+        val existingSubtasks = repository.getSubtasksForTask(task.id).firstOrNull() ?: emptyList()
+        for (subtask in existingSubtasks) {
+            repository.insertTask(
+                subtask.copy(
+                    id = 0,
+                    parentTaskId = newTaskId,
+                    isCompleted = false,
+                    completedAt = null,
+                    createdAt = Instant.now(),
+                    updatedAt = Instant.now()
+                )
+            ).unwrap()
         }
+
+        // 2. Preserve tags for the new occurrence
+        if (task.tags.isNotEmpty() && tagRepository != null) {
+            tagRepository.setTaskTags(newTaskId, task.tags.map { it.id }).unwrap()
+        }
+
+        return nextTask.copy(id = newTaskId)
     }
 
     private fun <T> Result<T>.unwrap(): T = when (this) {

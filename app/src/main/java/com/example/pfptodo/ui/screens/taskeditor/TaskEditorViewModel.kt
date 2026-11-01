@@ -240,13 +240,18 @@ class TaskEditorViewModel(
                     val result = taskUseCases.addTask(task)
                     if (result is Result.Success) {
                         val newId = result.data
-                        if (state.subtasks.isNotEmpty()) {
-                            taskUseCases.createSubtasksBatch(newId, state.subtasks)
+                        val batchFailed = state.subtasks.isNotEmpty() &&
+                            taskUseCases.createSubtasksBatch(newId, state.subtasks) is Result.Error
+                        if (batchFailed) {
+                            // Subtask write failed: the save as a whole failed — do not
+                            // schedule the reminder or report success.
+                            null
+                        } else {
+                            if (task.reminderTime != null) {
+                                reminderManager.scheduleReminder(task.copy(id = newId))
+                            }
+                            newId
                         }
-                        if (task.reminderTime != null) {
-                            reminderManager.scheduleReminder(task.copy(id = newId))
-                        }
-                        newId
                     } else {
                         reminderManager.cancelReminder(task.id)
                         null
@@ -256,26 +261,33 @@ class TaskEditorViewModel(
                     if (updateResult is Result.Error) {
                         null
                     } else {
-                        if (state.subtasks.isNotEmpty()) {
-                            taskUseCases.createSubtasksBatch(task.id, state.subtasks)
+                        val batchFailed = state.subtasks.isNotEmpty() &&
+                            taskUseCases.createSubtasksBatch(task.id, state.subtasks) is Result.Error
+                        if (batchFailed) {
+                            null
+                        } else {
+                            // Handle reminder changes on edit
+                            val newReminderTime = state.reminderTime
+                            if (originalReminderTime != null && newReminderTime == null) {
+                                reminderManager.cancelReminder(task.id)
+                            } else if (originalReminderTime != null && newReminderTime != null) {
+                                reminderManager.cancelReminder(task.id)
+                                reminderManager.scheduleReminder(task)
+                            } else if (originalReminderTime == null && newReminderTime != null) {
+                                reminderManager.scheduleReminder(task)
+                            }
+                            task.id
                         }
-                        // Handle reminder changes on edit
-                        val newReminderTime = state.reminderTime
-                        if (originalReminderTime != null && newReminderTime == null) {
-                            reminderManager.cancelReminder(task.id)
-                        } else if (originalReminderTime != null && newReminderTime != null) {
-                            reminderManager.cancelReminder(task.id)
-                            reminderManager.scheduleReminder(task)
-                        } else if (originalReminderTime == null && newReminderTime != null) {
-                            reminderManager.scheduleReminder(task)
-                        }
-                        task.id
                     }
                 }
 
                 if (targetTaskId != null && targetTaskId > 0L) {
-                    tagUseCases.setTaskTags(targetTaskId, state.selectedTagIds.toList())
-                    _uiState.update { it.copy(isSaving = false, isSaved = true) }
+                    val tagsResult = tagUseCases.setTaskTags(targetTaskId, state.selectedTagIds.toList())
+                    if (tagsResult is Result.Error) {
+                        _uiState.update { it.copy(isSaving = false, saveErrorRes = R.string.save_task_failed, saveError = tagsResult.exception.localizedMessage) }
+                    } else {
+                        _uiState.update { it.copy(isSaving = false, isSaved = true) }
+                    }
                 } else {
                     _uiState.update { it.copy(isSaving = false, saveErrorRes = R.string.save_task_failed, saveError = null) }
                 }

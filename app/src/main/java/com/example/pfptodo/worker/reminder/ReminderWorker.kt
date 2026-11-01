@@ -18,8 +18,14 @@ class ReminderWorker(
         if (taskId <= 0L) return Result.failure()
 
         if (!NotificationManagerCompat.from(applicationContext).areNotificationsEnabled()) {
-            // Permission denied or disabled — do not crash, just skip.
-            return Result.success()
+            // Notifications are currently disabled. Returning success here would consume
+            // this one-shot reminder permanently, so retry instead: WorkManager re-runs
+            // the work with its default exponential backoff (no explicit backoff criteria
+            // is set on either enqueue path), and the reminder can still fire if
+            // notifications are re-enabled reasonably soon. If they stay disabled, the
+            // retries back off exponentially (up to the WorkManager maximum) and cost
+            // nothing; the task checks below keep any eventual delivery correct.
+            return Result.retry()
         }
 
         val database = PishiDatabase.getDatabase(applicationContext)

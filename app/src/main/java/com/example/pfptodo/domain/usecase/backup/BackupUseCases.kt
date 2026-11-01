@@ -493,7 +493,7 @@ class BackupUseCases(
                 val result = taskRepository.getTaskById(newId)
                 if (result is Result.Success && result.data != null) {
                     val updatedTask = result.data!!.copy(parentTaskId = remappedParentId)
-                    taskRepository.updateTask(updatedTask)
+                    taskRepository.updateTask(updatedTask).unwrap()
                 }
             }
         }

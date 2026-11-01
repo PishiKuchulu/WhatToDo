@@ -56,9 +56,29 @@ class GetSubtasks(private val repository: TaskRepository) {
 
 /**
  * Use case for adding a new task.
+ *
+ * When the task is a subtask ([Task.parentTaskId] != null), the same 1-level depth rule
+ * [CreateSubtaskUseCase] enforces is applied here too, so every creation path (editor,
+ * quick add) is guarded: a subtask can never become a parent.
  */
 class AddTask(private val repository: TaskRepository) {
-    suspend operator fun invoke(task: Task): Result<Long> = repository.insertTask(task)
+    suspend operator fun invoke(task: Task): Result<Long> {
+        val parentId = task.parentTaskId
+        if (parentId != null) {
+            val parentResult = repository.getTaskById(parentId)
+            if (parentResult is Result.Error) {
+                return parentResult
+            }
+
+            val parentTask = (parentResult as Result.Success).data
+                ?: return Result.Error(IllegalArgumentException("Parent task not found for ID: $parentId"))
+
+            if (parentTask.parentTaskId != null) {
+                return Result.Error(IllegalStateException("Cannot add a subtask to an existing subtask. Max depth is 1."))
+            }
+        }
+        return repository.insertTask(task)
+    }
 }
 
 /**

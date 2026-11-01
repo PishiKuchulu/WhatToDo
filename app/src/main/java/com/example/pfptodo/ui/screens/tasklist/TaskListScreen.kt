@@ -61,6 +61,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 fun TaskListScreen(
     viewModel: TaskListViewModel,
     onTaskClick: (Long) -> Unit,
+    onEditTaskClick: (Long) -> Unit = onTaskClick,
     onAddTask: () -> Unit,
     onAddTaskWithPrefill: (TaskPrefill) -> Unit = { onAddTask() },
     onOpenMatrix: () -> Unit = {},
@@ -438,7 +439,7 @@ fun TaskListScreen(
                     onAction = { action ->
                         when (action) {
                             is com.example.pfptodo.domain.model.SuggestionAction.OpenTask -> onTaskClick(action.taskId)
-                            is com.example.pfptodo.domain.model.SuggestionAction.OpenTaskEditor -> onTaskClick(action.taskId)
+                            is com.example.pfptodo.domain.model.SuggestionAction.OpenTaskEditor -> onEditTaskClick(action.taskId)
                             is com.example.pfptodo.domain.model.SuggestionAction.FilterOverdue -> viewModel.onFilterChange(TaskFilter(status = TaskFilter.Status.OVERDUE))
                             is com.example.pfptodo.domain.model.SuggestionAction.FilterToday -> viewModel.onFilterChange(TaskFilter(dateFilter = TaskFilter.DateFilter.TODAY))
                         }

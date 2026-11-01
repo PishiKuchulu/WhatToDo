@@ -54,6 +54,9 @@ interface AppContainer {
     val birthdayUseCases: BirthdayUseCases
     val birthdayReminderManager: BirthdayReminderManager
 
+    /** Re-arms task and birthday reminders for all persisted rows (startup self-heal, backup restore). */
+    suspend fun rescheduleAllReminders()
+
     fun provideTaskListViewModelFactory(): ViewModelProvider.Factory
     fun provideCalendarViewModelFactory(): ViewModelProvider.Factory
     fun provideTaskDetailViewModelFactory(taskId: Long): ViewModelProvider.Factory
@@ -193,8 +196,13 @@ class AppContainerImpl(private val context: Context) : AppContainer {
         BirthdayReminderManagerImpl(context)
     }
 
-    /** Re-arms task and birthday reminders, e.g. after a backup restore (WorkManager knows nothing of restored rows). */
-    private suspend fun rescheduleAllReminders() {
+    /**
+     * Re-arms task and birthday reminders, e.g. after a backup restore (WorkManager knows
+     * nothing of restored rows) or at startup as a self-heal. Idempotent: task reminders go
+     * through [ReminderManager.scheduleReminder], which cancels any existing delivery for
+     * the task before re-arming, and birthday reminders enqueue unique work with replace.
+     */
+    override suspend fun rescheduleAllReminders() {
         taskRepository.getAllTasksRaw()
             .filter { !it.isCompleted && it.reminderTime != null }
             .forEach { reminderManager.scheduleReminder(it) }

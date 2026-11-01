@@ -92,6 +92,7 @@ abstract class PishiDatabase : RoomDatabase() {
             INSERT INTO `tasks` (`id`, `title`, `description`, `notes`, `isCompleted`, `priority`, `categoryId`, `parentTaskId`, `dueDate`, `reminderTime`, `orderIndex`, `recurrenceRule`, `createdAt`, `updatedAt`)
             SELECT `id`, `title`, `description`, `notes`, `isCompleted`, `priority`, NULL, `parentTaskId`, `dueDate`, `reminderTime`, `orderIndex`, `recurrenceRule`, `createdAt`, `updatedAt`
             FROM `tasks_old`
+            ORDER BY CASE WHEN `parentTaskId` IS NULL THEN 0 ELSE 1 END, `id`
             """.trimIndent(),
             "DROP TABLE `tasks_old`",
             "CREATE INDEX IF NOT EXISTS `index_tasks_categoryId` ON `tasks` (`categoryId`)",
@@ -135,6 +136,7 @@ abstract class PishiDatabase : RoomDatabase() {
             INSERT INTO `tasks` (`id`, `title`, `description`, `notes`, `isCompleted`, `priority`, `categoryId`, `parentTaskId`, `dueDate`, `reminderTime`, `orderIndex`, `recurrenceRule`, `createdAt`, `updatedAt`)
             SELECT `id`, `title`, `description`, `notes`, `isCompleted`, `priority`, `categoryId`, `parentTaskId`, `dueDate`, `reminderTime`, `orderIndex`, `recurrenceRule`, `createdAt`, `updatedAt`
             FROM `tasks_old`
+            ORDER BY CASE WHEN `parentTaskId` IS NULL THEN 0 ELSE 1 END, `id`
             """.trimIndent(),
             "DROP TABLE `tasks_old`",
             // Recreate task indices (they were renamed away with tasks_old).

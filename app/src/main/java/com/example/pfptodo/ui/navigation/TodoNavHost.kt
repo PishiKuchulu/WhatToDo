@@ -50,6 +50,9 @@ fun TodoNavHost(
                 onTaskClick = { taskId ->
                     navController.navigate(Screen.TaskDetail.createRoute(taskId))
                 },
+                onEditTaskClick = { taskId ->
+                    navController.navigate(Screen.TaskEditor.createRoute(taskId = taskId))
+                },
                 onAddTask = {
                     navController.navigate(Screen.TaskEditor.createRoute())
                 },

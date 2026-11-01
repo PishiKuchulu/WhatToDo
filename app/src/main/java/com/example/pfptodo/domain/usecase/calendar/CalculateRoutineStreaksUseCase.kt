@@ -26,9 +26,18 @@ class CalculateRoutineStreaksUseCase(
             return RoutineStreakSummary()
         }
 
-        // Group tasks into distinct routine series
+        // Group tasks into distinct routine series. An anchored series is identified
+        // by its anchor together with the normalized title and rule, so two different
+        // routines that happen to share an anchor instant never merge. Anchor-less
+        // tasks carry no series identity, so each one forms its own series by id and
+        // never merges with another anchor-less task.
         val groupedBySeries = recurringTasks.groupBy { task ->
-            task.recurrenceAnchor?.toString() ?: "${task.title.trim().lowercase()}_${task.recurrenceRule}"
+            val anchor = task.recurrenceAnchor
+            if (anchor != null) {
+                "${anchor}_${task.title.trim().lowercase()}_${task.recurrenceRule}"
+            } else {
+                "task_${task.id}"
+            }
         }
 
         val routineList = mutableListOf<RoutineStreakInfo>()

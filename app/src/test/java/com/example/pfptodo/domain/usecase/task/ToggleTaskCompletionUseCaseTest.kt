@@ -6,6 +6,7 @@ import com.example.pfptodo.domain.model.Tag
 import com.example.pfptodo.domain.model.Task
 import com.example.pfptodo.domain.repository.TagRepository
 import com.example.pfptodo.domain.repository.TaskRepository
+import com.example.pfptodo.domain.repository.TransactionRunner
 import com.example.pfptodo.domain.util.RecurrenceEngine
 import com.example.pfptodo.worker.reminder.ReminderManager
 import kotlinx.coroutines.flow.flowOf
@@ -263,5 +264,105 @@ class ToggleTaskCompletionUseCaseTest {
 
         assertTrue(result is Result.Success)
         verify(tagRepository).setTaskTags(eq(170L), eq(listOf(5L, 9L)))
+    }
+
+    @Test
+    fun `spawn failure without transaction runner rolls back the completion`() = runTest {
+        val now = Instant.now()
+        val originalTask = Task(
+            id = 80L,
+            title = "Weekly Review",
+            isCompleted = false,
+            recurrenceRule = RecurrenceRule.Weekly,
+            dueDate = now,
+            recurrenceAnchor = now,
+            reminderTime = now
+        )
+        val spawnError = RuntimeException("Insert failed")
+        whenever(taskRepository.updateTask(any())).thenReturn(Result.Success(Unit))
+        whenever(taskRepository.getAllTasksRaw()).thenReturn(emptyList())
+        whenever(taskRepository.insertTask(any())).thenReturn(Result.Error(spawnError))
+
+        val result = useCase(originalTask)
+
+        assertTrue(result is Result.Error)
+        assertEquals(spawnError, (result as Result.Error).exception)
+        // The completion write is undone by restoring the original task, and the
+        // reminder is never cancelled for a completion that did not stick.
+        verify(taskRepository, times(2)).updateTask(any())
+        verify(taskRepository).updateTask(check { restored ->
+            assertEquals(80L, restored.id)
+            assertFalse(restored.isCompleted)
+            assertNull(restored.completedAt)
+        })
+        verify(reminderManager, never()).cancelReminder(any())
+        verify(reminderManager, never()).scheduleReminder(any())
+    }
+
+    @Test
+    fun `spawn failure inside transaction returns error and cancels no reminder`() = runTest {
+        // A pass-through runner stands in for Room: the block's exception propagates
+        // exactly as a transaction rollback would surface it to the use case.
+        val passthroughRunner = object : TransactionRunner {
+            override suspend fun <T> inTransaction(block: suspend () -> T): T = block()
+        }
+        val transactionalUseCase =
+            ToggleTaskCompletionUseCase(taskRepository, reminderManager, tagRepository, passthroughRunner)
+        val now = Instant.now()
+        val originalTask = Task(
+            id = 90L,
+            title = "Weekly Review",
+            isCompleted = false,
+            recurrenceRule = RecurrenceRule.Weekly,
+            dueDate = now,
+            recurrenceAnchor = now,
+            reminderTime = now
+        )
+        val spawnError = RuntimeException("Insert failed")
+        whenever(taskRepository.updateTask(any())).thenReturn(Result.Success(Unit))
+        whenever(taskRepository.getAllTasksRaw()).thenReturn(emptyList())
+        whenever(taskRepository.insertTask(any())).thenReturn(Result.Error(spawnError))
+
+        val result = transactionalUseCase(originalTask)
+
+        assertTrue(result is Result.Error)
+        assertEquals(spawnError, (result as Result.Error).exception)
+        // No manual restore write (the transaction rolls back), and reminder side
+        // effects run only after a successful commit.
+        verify(taskRepository, times(1)).updateTask(any())
+        verify(reminderManager, never()).cancelReminder(any())
+        verify(reminderManager, never()).scheduleReminder(any())
+    }
+
+    @Test
+    fun `transactional completion spawns occurrence and schedules its reminder after commit`() = runTest {
+        val passthroughRunner = object : TransactionRunner {
+            override suspend fun <T> inTransaction(block: suspend () -> T): T = block()
+        }
+        val transactionalUseCase =
+            ToggleTaskCompletionUseCase(taskRepository, reminderManager, tagRepository, passthroughRunner)
+        val now = Instant.now()
+        val originalTask = Task(
+            id = 95L,
+            title = "Weekly Review",
+            isCompleted = false,
+            recurrenceRule = RecurrenceRule.Weekly,
+            dueDate = now,
+            recurrenceAnchor = now,
+            reminderTime = now
+        )
+        whenever(taskRepository.updateTask(any())).thenReturn(Result.Success(Unit))
+        whenever(taskRepository.insertTask(any())).thenReturn(Result.Success(195L))
+        whenever(taskRepository.getAllTasksRaw()).thenReturn(emptyList())
+        whenever(taskRepository.getSubtasksForTask(any())).thenReturn(flowOf(emptyList()))
+
+        val result = transactionalUseCase(originalTask)
+
+        assertTrue(result is Result.Success)
+        verify(reminderManager).cancelReminder(95L)
+        verify(reminderManager).scheduleReminder(check { scheduled ->
+            assertEquals(195L, scheduled.id)
+            assertFalse(scheduled.isCompleted)
+        })
     }
 }

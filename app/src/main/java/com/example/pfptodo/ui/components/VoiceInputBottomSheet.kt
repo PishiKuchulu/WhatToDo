@@ -58,12 +58,15 @@ fun VoiceInputBottomSheet(
         }
     }
 
-    val speechRecognizer = remember { SpeechRecognizer.createSpeechRecognizer(context) }
+    val recognitionAvailable = remember { SpeechRecognizer.isRecognitionAvailable(context) }
+    val speechRecognizer = remember {
+        if (recognitionAvailable) SpeechRecognizer.createSpeechRecognizer(context) else null
+    }
 
     val recognizerIntent = remember {
         Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
             putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
-            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+            putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault().toLanguageTag())
         }
     }
 
@@ -71,8 +74,12 @@ fun VoiceInputBottomSheet(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            speechRecognizer.startListening(recognizerIntent)
-            isListening = true
+            if (speechRecognizer != null) {
+                speechRecognizer.startListening(recognizerIntent)
+                isListening = true
+            } else {
+                errorMessage = context.getString(R.string.voice_error)
+            }
         } else {
             errorMessage = context.getString(R.string.voice_permission_denied)
         }
@@ -102,13 +109,18 @@ fun VoiceInputBottomSheet(
             override fun onPartialResults(partialResults: Bundle?) {}
             override fun onEvent(eventType: Int, params: Bundle?) {}
         }
-        speechRecognizer.setRecognitionListener(listener)
+        if (speechRecognizer != null) {
+            speechRecognizer.setRecognitionListener(listener)
 
-        // Start listening immediately
-        permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            // Start listening immediately
+            permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        } else {
+            errorMessage = context.getString(R.string.voice_error)
+        }
 
         onDispose {
-            speechRecognizer.destroy()
+            speechRecognizer?.setRecognitionListener(null)
+            speechRecognizer?.destroy()
         }
     }
 
@@ -159,7 +171,7 @@ fun VoiceInputBottomSheet(
                         if (!isListening) {
                             permissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
                         } else {
-                            speechRecognizer.stopListening()
+                            speechRecognizer?.stopListening()
                             isListening = false
                         }
                     },

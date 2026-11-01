@@ -125,8 +125,12 @@ fun TaskDetailScreen(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { task?.let { onAddSubtask(it.id) } }) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_subtask))
+            // A subtask cannot have subtasks of its own (max depth 1), so the
+            // add-subtask FAB is hidden when the displayed task is itself a subtask.
+            if (task?.parentTaskId == null) {
+                FloatingActionButton(onClick = { task?.let { onAddSubtask(it.id) } }) {
+                    Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_subtask))
+                }
             }
         }
     ) { padding ->
