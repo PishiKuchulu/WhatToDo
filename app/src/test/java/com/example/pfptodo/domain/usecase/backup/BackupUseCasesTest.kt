@@ -364,6 +364,51 @@ class BackupUseCasesTest {
     }
 
     @Test
+    fun `import matches a default category backed up under another locale by icon alias`() = runBlocking {
+        // This install was seeded under Persian: the default Personal row carries
+        // the fa name. The backup was made under English. Exact name+icon matching
+        // would duplicate the default; canonical alias identity must not (M-25).
+        val existingId = categories.insertCategory(
+            Category(name = "شخصی", color = "#FF6200EE", iconName = "person")
+        ).unwrap2()
+
+        val json = """
+            {"formatVersion": 4,
+             "categories": [{"id": 7, "name": "Personal", "color": "#FF6200EE", "iconName": "person"}],
+             "tags": [],
+             "tasks": [{"id": 10, "title": "T", "categoryId": 7, "orderIndex": 0, "recurrenceRule": "NONE"}],
+             "taskTagCrossRefs": [], "attachments": []}
+        """.trimIndent()
+
+        val result = useCases.importFromJson(json)
+        assertTrue(result is Result.Success)
+        assertEquals(1, categories.getAllCategoriesRaw().size)
+        assertEquals(existingId, tasks.getAllTasksRaw().single().categoryId)
+    }
+
+    @Test
+    fun `import matches incoming default to the existing row carrying the default icon`() = runBlocking {
+        // Per the M-25 rule, the match target is "the existing category with that
+        // icon, regardless of its stored name" — so even a row the user renamed
+        // (keeping the default icon) absorbs the incoming default instead of
+        // duplicating it.
+        categories.insertCategory(Category(name = "Family", color = "#111111", iconName = "person"))
+
+        val json = """
+            {"formatVersion": 4,
+             "categories": [{"id": 7, "name": "Personal", "color": "#FF6200EE", "iconName": "person"}],
+             "tags": [], "tasks": [], "taskTagCrossRefs": [], "attachments": []}
+        """.trimIndent()
+
+        val result = useCases.importFromJson(json)
+        assertTrue(result is Result.Success)
+        // "Family" has the person icon, and "Personal" IS a default alias for that
+        // icon, so by the M-25 rule the incoming default matches the existing row
+        // with the default icon — no duplicate is created.
+        assertEquals(1, categories.getAllCategoriesRaw().size)
+    }
+
+    @Test
     fun `legacy v1 backup without envelope still imports`() = runBlocking {
         val json = """
             {"categories": [{"id":1,"name":"LegacyCat","color":"#FFF","iconName":"x"}],

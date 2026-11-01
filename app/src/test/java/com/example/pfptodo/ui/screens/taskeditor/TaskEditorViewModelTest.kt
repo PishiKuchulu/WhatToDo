@@ -254,3 +254,105 @@ class TaskEditorViewModelEditPreservesDataTest {
         assertEquals(created, saved.createdAt)
     }
 }
+
+@OptIn(ExperimentalCoroutinesApi::class)
+class TaskEditorViewModelSubtaskReconcileTest {
+
+    private val testDispatcher = StandardTestDispatcher()
+    private val taskUseCases: TaskUseCases = mock()
+    private val tagUseCases: TagUseCases = mock()
+    private val reminderManager: ReminderManager = mock()
+
+    private val parent = Task(id = 50L, title = "Parent")
+    private val subA = Task(id = 11L, title = "Alpha", parentTaskId = 50L, orderIndex = 0)
+    private val subB = Task(id = 12L, title = "Beta", parentTaskId = 50L, orderIndex = 1)
+
+    @Before
+    fun setup() {
+        Dispatchers.setMain(testDispatcher)
+        whenever(tagUseCases.getAllTags).thenReturn(mock())
+        whenever(tagUseCases.getAllTags.invoke()).thenReturn(flowOf(emptyList()))
+        whenever(taskUseCases.getTaskById).thenReturn(mock())
+        whenever(taskUseCases.getTaskById.invoke(50L)).thenReturn(Result.Success(parent))
+        whenever(taskUseCases.getSubtasks).thenReturn(mock())
+        whenever(taskUseCases.getSubtasks.invoke(50L)).thenReturn(flowOf(listOf(subA, subB)))
+        whenever(taskUseCases.updateTask).thenReturn(mock())
+        whenever(taskUseCases.updateTask.invoke(any())).thenReturn(Result.Success(Unit))
+        whenever(tagUseCases.setTaskTags).thenReturn(mock())
+        whenever(tagUseCases.setTaskTags.invoke(any(), any())).thenReturn(Result.Success(Unit))
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
+    private fun editingViewModel(): TaskEditorViewModel {
+        val vm = TaskEditorViewModel(50L, null, taskUseCases, tagUseCases, reminderManager)
+        testDispatcher.scheduler.advanceUntilIdle()
+        return vm
+    }
+
+    @Test
+    fun `editing loads existing subtasks as rows carrying their ids`() = runTest {
+        val vm = editingViewModel()
+
+        assertEquals(
+            listOf(EditorSubtaskRow(id = 11L, title = "Alpha"), EditorSubtaskRow(id = 12L, title = "Beta")),
+            vm.uiState.value.subtasks
+        )
+    }
+
+    @Test
+    fun `removing a loaded subtask deletes it on save instead of re-inserting everything`() = runTest {
+        whenever(taskUseCases.deleteTask).thenReturn(mock())
+        whenever(taskUseCases.deleteTask.invoke(any())).thenReturn(Result.Success(Unit))
+        whenever(taskUseCases.createSubtasksBatch).thenReturn(mock())
+        whenever(taskUseCases.createSubtasksBatch.invoke(any(), any()))
+            .thenReturn(Result.Success(emptyList()))
+
+        val vm = editingViewModel()
+        vm.onRemoveSubtask(0)
+        vm.onSave()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        val captor = org.mockito.kotlin.argumentCaptor<Task>()
+        verify(taskUseCases.deleteTask).invoke(captor.capture())
+        assertEquals(11L, captor.firstValue.id)
+        // The kept row must not be inserted again — no batch call at all.
+        verify(taskUseCases.createSubtasksBatch, org.mockito.Mockito.never()).invoke(any(), any())
+        assertTrue(vm.uiState.value.isSaved)
+    }
+
+    @Test
+    fun `adding a row on edit batch-inserts only the new title`() = runTest {
+        whenever(taskUseCases.createSubtasksBatch).thenReturn(mock())
+        whenever(taskUseCases.createSubtasksBatch.invoke(any(), any()))
+            .thenReturn(Result.Success(listOf(99L)))
+        whenever(taskUseCases.deleteTask).thenReturn(mock())
+
+        val vm = editingViewModel()
+        vm.onAddSubtask("Gamma")
+        vm.onSave()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        verify(taskUseCases.createSubtasksBatch).invoke(50L, listOf("Gamma"))
+        verify(taskUseCases.deleteTask, org.mockito.Mockito.never()).invoke(any())
+        assertTrue(vm.uiState.value.isSaved)
+    }
+
+    @Test
+    fun `subtask delete failure fails the whole save`() = runTest {
+        whenever(taskUseCases.deleteTask).thenReturn(mock())
+        whenever(taskUseCases.deleteTask.invoke(any()))
+            .thenReturn(Result.Error(RuntimeException("delete failed")))
+
+        val vm = editingViewModel()
+        vm.onRemoveSubtask(1)
+        vm.onSave()
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertFalse(vm.uiState.value.isSaved)
+        assertNotNull(vm.uiState.value.saveErrorRes)
+    }
+}

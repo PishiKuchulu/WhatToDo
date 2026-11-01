@@ -119,6 +119,24 @@ class BackupV4Test {
     }
 
     @Test
+    fun `duplicate birthdays within a single backup import only once`() = runBlocking {
+        // The dedupe snapshot must grow as rows are inserted; otherwise the
+        // second copy inside the SAME file slips through (M-26).
+        val json = """
+            {"formatVersion": 4, "birthdays": [
+              {"id":1,"name":"Ali","month":5,"day":6},
+              {"id":2,"name":"Ali","month":5,"day":6},
+              {"id":3,"name":"Sara","month":2,"day":29,"contactId":"c7"},
+              {"id":4,"name":"Sara","month":2,"day":29,"contactId":"c7"}
+            ]}
+        """.trimIndent()
+        assertTrue(useCases.importFromJson(json) is Result.Success)
+        val imported = birthdays.getAllBirthdaysRaw()
+        assertEquals(2, imported.size)
+        assertEquals(setOf("Ali", "Sara"), imported.map { it.name }.toSet())
+    }
+
+    @Test
     fun `invalid birthday month is rejected`() = runBlocking {
         val json = """{"formatVersion": 4, "birthdays": [{"id":1,"name":"X","month":13,"day":1}]}"""
         assertTrue(useCases.importFromJson(json) is Result.Error)

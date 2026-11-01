@@ -1,5 +1,7 @@
 package com.example.pfptodo.ui.screens.taskdetail
 
+import com.example.pfptodo.core.util.Result
+import com.example.pfptodo.domain.model.Attachment
 import com.example.pfptodo.domain.model.Task
 import com.example.pfptodo.domain.repository.AttachmentRepository
 import com.example.pfptodo.domain.usecase.task.ObserveTaskById
@@ -15,9 +17,11 @@ import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
+import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -123,6 +127,67 @@ class TaskDetailViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         verify(taskUseCases.toggleTaskCompletion).invoke(currentTask)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `failed subtask toggle surfaces error in uiState until shown`() = runTest {
+        val currentTask = Task(id = 1L, title = "Parent")
+        whenever(observeTaskById.invoke(1L)).thenReturn(MutableStateFlow(currentTask))
+        whenever(taskUseCases.updateTask).thenReturn(mock())
+        whenever(taskUseCases.updateTask.invoke(any()))
+            .thenReturn(Result.Error(RuntimeException("db gone")))
+
+        val viewModel = TaskDetailViewModel(
+            taskId = 1L,
+            taskUseCases = taskUseCases,
+            attachmentRepository = attachmentRepository,
+            reminderManager = reminderManager
+        )
+
+        val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertNull(viewModel.uiState.value.error)
+
+        viewModel.onToggleSubtask(Task(id = 2L, title = "Sub", parentTaskId = 1L))
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals("db gone", viewModel.uiState.value.error)
+
+        viewModel.onErrorShown()
+        testDispatcher.scheduler.advanceUntilIdle()
+        assertNull(viewModel.uiState.value.error)
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `failed attachment insert surfaces error in uiState`() = runTest {
+        val currentTask = Task(id = 1L, title = "Parent")
+        whenever(observeTaskById.invoke(1L)).thenReturn(MutableStateFlow(currentTask))
+        whenever(attachmentRepository.insertAttachment(any()))
+            .thenReturn(Result.Error(RuntimeException("insert failed")))
+
+        val viewModel = TaskDetailViewModel(
+            taskId = 1L,
+            taskUseCases = taskUseCases,
+            attachmentRepository = attachmentRepository,
+            reminderManager = reminderManager
+        )
+
+        val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        viewModel.onAddAttachment(
+            Attachment(id = 0L, taskId = 1L, type = com.example.pfptodo.domain.model.AttachmentType.DOCUMENT, uri = "file:///x", fileName = "x.pdf")
+        )
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertNotNull(viewModel.uiState.value.error)
+        assertEquals("insert failed", viewModel.uiState.value.error)
         collectJob.cancel()
     }
 }

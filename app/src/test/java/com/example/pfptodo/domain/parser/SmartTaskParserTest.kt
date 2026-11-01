@@ -135,6 +135,8 @@ class SmartTaskParserTest {
         val task = result.parsedTask
         assertEquals("Team sync", task.title)
         assertEquals(RecurrenceRule.Weekly, task.recurrenceRule)
+        // M-04: "every Monday" anchors the first due date to the next Monday
+        assertEquals(LocalDate.of(2026, 8, 24), task.date)
         assertEquals(LocalTime.of(10, 0), task.time)
         assertEquals(listOf("Work"), task.tags)
     }
@@ -204,6 +206,129 @@ class SmartTaskParserTest {
         assertEquals("Team retrospective", resultColon.parsedTask.title)
         assertEquals(LocalDate.of(2026, 8, 21), resultColon.parsedTask.date)
         assertEquals(LocalTime.of(15, 0), resultColon.parsedTask.time)
+    }
+
+    // ============================ M-03: time without a date ============================
+
+    @Test
+    fun parse_english_timeOnlyFuture_defaultsToToday() {
+        // Base time is 10:00; 5 PM is still ahead today
+        val result = parser.parse("Call mom at 5 PM", fixedClock)
+        val task = result.parsedTask
+        assertEquals(LocalDate.of(2026, 8, 19), task.date)
+        assertEquals(LocalTime.of(17, 0), task.time)
+        assertEquals(Instant.parse("2026-08-19T13:30:00Z"), task.dueInstant)
+    }
+
+    @Test
+    fun parse_english_timeOnlyPast_rollsToTomorrow() {
+        // 8 AM has already passed at the 10:00 base time
+        val result = parser.parse("Call mom at 8 AM", fixedClock)
+        val task = result.parsedTask
+        assertEquals(LocalDate.of(2026, 8, 20), task.date)
+        assertEquals(LocalTime.of(8, 0), task.time)
+        assertEquals(Instant.parse("2026-08-20T04:30:00Z"), task.dueInstant)
+    }
+
+    @Test
+    fun parse_persian_timeOnlyFuture_defaultsToToday() {
+        val result = parser.parse("تماس با مامان ساعت ۵ عصر", fixedClock)
+        val task = result.parsedTask
+        assertEquals(LocalDate.of(2026, 8, 19), task.date)
+        assertEquals(LocalTime.of(17, 0), task.time)
+        assertNotNull(task.dueInstant)
+    }
+
+    @Test
+    fun parse_persian_timeOnlyPast_rollsToTomorrow() {
+        val result = parser.parse("تماس با مامان ساعت ۸ صبح", fixedClock)
+        val task = result.parsedTask
+        assertEquals(LocalDate.of(2026, 8, 20), task.date)
+        assertEquals(LocalTime.of(8, 0), task.time)
+        assertNotNull(task.dueInstant)
+    }
+
+    // ============================ M-04: weekday semantics ============================
+
+    @Test
+    fun parse_english_thisWeekday_includesToday() {
+        // Base date is a Wednesday: "this Wednesday" is today, not next week
+        val result = parser.parse("Team meeting this Wednesday", fixedClock)
+        assertEquals(LocalDate.of(2026, 8, 19), result.parsedTask.date)
+    }
+
+    @Test
+    fun parse_english_nextWeekday_skipsToday() {
+        val result = parser.parse("Team meeting next Wednesday", fixedClock)
+        assertEquals(LocalDate.of(2026, 8, 26), result.parsedTask.date)
+    }
+
+    @Test
+    fun parse_english_bareWeekday_movesForward() {
+        val result = parser.parse("Team meeting Wednesday", fixedClock)
+        assertEquals(LocalDate.of(2026, 8, 26), result.parsedTask.date)
+    }
+
+    @Test
+    fun parse_english_everyWeekdayOnSameDay_anchorsToToday() {
+        // Base date is a Wednesday: the first "every Wednesday" occurrence is today
+        val result = parser.parse("Standup every Wednesday at 9 AM", fixedClock)
+        val task = result.parsedTask
+        assertEquals(RecurrenceRule.Weekly, task.recurrenceRule)
+        assertEquals(LocalDate.of(2026, 8, 19), task.date)
+        assertEquals(LocalTime.of(9, 0), task.time)
+    }
+
+    // ============================ M-05: invalid times/dates are not clamped ============================
+
+    @Test
+    fun parse_english_invalid24hTime_producesNoTime() {
+        val result = parser.parse("Task at 25:00", fixedClock)
+        assertNull(result.parsedTask.time)
+        assertNull(result.parsedTask.date)
+        assertNull(result.parsedTask.dueInstant)
+    }
+
+    @Test
+    fun parse_english_invalidMinute_producesNoTime() {
+        val result = parser.parse("Task at 9:75 AM", fixedClock)
+        assertNull(result.parsedTask.time)
+        assertNull(result.parsedTask.dueInstant)
+    }
+
+    @Test
+    fun parse_persian_invalidJalaliDay_producesNoDate() {
+        // Mehr (month 7) has 30 days: 1405/07/31 must not be clamped to the 30th
+        val result = parser.parse("پرداخت قبض ۱۴۰۵/۰۷/۳۱", fixedClock)
+        assertNull(result.parsedTask.date)
+        assertNull(result.parsedTask.dueInstant)
+    }
+
+    @Test
+    fun parse_persian_invalidJalaliMonth_producesNoDate() {
+        // Month 13 does not exist (previously this reached the converter's require())
+        val result = parser.parse("پرداخت قبض ۱۴۰۵/۱۳/۰۱", fixedClock)
+        assertNull(result.parsedTask.date)
+    }
+
+    @Test
+    fun parse_persian_esfand30InNonLeapYear_producesNoDate() {
+        // 1405 is not a Jalali leap year, so Esfand has 29 days
+        val result = parser.parse("پرداخت قبض ۱۴۰۵/۱۲/۳۰", fixedClock)
+        assertNull(result.parsedTask.date)
+    }
+
+    @Test
+    fun parse_persian_esfand29InNonLeapYear_isValid() {
+        val result = parser.parse("پرداخت قبض ۱۴۰۵/۱۲/۲۹", fixedClock)
+        assertEquals(LocalDate.of(2027, 3, 20), result.parsedTask.date)
+    }
+
+    @Test
+    fun parse_persian_invalidHour_producesNoTime() {
+        val result = parser.parse("جلسه ساعت ۲۵", fixedClock)
+        assertNull(result.parsedTask.time)
+        assertNull(result.parsedTask.dueInstant)
     }
 
     @Test

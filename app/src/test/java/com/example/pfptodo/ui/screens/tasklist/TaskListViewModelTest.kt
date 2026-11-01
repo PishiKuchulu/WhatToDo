@@ -2,6 +2,7 @@ package com.example.pfptodo.ui.screens.tasklist
 
 import com.example.pfptodo.core.repository.ThemeRepository
 import com.example.pfptodo.domain.model.Priority
+import com.example.pfptodo.domain.model.SearchChipType
 import com.example.pfptodo.domain.model.SortOrder
 import com.example.pfptodo.domain.model.Tag
 import com.example.pfptodo.domain.model.Task
@@ -169,6 +170,34 @@ class TaskListViewModelTest {
     }
 
     @Test
+    fun `failed toggle sets operationError until it is shown`() = runTest {
+        val task = Task(id = 50L, title = "Test Task")
+        whenever(toggleTaskCompletionUseCase.invoke(any()))
+            .thenReturn(com.example.pfptodo.core.util.Result.Error(RuntimeException("db gone")))
+
+        viewModel.onToggleTaskCompletion(task)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(com.example.pfptodo.R.string.operation_failed, viewModel.operationError.value)
+        viewModel.onOperationErrorShown()
+        assertEquals(null, viewModel.operationError.value)
+    }
+
+    @Test
+    fun `failed delete sets operationError and does not cancel the reminder`() = runTest {
+        val task = Task(id = 50L, title = "Test Task")
+        whenever(taskUseCases.deleteTask).thenReturn(mock())
+        whenever(taskUseCases.deleteTask.invoke(any()))
+            .thenReturn(com.example.pfptodo.core.util.Result.Error(RuntimeException("db gone")))
+
+        viewModel.onDeleteTask(task)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertEquals(com.example.pfptodo.R.string.operation_failed, viewModel.operationError.value)
+        verify(reminderManager, org.mockito.Mockito.never()).cancelReminder(any())
+    }
+
+    @Test
     fun `parseSmartInput delegates to ParseSmartTaskUseCase`() {
         val parsed = viewModel.parseSmartInput("Buy milk tomorrow #Shopping")
         assertEquals("Buy milk", parsed.title)
@@ -226,11 +255,78 @@ class TaskListViewModelTest {
         assertEquals(2, viewModel.uiState.value.parsedSearch.chips.size)
         assertEquals("", viewModel.uiState.value.parsedSearch.keyword)
 
-        // Dismiss chip clears search
+        // Dismissing one chip removes only that chip's intent (M-07):
+        // the priority chip goes away, the "this week" date intent survives.
         viewModel.onRemoveSearchChip(viewModel.uiState.value.parsedSearch.chips[0])
         testScheduler.runCurrent()
+        assertEquals("this week", viewModel.searchQuery.value)
+
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `removing search chips one by one rebuilds the query from remaining intents`() = runTest {
+        val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+
+        viewModel.onSearchQueryChange("important tasks this week")
+        testScheduler.advanceTimeBy(350)
+        testScheduler.runCurrent()
+
+        val chips = viewModel.uiState.value.parsedSearch.chips
+        assertEquals(2, chips.size)
+
+        // Remove the keyword-less priority chip: date intent remains
+        viewModel.onRemoveSearchChip(chips.first { it.type == SearchChipType.PRIORITY })
+        assertEquals("this week", viewModel.searchQuery.value)
+
+        // Remove the last remaining chip: query is empty
+        viewModel.onRemoveSearchChip(chips.first { it.type == SearchChipType.DATE })
         assertEquals("", viewModel.searchQuery.value)
 
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `removing the keyword chip keeps the structured intents`() = runTest {
+        val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+
+        viewModel.onSearchQueryChange("important tasks travel")
+        testScheduler.advanceTimeBy(350)
+        testScheduler.runCurrent()
+
+        val keywordChip = viewModel.uiState.value.parsedSearch.chips
+            .first { it.type == SearchChipType.KEYWORD }
+        viewModel.onRemoveSearchChip(keywordChip)
+        assertEquals("important", viewModel.searchQuery.value)
+
+        collectJob.cancel()
+    }
+
+    @Test
+    fun `natural language priorities override manual priorities instead of unioning`() = runTest {
+        // M-08: with a manual LOW priority filter active, an "important" search
+        // must narrow to HIGH only — previously the two sets were unioned.
+        val task = Task(id = 101L, title = "High only", priority = Priority.HIGH)
+        whenever(getFilteredTasksUseCase.invoke(
+            "",
+            TaskFilter(priorities = setOf(Priority.HIGH)),
+            SortOrder.MANUAL
+        )).thenReturn(flowOf(listOf(task)))
+
+        val collectJob = launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect {}
+        }
+
+        viewModel.onFilterChange(TaskFilter(priorities = setOf(Priority.LOW)))
+        viewModel.onSearchQueryChange("important tasks")
+        testScheduler.advanceTimeBy(350)
+        testScheduler.runCurrent()
+
+        assertEquals(listOf(task), viewModel.uiState.value.tasks)
         collectJob.cancel()
     }
 }

@@ -18,6 +18,7 @@ import org.junit.Test
 import org.junit.Before
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
+import org.mockito.kotlin.argumentCaptor
 
 class GetFilteredTasksUseCaseTest {
 
@@ -33,6 +34,18 @@ class GetFilteredTasksUseCaseTest {
     @Before
     fun setup() {
         useCase = GetFilteredTasksUseCase(repository)
+    }
+
+    @Test
+    fun `search query escapes LIKE wildcards before reaching the repository`() = runBlocking {
+        // M-09: %, _ and the escape char itself must be escaped so the DAO's
+        // LIKE ... ESCAPE '\' matches the user's text literally.
+        val captor = argumentCaptor<String>()
+        whenever(repository.searchTasks(captor.capture())).thenReturn(kotlinx.coroutines.flow.flowOf(emptyList()))
+
+        useCase("100%_\\done", TaskFilter(), SortOrder.MANUAL).first()
+
+        assertEquals("100\\%\\_\\\\done", captor.firstValue)
     }
 
     @Test
@@ -97,6 +110,26 @@ class GetFilteredTasksUseCaseTest {
 
         val result = useCase("", TaskFilter(dateFilter = TaskFilter.DateFilter.TOMORROW), SortOrder.MANUAL).first()
         assertEquals(listOf(32L), result.map { it.id })
+    }
+
+    @Test
+    fun `DAY_AFTER_TOMORROW filter includes only the day after tomorrow`() = runBlocking {
+        val dueTomorrow = Task(
+            id = 33, title = "Tomorrow",
+            dueDate = today.plusDays(1).atTime(10, 0).atZone(ZoneId.systemDefault()).toInstant()
+        )
+        val dueDayAfter = Task(
+            id = 34, title = "DayAfter",
+            dueDate = today.plusDays(2).atTime(10, 0).atZone(ZoneId.systemDefault()).toInstant()
+        )
+        val dueInThreeDays = Task(
+            id = 35, title = "InThreeDays",
+            dueDate = today.plusDays(3).atTime(10, 0).atZone(ZoneId.systemDefault()).toInstant()
+        )
+        whenever(repository.getAllMainTasks()).thenReturn(kotlinx.coroutines.flow.flowOf(listOf(dueTomorrow, dueDayAfter, dueInThreeDays)))
+
+        val result = useCase("", TaskFilter(dateFilter = TaskFilter.DateFilter.DAY_AFTER_TOMORROW), SortOrder.MANUAL).first()
+        assertEquals(listOf(34L), result.map { it.id })
     }
 
     @Test

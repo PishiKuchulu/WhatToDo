@@ -156,4 +156,81 @@ class CalculateRoutineStreaksUseCaseTest {
         assertEquals(2, summary.totalActiveRoutines)
         assertTrue(summary.routines.all { it.totalCompleted == 1 })
     }
+
+    @Test
+    fun `weekly gap of 8 days breaks the streak`() {
+        // Jul 29 -> Aug 5 is exactly one week; Aug 5 -> Aug 13 is 8 days, which
+        // is not a weekly cadence step and must break the streak.
+        val anchor = Instant.parse("2026-07-29T07:00:00Z")
+        val c1 = Task(id = 1, title = "Weekly Sync", recurrenceRule = RecurrenceRule.Weekly, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-07-29T07:00:00Z"))
+        val c2 = Task(id = 2, title = "Weekly Sync", recurrenceRule = RecurrenceRule.Weekly, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-05T07:00:00Z"))
+        val c3 = Task(id = 3, title = "Weekly Sync", recurrenceRule = RecurrenceRule.Weekly, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-13T07:00:00Z"))
+
+        val summary = useCase(listOf(c1, c2, c3))
+        val routine = summary.routines[0]
+        assertEquals(1, routine.currentStreak)
+        assertEquals(2, routine.bestStreak)
+    }
+
+    @Test
+    fun `monthly completion on the wrong day of month breaks the streak`() {
+        // Jun 15 -> Jul 15 is consecutive; Jul 15 -> Aug 10 advances one month
+        // but lands on the wrong day, so it is not the next monthly occurrence.
+        val anchor = Instant.parse("2026-06-15T07:00:00Z")
+        val c1 = Task(id = 1, title = "Rent", recurrenceRule = RecurrenceRule.Monthly, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-06-15T07:00:00Z"))
+        val c2 = Task(id = 2, title = "Rent", recurrenceRule = RecurrenceRule.Monthly, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-07-15T07:00:00Z"))
+        val c3 = Task(id = 3, title = "Rent", recurrenceRule = RecurrenceRule.Monthly, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-10T07:00:00Z"))
+
+        val summary = useCase(listOf(c1, c2, c3))
+        val routine = summary.routines[0]
+        assertEquals(1, routine.currentStreak)
+        assertEquals(2, routine.bestStreak)
+    }
+
+    @Test
+    fun `monthly month-end clamped chain stays consecutive`() {
+        // Anchor day 31 clamps to Feb 28 and returns to Mar 31: both steps are
+        // consecutive occurrences of the same monthly series.
+        val anchor = Instant.parse("2026-01-31T07:00:00Z")
+        val c1 = Task(id = 1, title = "Payroll", recurrenceRule = RecurrenceRule.Monthly, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-01-31T07:00:00Z"))
+        val c2 = Task(id = 2, title = "Payroll", recurrenceRule = RecurrenceRule.Monthly, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-02-28T07:00:00Z"))
+        val c3 = Task(id = 3, title = "Payroll", recurrenceRule = RecurrenceRule.Monthly, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-03-31T07:00:00Z"))
+
+        val summary = useCase(listOf(c1, c2, c3))
+        val routine = summary.routines[0]
+        assertEquals(3, routine.bestStreak)
+        // Last completion was in March; by Aug 19 the current streak has lapsed.
+        assertEquals(0, routine.currentStreak)
+    }
+
+    @Test
+    fun `interval gap shorter than the interval breaks the streak`() {
+        // Interval(3): Aug 13 -> Aug 16 is exact; Aug 16 -> Aug 18 is only
+        // 2 days and must not count as consecutive.
+        val anchor = Instant.parse("2026-08-13T07:00:00Z")
+        val c1 = Task(id = 1, title = "Water Plants", recurrenceRule = RecurrenceRule.Interval(3), recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-13T07:00:00Z"))
+        val c2 = Task(id = 2, title = "Water Plants", recurrenceRule = RecurrenceRule.Interval(3), recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-16T07:00:00Z"))
+        val c3 = Task(id = 3, title = "Water Plants", recurrenceRule = RecurrenceRule.Interval(3), recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-08-18T07:00:00Z"))
+
+        val summary = useCase(listOf(c1, c2, c3))
+        val routine = summary.routines[0]
+        assertEquals(1, routine.currentStreak)
+        assertEquals(2, routine.bestStreak)
+    }
+
+    @Test
+    fun `yearly routine completed six months ago keeps its current streak`() {
+        // Completions on Feb 19 in consecutive years; today is Aug 19 2026,
+        // six months after the last one. A year-scale window keeps the streak
+        // alive instead of zeroing it after ~1 day.
+        val anchor = Instant.parse("2025-02-19T07:00:00Z")
+        val c1 = Task(id = 1, title = "Annual Review", recurrenceRule = RecurrenceRule.Yearly, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2025-02-19T07:00:00Z"))
+        val c2 = Task(id = 2, title = "Annual Review", recurrenceRule = RecurrenceRule.Yearly, recurrenceAnchor = anchor, isCompleted = true, completedAt = Instant.parse("2026-02-19T07:00:00Z"))
+
+        val summary = useCase(listOf(c1, c2))
+        val routine = summary.routines[0]
+        assertEquals(2, routine.currentStreak)
+        assertEquals(2, routine.bestStreak)
+        assertTrue(routine.isCompletedForCurrentPeriod)
+    }
 }

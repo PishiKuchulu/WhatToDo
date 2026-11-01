@@ -4,6 +4,9 @@ import android.content.Context
 import com.example.pfptodo.R
 import com.example.pfptodo.domain.model.Category
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -51,5 +54,44 @@ class CategoryExtensionsTest {
         assertEquals("Work (Localized)", resolveCategoryDisplayName("Arbeit", context))
 
         assertEquals("Custom Category Name", resolveCategoryDisplayName("Custom Category Name", context))
+    }
+
+    // ---- M-25: canonical default-category identity across locales ----
+
+    @Test
+    fun `default category aliases resolve to their default icon in any locale`() {
+        assertEquals("person", defaultCategoryIconForName("Personal"))
+        assertEquals("person", defaultCategoryIconForName("شخصی"))
+        assertEquals("person", defaultCategoryIconForName("Privat"))
+        assertEquals("work", defaultCategoryIconForName("Work"))
+        assertEquals("work", defaultCategoryIconForName("کاری"))
+        assertEquals("work", defaultCategoryIconForName("Travail"))
+        assertEquals("shopping_cart", defaultCategoryIconForName("Shopping"))
+        assertEquals("shopping_cart", defaultCategoryIconForName("خرید"))
+        assertEquals("shopping_cart", defaultCategoryIconForName("Einkaufen"))
+        assertEquals("school", defaultCategoryIconForName("Study"))
+        assertEquals("school", defaultCategoryIconForName("مطالعه"))
+        assertEquals("school", defaultCategoryIconForName("学習"))
+    }
+
+    @Test
+    fun `alias lookup is case-insensitive and trims whitespace`() {
+        assertEquals("work", defaultCategoryIconForName("  WORK "))
+        assertEquals("person", defaultCategoryIconForName("PERSONAL"))
+    }
+
+    @Test
+    fun `custom names are not default aliases`() {
+        assertNull(defaultCategoryIconForName("Gaming Projects"))
+        assertFalse(isDefaultCategoryAlias("Gaming Projects", "person"))
+    }
+
+    @Test
+    fun `alias must belong to the given icon`() {
+        assertTrue(isDefaultCategoryAlias("شخصی", "person"))
+        assertTrue(isDefaultCategoryAlias("Personal", "person"))
+        // Same name, wrong default -> not a match.
+        assertFalse(isDefaultCategoryAlias("شخصی", "work"))
+        assertFalse(isDefaultCategoryAlias("Personal", "school"))
     }
 }

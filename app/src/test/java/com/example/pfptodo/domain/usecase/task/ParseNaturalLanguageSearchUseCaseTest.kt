@@ -250,6 +250,45 @@ class ParseNaturalLanguageSearchUseCaseTest {
         assertEquals(TaskFilter.DateFilter.THIS_WEEK, result5.filter.dateFilter)
     }
 
+    @Test
+    fun `persian - day after tomorrow maps to its own filter`() {
+        // M-06: پس‌فردا must be matched longest-first and map to DAY_AFTER_TOMORROW —
+        // not to TOMORROW with a residual «پس» keyword.
+        val spaced = useCase("کارهای پس فردا")
+        assertEquals(TaskFilter.DateFilter.DAY_AFTER_TOMORROW, spaced.filter.dateFilter)
+        assertEquals("", spaced.keyword)
+        assertEquals("پس فردا", spaced.chips.single { it.type == SearchChipType.DATE }.matchedPhrase)
+
+        val zwnj = useCase("کارهای پس‌فردا")
+        assertEquals(TaskFilter.DateFilter.DAY_AFTER_TOMORROW, zwnj.filter.dateFilter)
+        assertEquals("", zwnj.keyword)
+        assertEquals("پس‌فردا", zwnj.chips.single { it.type == SearchChipType.DATE }.matchedPhrase)
+
+        // Plain فردا still maps to TOMORROW
+        val tomorrow = useCase("کارهای فردا")
+        assertEquals(TaskFilter.DateFilter.TOMORROW, tomorrow.filter.dateFilter)
+    }
+
+    @Test
+    fun `english - day after tomorrow maps to its own filter`() {
+        val result = useCase("tasks day after tomorrow")
+        assertEquals(TaskFilter.DateFilter.DAY_AFTER_TOMORROW, result.filter.dateFilter)
+        assertEquals("", result.keyword)
+        assertEquals("day after tomorrow", result.chips.single { it.type == SearchChipType.DATE }.matchedPhrase)
+    }
+
+    @Test
+    fun `chips record the phrase that produced them`() {
+        val persian = useCase("کارهای مهم فردا")
+        assertEquals(listOf("مهم", "فردا"), persian.chips.map { it.matchedPhrase })
+
+        val english = useCase("important tasks tomorrow")
+        assertEquals(listOf("important", "tomorrow"), english.chips.map { it.matchedPhrase })
+
+        val keyword = useCase("کارهای مربوط به سفر")
+        assertEquals("سفر", keyword.chips[0].matchedPhrase)
+    }
+
     // ============================ Edge Cases ============================
 
     @Test

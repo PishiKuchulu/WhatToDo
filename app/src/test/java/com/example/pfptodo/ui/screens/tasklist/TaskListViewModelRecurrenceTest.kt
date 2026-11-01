@@ -153,7 +153,8 @@ class TaskListViewModelRecurrenceTest {
         val from = instantOn(fromDate, anchorTime)
 
         // Recurring monthly — must land back on Mar 31 (not Mar 28) thanks to anchor.
-        val next = RecurrenceEngine.calculateNextOccurrence(anchor, from, RecurrenceRule.Monthly)
+        // now = from: this test pins single-step cadence, not the late-completion skip-ahead.
+        val next = RecurrenceEngine.calculateNextOccurrence(anchor, from, RecurrenceRule.Monthly, now = from)
         assertEquals(instantOn(LocalDate.of(2024, 3, 31), anchorTime), next)
     }
 
@@ -162,7 +163,7 @@ class TaskListViewModelRecurrenceTest {
         // No anchor provided: the engine treats `from` as the anchor (old behavior
         // for data migrated without an anchor) and never crashes.
         val from = instantOn(LocalDate.of(2024, 3, 28), LocalTime.of(10, 0))
-        val next = RecurrenceEngine.calculateNextOccurrence(from, from, RecurrenceRule.Monthly)
+        val next = RecurrenceEngine.calculateNextOccurrence(from, from, RecurrenceRule.Monthly, now = from)
         // From Mar 28 with no anchor → April 28 (single-step, no drift yet).
         assertEquals(instantOn(LocalDate.of(2024, 4, 28), LocalTime.of(10, 0)), next)
     }

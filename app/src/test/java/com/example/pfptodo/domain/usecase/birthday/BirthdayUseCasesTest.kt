@@ -3,10 +3,17 @@ package com.example.pfptodo.domain.usecase.birthday
 import com.example.pfptodo.core.util.Result
 import com.example.pfptodo.domain.model.Birthday
 import com.example.pfptodo.domain.repository.BirthdayRepository
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.runCurrent
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -183,6 +190,41 @@ class BirthdayUseCasesTest {
 
         assertEquals(listOf("Ali", "Mina"), upcoming.map { it.birthday.name })
         assertTrue(upcoming.first().isToday)
+    }
+
+    /** A [Clock] whose instant the test moves by hand. */
+    private class MutableClock(
+        var currentInstant: Instant,
+        private val currentZone: ZoneId
+    ) : Clock() {
+        override fun getZone(): ZoneId = currentZone
+        override fun withZone(zone: ZoneId): Clock = MutableClock(currentInstant, zone)
+        override fun instant(): Instant = currentInstant
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun invoke_reprojectsAfterMidnight() = runTest {
+        fakeRepo.seed(Birthday(name = "Zara", month = 10, day = 18))
+        val zone = ZoneId.of("UTC")
+        val clock = MutableClock(Instant.parse("2026-10-17T23:59:30Z"), zone)
+        val useCase = GetUpcomingBirthdays(fakeRepo, clock)
+
+        val collected = mutableListOf<List<UpcomingBirthday>>()
+        val job = launch { useCase().collect { collected.add(it) } }
+        runCurrent()
+        assertEquals(1L, collected.last().single().daysUntil)
+        assertFalse(collected.last().single().isToday)
+
+        // Cross local midnight: the projection must refresh on its own,
+        // without any repository change (M-14 day ticker). The ticker delay
+        // runs on the test scheduler, so advance virtual time past it.
+        clock.currentInstant = Instant.parse("2026-10-18T00:00:02Z")
+        advanceTimeBy(32_000)
+        runCurrent()
+        assertEquals(0L, collected.last().single().daysUntil)
+        assertTrue(collected.last().single().isToday)
+        job.cancelAndJoin()
     }
 
     // ------------------------------------------------------------------
