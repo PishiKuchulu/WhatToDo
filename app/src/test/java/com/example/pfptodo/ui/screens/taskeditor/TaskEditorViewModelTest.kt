@@ -10,6 +10,7 @@ import com.example.pfptodo.worker.reminder.ReminderManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.*
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -273,13 +274,17 @@ class TaskEditorViewModelSubtaskReconcileTest {
         whenever(tagUseCases.getAllTags).thenReturn(mock())
         whenever(tagUseCases.getAllTags.invoke()).thenReturn(flowOf(emptyList()))
         whenever(taskUseCases.getTaskById).thenReturn(mock())
-        whenever(taskUseCases.getTaskById.invoke(50L)).thenReturn(Result.Success(parent))
         whenever(taskUseCases.getSubtasks).thenReturn(mock())
         whenever(taskUseCases.getSubtasks.invoke(50L)).thenReturn(flowOf(listOf(subA, subB)))
         whenever(taskUseCases.updateTask).thenReturn(mock())
-        whenever(taskUseCases.updateTask.invoke(any())).thenReturn(Result.Success(Unit))
         whenever(tagUseCases.setTaskTags).thenReturn(mock())
-        whenever(tagUseCases.setTaskTags.invoke(any(), any())).thenReturn(Result.Success(Unit))
+        // The three use cases below are suspend: their invoke() can only be
+        // stubbed inside a coroutine, so those stubbings live in runBlocking.
+        runBlocking {
+            whenever(taskUseCases.getTaskById.invoke(50L)).thenReturn(Result.Success(parent))
+            whenever(taskUseCases.updateTask.invoke(any())).thenReturn(Result.Success(Unit))
+            whenever(tagUseCases.setTaskTags.invoke(any(), any())).thenReturn(Result.Success(Unit))
+        }
     }
 
     @After
