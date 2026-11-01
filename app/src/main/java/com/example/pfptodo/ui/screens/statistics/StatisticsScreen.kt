@@ -165,7 +165,11 @@ fun StatCard(
 @Composable
 fun CategoryCountRow(name: String, count: Int) {
     val context = LocalContext.current
-    val displayName = remember(name) { com.example.pfptodo.core.util.resolveCategoryDisplayName(name, context) }
+    // Key on the current language too: the resolved name comes from localized
+    // resources, so a language change must recompute it even when the raw
+    // category name is unchanged (M-31).
+    val languageTag = Locale.getDefault().toLanguageTag()
+    val displayName = remember(name, languageTag) { com.example.pfptodo.core.util.resolveCategoryDisplayName(name, context) }
     Text(
         text = AppDateFormat.localizeDigits(stringResource(R.string.category_tasks_count, displayName, count), Locale.getDefault()),
         style = MaterialTheme.typography.bodyMedium,

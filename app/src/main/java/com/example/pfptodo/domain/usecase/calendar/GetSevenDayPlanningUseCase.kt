@@ -21,11 +21,6 @@ class GetSevenDayPlanningUseCase(
     private val clock: Clock = Clock.systemDefaultZone()
 ) {
 
-    private val persianMonthNames = arrayOf(
-        "فروردین", "اردیبهشت", "خرداد", "تیر", "مرداد", "شهریور",
-        "مهر", "آبان", "آذر", "دی", "بهمن", "اسفند"
-    )
-
     operator fun invoke(
         allTasks: List<Task>,
         selectedDate: LocalDate,
@@ -55,7 +50,7 @@ class GetSevenDayPlanningUseCase(
 
             val (dayName, dayNum, monthName) = if (useJalali) {
                 val jDate = JalaliCalendarConverter.gregorianToJalali(date)
-                val dName = if (isPersianLocale) getPersianDayOfWeekName(date.dayOfWeek)
+                val dName = if (isPersianLocale) AppDateFormat.persianWeekdayShortName(date.dayOfWeek)
                 else date.dayOfWeek.getDisplayName(TextStyle.SHORT, locale)
                 Triple(
                     dName,
@@ -84,15 +79,4 @@ class GetSevenDayPlanningUseCase(
         }
     }
 
-    private fun getPersianDayOfWeekName(dayOfWeek: DayOfWeek): String {
-        return when (dayOfWeek) {
-            DayOfWeek.SATURDAY -> "شنبه"
-            DayOfWeek.SUNDAY -> "۱شنبه"
-            DayOfWeek.MONDAY -> "۲شنبه"
-            DayOfWeek.TUESDAY -> "۳شنبه"
-            DayOfWeek.WEDNESDAY -> "۴شنبه"
-            DayOfWeek.THURSDAY -> "۵شنبه"
-            DayOfWeek.FRIDAY -> "جمعه"
-        }
-    }
 }

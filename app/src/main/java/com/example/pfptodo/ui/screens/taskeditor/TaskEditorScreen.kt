@@ -253,7 +253,7 @@ fun TaskEditorScreen(
                 modifier = Modifier.fillMaxWidth(),
                 verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
-                uiState.subtasks.forEachIndexed { index, subtaskTitle ->
+                uiState.subtasks.forEachIndexed { index, subtaskRow ->
                     Surface(
                         shape = RoundedCornerShape(8.dp),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
@@ -273,7 +273,7 @@ fun TaskEditorScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = subtaskTitle,
+                                text = subtaskRow.title,
                                 style = MaterialTheme.typography.bodyMedium,
                                 modifier = Modifier.weight(1f)
                             )
@@ -412,7 +412,13 @@ fun TaskEditorScreen(
                     Switch(
                         checked = uiState.reminderTime != null,
                         onCheckedChange = { checked ->
-                            viewModel.onReminderChange(if (checked) (uiState.dueDate ?: Instant.now()) else null)
+                            // A reminder needs a due date to anchor to: without one the
+                            // switch stays off (the supporting text keeps showing
+                            // "not scheduled") instead of arming a reminder for *now*
+                            // that would fire immediately. Once a due date is picked,
+                            // enabling the switch sets the reminder to the due date,
+                            // and the ViewModel keeps it following later due-date edits.
+                            viewModel.onReminderChange(if (checked) uiState.dueDate else null)
                         }
                     )
                 }

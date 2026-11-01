@@ -2,6 +2,7 @@ package com.example.pfptodo.ui.screens.statistics
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.pfptodo.core.util.dayTickerFlow
 import com.example.pfptodo.domain.model.Category
 import com.example.pfptodo.domain.model.Task
 import com.example.pfptodo.domain.usecase.category.CategoryUseCases
@@ -24,10 +25,14 @@ class StatisticsViewModel(
     private val categories: StateFlow<List<Category>> = categoryUseCases.getAllCategories()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+    // The day ticker re-triggers computeStatistics at local midnight so the
+    // overdue count and the 7-day trend window roll over without new task
+    // data (M-14/M-31); the emitted date itself is unused.
     val uiState: StateFlow<StatisticsUiState> = combine(
         taskUseCases.getFilteredTasks("", com.example.pfptodo.domain.model.TaskFilter(), com.example.pfptodo.domain.model.SortOrder.CREATION_DATE),
-        categories
-    ) { tasks, cats ->
+        categories,
+        dayTickerFlow()
+    ) { tasks, cats, _ ->
         computeStatistics(tasks, cats)
     }.stateIn(
         scope = viewModelScope,

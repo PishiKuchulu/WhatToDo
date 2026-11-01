@@ -1,5 +1,7 @@
 package com.example.pfptodo.data.repository
 
+import android.util.Log
+
 import com.example.pfptodo.core.util.Result
 import com.example.pfptodo.data.local.dao.TagDao
 import com.example.pfptodo.data.local.entity.TaskTagCrossRef
@@ -15,7 +17,10 @@ class TagRepositoryImpl(private val tagDao: TagDao) : TagRepository {
     override fun getAllTags(): Flow<List<Tag>> {
         return tagDao.getAllTags().map { entities ->
             entities.map { it.toDomain() }
-        }.catch { emit(emptyList()) }
+        }.catch { e ->
+            Log.e(TAG, "Failed to load tags; falling back to empty list", e)
+            emit(emptyList())
+        }
     }
 
     override suspend fun getAllTagsRaw(): List<Tag> {
@@ -42,8 +47,23 @@ class TagRepositoryImpl(private val tagDao: TagDao) : TagRepository {
 
     override suspend fun insertTag(tag: Tag): Result<Long> {
         return try {
-            val id = tagDao.insertTag(tag.toEntity())
-            Result.Success(id)
+            // Canonicalize on creation (M-23): name lookups are case-insensitive
+            // (TagDao.getTagByName uses LOWER()), but the unique index on `name`
+            // is case-sensitive — so inserting a case-variant (or padded) name
+            // would create a second row for what every lookup treats as the
+            // same tag. Trim, look up case-insensitively first, and reuse the
+            // existing row. Every creation path funnels through here: the
+            // AddTag use case (settings UI create, task-editor create and its
+            // get-or-create fallback, smart-add in the task list) and backup
+            // import's direct insert.
+            val canonical = tag.copy(name = tag.name.trim())
+            val existing = tagDao.getTagByName(canonical.name)
+            if (existing != null) {
+                Result.Success(existing.id)
+            } else {
+                val id = tagDao.insertTag(canonical.toEntity())
+                Result.Success(id)
+            }
         } catch (e: Exception) {
             Result.Error(e)
         }
@@ -70,7 +90,10 @@ class TagRepositoryImpl(private val tagDao: TagDao) : TagRepository {
     override fun getTagsForTask(taskId: Long): Flow<List<Tag>> {
         return tagDao.getTagsForTask(taskId).map { entities ->
             entities.map { it.toDomain() }
-        }.catch { emit(emptyList()) }
+        }.catch { e ->
+            Log.e(TAG, "Failed to load tags for task; falling back to empty list", e)
+            emit(emptyList())
+        }
     }
 
     override suspend fun setTaskTags(taskId: Long, tagIds: List<Long>): Result<Unit> {
@@ -93,5 +116,9 @@ class TagRepositoryImpl(private val tagDao: TagDao) : TagRepository {
         } catch (e: Exception) {
             Result.Error(e)
         }
+    }
+
+    private companion object {
+        const val TAG = "TagRepositoryImpl"
     }
 }

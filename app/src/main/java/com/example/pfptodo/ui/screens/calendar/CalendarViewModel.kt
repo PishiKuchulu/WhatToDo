@@ -2,6 +2,8 @@ package com.example.pfptodo.ui.screens.calendar
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.pfptodo.R
+import com.example.pfptodo.core.util.Result
 import com.example.pfptodo.domain.model.DayPlanningItem
 import com.example.pfptodo.domain.model.RoutineStreakSummary
 import com.example.pfptodo.domain.model.Task
@@ -27,6 +29,23 @@ class CalendarViewModel(
 
     private val _selectedDate = MutableStateFlow(LocalDate.now())
     val selectedDate = _selectedDate.asStateFlow()
+
+    /**
+     * String resource of the last failed task operation (toggle/delete), or null.
+     * The screen observes this, shows it once, and calls [onOperationErrorShown].
+     */
+    private val _operationError = MutableStateFlow<Int?>(null)
+    val operationError = _operationError.asStateFlow()
+
+    fun onOperationErrorShown() {
+        _operationError.value = null
+    }
+
+    private fun reportIfError(result: Result<*>?) {
+        if (result is Result.Error) {
+            _operationError.value = R.string.operation_failed
+        }
+    }
 
     private val _currentMonth = MutableStateFlow(LocalDate.now().withDayOfMonth(1))
     val currentMonth = _currentMonth.asStateFlow()
@@ -64,12 +83,6 @@ class CalendarViewModel(
         val tasksForSelectedDay = allTasks.filter { task ->
             task.dueDate?.let { it.atZone(zone).toLocalDate() == selectedDate } ?: false
         }
-        val tasksForMonth = allTasks.filter { task ->
-            task.dueDate?.let {
-                val d = it.atZone(zone).toLocalDate()
-                d.year == currentMonth.year && d.month == currentMonth.month
-            } ?: false
-        }
 
         CalendarUiState(
             selectedDate = selectedDate,
@@ -77,8 +90,7 @@ class CalendarViewModel(
             sevenDayPlan = sevenDayPlan,
             streakSummary = streakSummary,
             allTasks = allTasks,
-            tasksForSelectedDay = tasksForSelectedDay,
-            tasksForMonth = tasksForMonth
+            tasksForSelectedDay = tasksForSelectedDay
         )
     }.stateIn(
         scope = viewModelScope,
@@ -99,13 +111,13 @@ class CalendarViewModel(
 
     fun onToggleTaskCompletion(task: Task) {
         viewModelScope.launch {
-            taskUseCases.toggleTaskCompletion(task)
+            reportIfError(taskUseCases.toggleTaskCompletion(task))
         }
     }
 
     fun onDeleteTask(task: Task) {
         viewModelScope.launch {
-            taskUseCases.deleteTask(task)
+            reportIfError(taskUseCases.deleteTask(task))
         }
     }
 }
@@ -116,6 +128,5 @@ data class CalendarUiState(
     val sevenDayPlan: List<DayPlanningItem> = emptyList(),
     val streakSummary: RoutineStreakSummary = RoutineStreakSummary(),
     val allTasks: List<Task> = emptyList(),
-    val tasksForSelectedDay: List<Task> = emptyList(),
-    val tasksForMonth: List<Task> = emptyList()
+    val tasksForSelectedDay: List<Task> = emptyList()
 )

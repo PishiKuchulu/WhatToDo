@@ -1,5 +1,7 @@
 package com.example.pfptodo.data.repository
 
+import android.util.Log
+
 import com.example.pfptodo.core.util.Result
 import com.example.pfptodo.data.local.dao.TaskDao
 import com.example.pfptodo.data.mapper.toDomain
@@ -14,13 +16,19 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
     override fun getAllMainTasks(): Flow<List<Task>> {
         return taskDao.getAllMainTasks().map { entities ->
             entities.map { it.toDomain() }
-        }.catch { emit(emptyList()) }
+        }.catch { e ->
+            Log.e(TAG, "Failed to load main tasks; falling back to empty list", e)
+            emit(emptyList())
+        }
     }
 
     override fun searchTasks(query: String): Flow<List<Task>> {
         return taskDao.searchTasks(query).map { entities ->
             entities.map { it.toDomain() }
-        }.catch { emit(emptyList()) }
+        }.catch { e ->
+            Log.e(TAG, "Failed to search tasks; falling back to empty list", e)
+            emit(emptyList())
+        }
     }
 
     override suspend fun getTaskById(id: Long): Result<Task?> {
@@ -35,13 +43,19 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
 
     override fun observeTaskById(id: Long): Flow<Task?> {
         return taskDao.observeTaskWithCountsAndTagsById(id).map { it?.toDomain() }
-            .catch { emit(null) }
+            .catch { e ->
+                Log.e(TAG, "Failed to observe task; falling back to null", e)
+                emit(null)
+            }
     }
 
     override fun getSubtasksForTask(parentId: Long): Flow<List<Task>> {
         return taskDao.getSubtasksForTask(parentId).map { entities ->
             entities.map { it.toDomain() }
-        }.catch { emit(emptyList()) }
+        }.catch { e ->
+            Log.e(TAG, "Failed to load subtasks; falling back to empty list", e)
+            emit(emptyList())
+        }
     }
 
     override suspend fun getAllTasksRaw(): List<Task> {
@@ -95,5 +109,9 @@ class TaskRepositoryImpl(private val taskDao: TaskDao) : TaskRepository {
         } catch (e: Exception) {
             Result.Error(e)
         }
+    }
+
+    private companion object {
+        const val TAG = "TaskRepositoryImpl"
     }
 }

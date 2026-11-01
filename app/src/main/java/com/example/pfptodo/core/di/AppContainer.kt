@@ -120,8 +120,8 @@ class AppContainerImpl(private val context: Context) : AppContainer {
             getEisenhowerMatrix = GetEisenhowerMatrixUseCase(taskRepository),
             rescheduleTask = RescheduleTaskUseCase(taskRepository, reminderManager),
             createSubtask = CreateSubtaskUseCase(taskRepository),
-            createSubtasksBatch = CreateSubtasksBatchUseCase(taskRepository),
-            reorderSubtasks = ReorderSubtasksUseCase(taskRepository),
+            createSubtasksBatch = CreateSubtasksBatchUseCase(taskRepository, RoomTransactionRunner(database)),
+            reorderSubtasks = ReorderSubtasksUseCase(taskRepository, RoomTransactionRunner(database)),
             getSmartSuggestions = GetSmartSuggestionsUseCase(),
             parseNaturalLanguageSearch = ParseNaturalLanguageSearchUseCase(),
             getSevenDayPlanning = com.example.pfptodo.domain.usecase.calendar.GetSevenDayPlanningUseCase(),
@@ -209,6 +209,28 @@ class AppContainerImpl(private val context: Context) : AppContainer {
         birthdayRepository.getAllBirthdaysRaw().forEach { birthdayReminderManager.scheduleReminder(it) }
     }
 
+    /**
+     * Best-effort re-acquisition of persistable read grants for attachment URIs
+     * after a backup import (M-28). A backup carries plain content:// URI
+     * strings; on a new device (or after the picker grant was lost) the URI is
+     * only readable while the provider still honours this app, so we re-take
+     * the persistable grant where the provider offers one. Grants that cannot
+     * be re-taken (provider gone, no persistable offer) are skipped silently —
+     * those attachments stay visible as rows and fail only when opened.
+     */
+    suspend fun regainAttachmentUriGrants() {
+        runCatching {
+            attachmentRepository.getAllAttachmentsRaw().forEach { attachment ->
+                runCatching {
+                    context.contentResolver.takePersistableUriPermission(
+                        android.net.Uri.parse(attachment.uri),
+                        android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+                    )
+                }
+            }
+        }
+    }
+
     override fun provideTaskListViewModelFactory() = object : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return TaskListViewModel(taskUseCases, tagUseCases, parseSmartTaskUseCase, themeRepository, reminderManager, categoryUseCases, calendarRepository) as T
@@ -247,7 +269,7 @@ class AppContainerImpl(private val context: Context) : AppContainer {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return SettingsViewModel(
                 themeRepository, languageRepository, tagUseCases, backupUseCases, categoryUseCases, calendarRepository,
-                onImported = { rescheduleAllReminders() }
+                onImported = { rescheduleAllReminders(); regainAttachmentUriGrants() }
             ) as T
         }
     }

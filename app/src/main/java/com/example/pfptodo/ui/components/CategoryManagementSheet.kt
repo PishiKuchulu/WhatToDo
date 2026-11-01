@@ -175,7 +175,10 @@ private fun CategoryEditorDialog(
     onConfirm: (name: String, color: String, iconName: String) -> Unit
 ) {
     val context = LocalContext.current
-    var name by remember { mutableStateOf(initial?.getDisplayName(context) ?: "") }
+    // Seed with the category's RAW stored name, never the localized display name:
+    // saving a localized string back would corrupt the stored identity (M-24).
+    // Display localization (getDisplayName) stays a display-only concern.
+    var name by remember { mutableStateOf(initial?.name ?: "") }
     var color by remember { mutableStateOf(initial?.color ?: PRESET_TAG_COLORS.first()) }
     var icon by remember { mutableStateOf(initial?.iconName ?: CATEGORY_ICONS.keys.first()) }
 

@@ -148,12 +148,16 @@ class CalculateRoutineStreaksUseCase(
             val curr = distinctDates[i]
             val next = distinctDates[i + 1]
 
+            // Consecutive means exactly one period apart on the series' own
+            // cadence: a missed period (a multiple of the period) is a break,
+            // and there is no lateness tolerance on the pair delta.
+            val deltaDays = ChronoUnit.DAYS.between(curr, next)
             val isConsecutive = when (rule) {
-                RecurrenceRule.Daily -> ChronoUnit.DAYS.between(curr, next) == 1L
-                RecurrenceRule.Weekly -> ChronoUnit.DAYS.between(curr, next) in 1L..8L
-                RecurrenceRule.Monthly -> ChronoUnit.MONTHS.between(curr.withDayOfMonth(1), next.withDayOfMonth(1)) == 1L
-                RecurrenceRule.Yearly -> ChronoUnit.YEARS.between(curr.withDayOfYear(1), next.withDayOfYear(1)) == 1L
-                is RecurrenceRule.Interval -> ChronoUnit.DAYS.between(curr, next) in (rule.days - 1L)..(rule.days + 2L)
+                RecurrenceRule.Daily -> deltaDays == 1L
+                RecurrenceRule.Weekly -> deltaDays == 7L
+                RecurrenceRule.Monthly -> isNextMonthlyOccurrence(curr, next)
+                RecurrenceRule.Yearly -> isNextYearlyOccurrence(curr, next)
+                is RecurrenceRule.Interval -> deltaDays == rule.days.toLong()
                 RecurrenceRule.None -> false
             }
 
@@ -191,6 +195,14 @@ class CalculateRoutineStreaksUseCase(
                     else -> Pair(0, false)
                 }
             }
+            RecurrenceRule.Yearly -> {
+                val yearsSince = ChronoUnit.YEARS.between(lastDate.withDayOfYear(1), today.withDayOfYear(1))
+                when {
+                    yearsSince == 0L -> Pair(runningStreak, true)
+                    yearsSince == 1L -> Pair(runningStreak, false)
+                    else -> Pair(0, false)
+                }
+            }
             is RecurrenceRule.Interval -> {
                 when {
                     daysSinceLast <= rule.days -> Pair(runningStreak, daysSinceLast == 0L)
@@ -204,5 +216,41 @@ class CalculateRoutineStreaksUseCase(
         }
 
         return Triple(currentStreak, maxStreak, isCompletedCurrent)
+    }
+
+    /**
+     * True when [next] is the occurrence exactly one calendar month after
+     * [curr] on the series' cadence: the month advances by one AND the day of
+     * month stays consistent with the series' anchor day.
+     */
+    private fun isNextMonthlyOccurrence(curr: LocalDate, next: LocalDate): Boolean {
+        val monthDelta = (next.year - curr.year) * 12 + (next.monthValue - curr.monthValue)
+        return monthDelta == 1 && isAnchorDayConsistent(curr, next)
+    }
+
+    /**
+     * True when [next] is the occurrence exactly one calendar year after
+     * [curr]: same month, one year later, with the day of month consistent
+     * with the series' anchor day.
+     */
+    private fun isNextYearlyOccurrence(curr: LocalDate, next: LocalDate): Boolean {
+        return next.year - curr.year == 1 &&
+            next.monthValue == curr.monthValue &&
+            isAnchorDayConsistent(curr, next)
+    }
+
+    /**
+     * Day-of-month consistency between two consecutive occurrences, judged
+     * from the dates as given (the previous completion carries the anchor
+     * day). Month-end clamping is honoured both ways: an occurrence clamped
+     * to the last day of a shorter month (Jan 31 → Feb 28), and the return
+     * from a clamped day to the anchor day in the next period (Feb 28 →
+     * Mar 31, Feb 29 → Feb 28 the following year).
+     */
+    private fun isAnchorDayConsistent(curr: LocalDate, next: LocalDate): Boolean {
+        if (next.dayOfMonth == curr.dayOfMonth) return true
+        val nextClampedDown = next.dayOfMonth == next.lengthOfMonth() && curr.dayOfMonth > next.dayOfMonth
+        val currWasClamped = curr.dayOfMonth == curr.lengthOfMonth() && next.dayOfMonth > curr.dayOfMonth
+        return nextClampedDown || currWasClamped
     }
 }

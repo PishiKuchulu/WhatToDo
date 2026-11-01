@@ -19,7 +19,9 @@ sealed class RecurrenceRule {
                 else -> {
                     if (rule.startsWith("INTERVAL=")) {
                         val interval = rule.substringAfter("=").toIntOrNull() ?: 1
-                        Interval(interval)
+                        // An interval below 1 day is not a usable rule: treat it
+                        // as no recurrence instead of a rule that can never advance.
+                        if (interval < 1) None else Interval(interval)
                     } else None
                 }
             }

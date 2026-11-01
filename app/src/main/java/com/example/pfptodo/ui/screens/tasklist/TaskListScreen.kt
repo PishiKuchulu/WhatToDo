@@ -95,6 +95,16 @@ fun TaskListScreen(
     val taskDoneMsg = stringResource(R.string.task_completed_undo)
     val undoLabel = stringResource(R.string.undo)
 
+    // One-shot operation failures (toggle/snooze/delete) reported by the ViewModel.
+    val operationErrorRes by viewModel.operationError.collectAsStateWithLifecycle()
+    val operationErrorMsg = operationErrorRes?.let { stringResource(it) }
+    LaunchedEffect(operationErrorMsg) {
+        if (operationErrorMsg != null) {
+            snackbarHostState.showSnackbar(operationErrorMsg)
+            viewModel.onOperationErrorShown()
+        }
+    }
+
     // Launcher shortcut / widget "voice" action: open the voice sheet once, then reset the request.
     val voiceRequested by AppActions.openVoiceInput.collectAsStateWithLifecycle()
     LaunchedEffect(voiceRequested) {

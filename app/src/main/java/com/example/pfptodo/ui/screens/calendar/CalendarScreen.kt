@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -29,6 +30,7 @@ import com.example.pfptodo.domain.model.Priority
 import com.example.pfptodo.domain.model.Task
 import com.example.pfptodo.core.util.AppDateFormat
 import com.example.pfptodo.core.util.CalendarType
+import com.example.pfptodo.core.util.dayTickerFlow
 import com.example.pfptodo.ui.components.TaskItem
 import com.example.pfptodo.ui.theme.LocalCalendarType
 import java.time.LocalDate
@@ -45,6 +47,17 @@ fun CalendarScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val calendarType = LocalCalendarType.current
 
+    // One-shot operation failures (toggle/delete) reported by the ViewModel (M-34).
+    val snackbarHostState = remember { SnackbarHostState() }
+    val operationErrorRes by viewModel.operationError.collectAsStateWithLifecycle()
+    val operationErrorMsg = operationErrorRes?.let { stringResource(it) }
+    LaunchedEffect(operationErrorMsg) {
+        if (operationErrorMsg != null) {
+            snackbarHostState.showSnackbar(operationErrorMsg)
+            viewModel.onOperationErrorShown()
+        }
+    }
+
     // Gregorian navigation lives in the ViewModel. For Jalali the displayed month is tracked here
     // (the ViewModel only knows Gregorian months) and follows the selected day.
     var jalaliMonth by remember { mutableStateOf(AppDateFormat.firstOfMonth(uiState.selectedDate, CalendarType.JALALI)) }
@@ -54,6 +67,7 @@ fun CalendarScreen(
     val displayMonth = if (calendarType == CalendarType.JALALI) jalaliMonth else uiState.currentMonth
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.calendar_title)) },
@@ -64,79 +78,99 @@ fun CalendarScreen(
             )
         }
     ) { padding ->
-        Column(modifier = Modifier.padding(padding)) {
+        // Single LazyColumn (M-15): previously a non-scrollable Column stacked
+        // the fixed sections above a fillMaxSize LazyColumn, which squeezed
+        // and clipped content on small screens. Now every section is an item
+        // of one scrolling list.
+        LazyColumn(
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+        ) {
             // 7-Day Planning Strip
-            SevenDayPlanningStrip(
-                items = uiState.sevenDayPlan,
-                onDateSelected = { viewModel.onDateSelected(it) }
-            )
+            item {
+                SevenDayPlanningStrip(
+                    items = uiState.sevenDayPlan,
+                    onDateSelected = { viewModel.onDateSelected(it) }
+                )
+            }
 
-            CalendarHeader(
-                currentMonth = displayMonth,
-                calendarType = calendarType,
-                onMonthChange = { delta ->
-                    if (calendarType == CalendarType.JALALI) {
-                        jalaliMonth = AppDateFormat.plusMonths(jalaliMonth, delta, CalendarType.JALALI)
-                    } else {
-                        viewModel.onMonthChange(uiState.currentMonth.plusMonths(delta.toLong()))
+            item {
+                CalendarHeader(
+                    currentMonth = displayMonth,
+                    calendarType = calendarType,
+                    onMonthChange = { delta ->
+                        if (calendarType == CalendarType.JALALI) {
+                            jalaliMonth = AppDateFormat.plusMonths(jalaliMonth, delta, CalendarType.JALALI)
+                        } else {
+                            viewModel.onMonthChange(uiState.currentMonth.plusMonths(delta.toLong()))
+                        }
                     }
-                }
-            )
+                )
+            }
 
-            CalendarGrid(
-                currentMonth = displayMonth,
-                calendarType = calendarType,
-                selectedDate = uiState.selectedDate,
-                onDateSelected = { viewModel.onDateSelected(it) },
-                tasksForMonth = uiState.tasksForMonth,
-                allTasks = uiState.allTasks
-            )
+            item {
+                CalendarGrid(
+                    currentMonth = displayMonth,
+                    calendarType = calendarType,
+                    selectedDate = uiState.selectedDate,
+                    onDateSelected = { viewModel.onDateSelected(it) },
+                    allTasks = uiState.allTasks
+                )
+            }
 
             // Routine Streak Intelligence Section
-            RoutineStreakSection(
-                summary = uiState.streakSummary
-            )
+            item {
+                RoutineStreakSection(
+                    summary = uiState.streakSummary
+                )
+            }
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+            item {
+                HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+            }
 
-            Text(
-                text = stringResource(R.string.tasks_for_date, AppDateFormat.date(uiState.selectedDate, calendarType, Locale.getDefault())),
-                style = MaterialTheme.typography.titleMedium,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
+            item {
+                Text(
+                    text = stringResource(R.string.tasks_for_date, AppDateFormat.date(uiState.selectedDate, calendarType, Locale.getDefault())),
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
+            }
 
             if (uiState.tasksForSelectedDay.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(32.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            imageVector = Icons.Default.CalendarMonth,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.outline,
-                            modifier = Modifier.size(44.dp)
-                        )
-                        Spacer(Modifier.height(10.dp))
-                        Text(
-                            text = stringResource(R.string.no_tasks_day),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+                item {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(260.dp)
+                            .padding(32.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                imageVector = Icons.Default.CalendarMonth,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.outline,
+                                modifier = Modifier.size(44.dp)
+                            )
+                            Spacer(Modifier.height(10.dp))
+                            Text(
+                                text = stringResource(R.string.no_tasks_day),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             } else {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(uiState.tasksForSelectedDay, key = { it.id }) { task ->
-                        TaskItem(
-                            task = task,
-                            onToggleCompletion = { viewModel.onToggleTaskCompletion(task) },
-                            onDelete = { viewModel.onDeleteTask(task) },
-                            modifier = Modifier.clickable { onTaskClick(task.id) }
-                        )
-                    }
+                items(uiState.tasksForSelectedDay, key = { it.id }) { task ->
+                    TaskItem(
+                        task = task,
+                        onToggleCompletion = { viewModel.onToggleTaskCompletion(task) },
+                        onDelete = { viewModel.onDeleteTask(task) },
+                        modifier = Modifier.clickable { onTaskClick(task.id) }
+                    )
                 }
             }
         }
@@ -182,7 +216,6 @@ fun CalendarGrid(
     calendarType: CalendarType,
     selectedDate: LocalDate,
     onDateSelected: (LocalDate) -> Unit,
-    tasksForMonth: List<Task>,
     allTasks: List<Task>
 ) {
     // Month geometry follows the selected calendar (Jalali months are 29-31 days, weeks start Saturday).
@@ -191,8 +224,11 @@ fun CalendarGrid(
     val firstDayOfWeek = AppDateFormat.firstDayOfWeek(calendarType, Locale.getDefault())
     val startDayOfWeek = AppDateFormat.leadingBlanks(firstDayOfMonth, firstDayOfWeek)
 
-    val today = remember { LocalDate.now() }
-    val densityMap = remember(allTasks, firstDayOfMonth, daysInMonth) {
+    // "Today" comes from the day ticker (M-14) so the today highlight and the
+    // overdue density roll over at local midnight while the screen is open,
+    // instead of being frozen at the value from first composition.
+    val today by dayTickerFlow().collectAsStateWithLifecycle(initialValue = LocalDate.now())
+    val densityMap = remember(allTasks, firstDayOfMonth, daysInMonth, today) {
         val monthEnd = firstDayOfMonth.plusDays(daysInMonth.toLong())
         val dateTasksMap = allTasks.groupBy { task ->
             task.dueDate?.atZone(ZoneId.systemDefault())?.toLocalDate()
@@ -217,8 +253,11 @@ fun CalendarGrid(
         }
     }
 
-    // Weekday headers ordered from the locale's first day.
-    val weekDays = remember(firstDayOfWeek) {
+    // Weekday headers ordered from the locale's first day. Keyed on the
+    // current locale as well as the first day of week (M-17): a language
+    // change alone must rebuild the labels.
+    val localeTag = LocalConfiguration.current.locales[0].toLanguageTag()
+    val weekDays = remember(firstDayOfWeek, localeTag) {
         (0..6).map { offset ->
             val day = firstDayOfWeek.plus(offset.toLong())
             day.getDisplayName(java.time.format.TextStyle.NARROW, Locale.getDefault())

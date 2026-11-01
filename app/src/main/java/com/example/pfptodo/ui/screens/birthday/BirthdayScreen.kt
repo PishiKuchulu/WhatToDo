@@ -30,7 +30,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.pfptodo.R
-import com.example.pfptodo.core.util.ContactBirthdayReader
 import com.example.pfptodo.core.util.JalaliCalendarConverter
 import com.example.pfptodo.domain.usecase.birthday.UpcomingBirthday
 import java.time.LocalDate
@@ -61,24 +60,12 @@ fun BirthdayScreen(viewModel: BirthdayViewModel) {
     val context = LocalContext.current
 
     // System contact picker: grants access to exactly one chosen contact, zero dangerous permissions.
+    // The callback only forwards the URI — the ViewModel reads the contact off the main thread (M-19).
     val contactPicker = rememberLauncherForActivityResult(
         ActivityResultContracts.PickContact()
     ) { uri: Uri? ->
         if (uri != null) {
-            val data = ContactBirthdayReader.read(context.contentResolver, uri)
-            if (data != null) {
-                viewModel.openEditorForNew(
-                    ImportedContact(
-                        name = data.name,
-                        month = data.month,
-                        day = data.day,
-                        year = data.year,
-                        contactId = data.contactId
-                    )
-                )
-            } else {
-                viewModel.openEditorForNew()
-            }
+            viewModel.onContactPicked(context.contentResolver, uri)
         }
     }
 
@@ -374,11 +361,16 @@ private fun BirthdayEditorSheet(
     val isJalali = calendarType == CalendarType.JALALI
     val referenceGregorianYear = java.time.LocalDate.now().year
     val referenceJalaliYear = AppDateFormat.year(java.time.LocalDate.now(), CalendarType.JALALI)
+    // False while month/day are unknown (e.g. a contact imported without a birthday):
+    // the editor must not present or save an invented date (M-18).
+    val hasDate = state.month != null && state.day != null
     // The record is stored as Gregorian; in Jalali mode it is shown (and edited) as Jalali.
+    // While the date is unknown, 1/1 is only a neutral conversion seed for seeding the
+    // pickers — it is never written back unless the user picks a complete date.
     val shown = if (isJalali) {
-        BirthdayDateConverter.gregorianToJalali(state.month, state.day, state.birthYear, referenceGregorianYear)
+        BirthdayDateConverter.gregorianToJalali(state.month ?: 1, state.day ?: 1, state.birthYear, referenceGregorianYear)
     } else {
-        BirthdayDateConverter.Fields(state.month, state.day, state.birthYear)
+        BirthdayDateConverter.Fields(state.month ?: 1, state.day ?: 1, state.birthYear)
     }
     // Applies a month/day/year typed in the active calendar back to the stored Gregorian fields.
     val applyShown: (Int, Int, Int?) -> Unit = { m, d, y ->
@@ -387,6 +379,24 @@ private fun BirthdayEditorSheet(
             onMonthChange(g.month); onDayChange(g.day); onYearChange(g.year?.toString() ?: "")
         } else {
             onMonthChange(m); onDayChange(d); onYearChange(y?.toString() ?: "")
+        }
+    }
+    // For an incomplete record, typed month/day are held locally until BOTH exist;
+    // only then are they converted and applied as one complete date, so a half-typed
+    // date can never fabricate its missing half. A typed year is held the same way.
+    // Keyed by record identity so picking a contact mid-edit starts clean.
+    var pendingMonth by remember(state.id, state.contactId) { mutableStateOf("") }
+    var pendingDay by remember(state.id, state.contactId) { mutableStateOf("") }
+    var pendingYear by remember(state.id, state.contactId) { mutableStateOf("") }
+    val applyPending: () -> Unit = {
+        val m = pendingMonth.toIntOrNull()
+        val d = pendingDay.toIntOrNull()
+        if (m != null && d != null && m in 1..12 && d in 1..31) {
+            val typedYear = pendingYear.takeIf { it.length == 4 }?.toIntOrNull()
+            applyShown(m, d, typedYear ?: shown.year)
+            pendingMonth = ""
+            pendingDay = ""
+            pendingYear = ""
         }
     }
 
@@ -440,7 +450,14 @@ private fun BirthdayEditorSheet(
                 Icon(Icons.Default.CalendarMonth, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    AppDateFormat.localizeDigits("${shown.month}/${shown.day}" + (shown.year?.let { " ($it)" } ?: ""), Locale.getDefault()) +
+                    AppDateFormat.localizeDigits(
+                        if (hasDate) {
+                            "${shown.month}/${shown.day}" + (shown.year?.let { " ($it)" } ?: "")
+                        } else {
+                            "${pendingMonth.ifEmpty { "–" }}/${pendingDay.ifEmpty { "–" }}"
+                        },
+                        Locale.getDefault()
+                    ) +
                         "  ·  " + stringResource(if (isJalali) R.string.calendar_jalali else R.string.calendar_gregorian)
                 )
             }
@@ -448,10 +465,16 @@ private fun BirthdayEditorSheet(
             // Date Inputs Row (Month, Day, Year)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(
-                    value = shown.month.toString(),
+                    value = if (hasDate) shown.month.toString() else pendingMonth,
                     onValueChange = { text ->
-                        DigitNormalizer.toAsciiDigits(text).toIntOrNull()?.takeIf { it in 1..12 }
-                            ?.let { applyShown(it, shown.day, shown.year) }
+                        val digits = DigitNormalizer.toAsciiDigits(text)
+                        if (hasDate) {
+                            digits.toIntOrNull()?.takeIf { it in 1..12 }
+                                ?.let { applyShown(it, shown.day, shown.year) }
+                        } else {
+                            pendingMonth = digits.filter { it.isDigit() }.take(2)
+                            applyPending()
+                        }
                     },
                     label = { Text(stringResource(R.string.birthday_month_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -460,10 +483,16 @@ private fun BirthdayEditorSheet(
                     modifier = Modifier.weight(1f)
                 )
                 OutlinedTextField(
-                    value = shown.day.toString(),
+                    value = if (hasDate) shown.day.toString() else pendingDay,
                     onValueChange = { text ->
-                        DigitNormalizer.toAsciiDigits(text).toIntOrNull()?.takeIf { it in 1..31 }
-                            ?.let { applyShown(shown.month, it, shown.year) }
+                        val digits = DigitNormalizer.toAsciiDigits(text)
+                        if (hasDate) {
+                            digits.toIntOrNull()?.takeIf { it in 1..31 }
+                                ?.let { applyShown(shown.month, it, shown.year) }
+                        } else {
+                            pendingDay = digits.filter { it.isDigit() }.take(2)
+                            applyPending()
+                        }
                     },
                     label = { Text(stringResource(R.string.birthday_day_label)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -472,13 +501,19 @@ private fun BirthdayEditorSheet(
                     modifier = Modifier.weight(1f)
                 )
                 OutlinedTextField(
-                    value = shown.year?.toString() ?: "",
+                    value = if (hasDate) (shown.year?.toString() ?: "") else pendingYear,
                     onValueChange = { text ->
                         val digits = DigitNormalizer.toAsciiDigits(text).filter { it.isDigit() }.take(4)
-                        if (digits.isEmpty()) {
-                            applyShown(shown.month, shown.day, null)
-                        } else if (digits.length == 4) {
-                            applyShown(shown.month, shown.day, digits.toInt())
+                        if (hasDate) {
+                            if (digits.isEmpty()) {
+                                applyShown(shown.month, shown.day, null)
+                            } else if (digits.length == 4) {
+                                applyShown(shown.month, shown.day, digits.toInt())
+                            }
+                        } else {
+                            // Date incomplete: hold the year locally too; it is
+                            // applied together with the completed month/day.
+                            pendingYear = digits
                         }
                     },
                     label = { Text(stringResource(R.string.birthday_year_label)) },
@@ -599,10 +634,11 @@ private fun BirthdayEditorSheet(
 
     if (showDatePickerDialog && isJalali) {
         val initial = try {
-            if (shown.year != null) {
-                JalaliCalendarConverter.jalaliToGregorian(shown.year, shown.month, shown.day)
-            } else {
-                JalaliCalendarConverter.jalaliToGregorian(referenceJalaliYear, shown.month, shown.day)
+            when {
+                !hasDate -> java.time.LocalDate.now()
+                else -> shown.year?.let { year ->
+                    JalaliCalendarConverter.jalaliToGregorian(year, shown.month, shown.day)
+                } ?: BirthdayDateConverter.jalaliYearlessToGregorian(shown.month, shown.day, referenceJalaliYear)
             }
         } catch (e: Exception) {
             java.time.LocalDate.now()
@@ -613,7 +649,11 @@ private fun BirthdayEditorSheet(
             onConfirm = { picked ->
                 onMonthChange(picked.monthValue)
                 onDayChange(picked.dayOfMonth)
-                onYearChange(picked.year.toString())
+                // Write a year back only when the record already has one: a year-less
+                // record must not gain the picker's anchor year merely by opening
+                // and confirming the picker (M-20). The year-less seed above is
+                // leap-anchored, so month/day round-trip unchanged (Feb 29 included).
+                if (state.yearKnown) onYearChange(picked.year.toString())
                 showDatePickerDialog = false
             }
         )
@@ -627,7 +667,8 @@ private fun BirthdayEditorSheet(
                         cal.timeInMillis = millis
                         onMonthChange(cal.get(Calendar.MONTH) + 1)
                         onDayChange(cal.get(Calendar.DAY_OF_MONTH))
-                        onYearChange(cal.get(Calendar.YEAR).toString())
+                        // Same rule as the Jalali picker: no invented year (M-20).
+                        if (state.yearKnown) onYearChange(cal.get(Calendar.YEAR).toString())
                     }
                     showDatePickerDialog = false
                 }) { Text(stringResource(R.string.ok)) }

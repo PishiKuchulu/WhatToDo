@@ -11,6 +11,7 @@ import com.example.pfptodo.domain.model.TokenType
 import java.time.Clock
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
@@ -150,7 +151,21 @@ object PersianTaskParser {
             val m = jalaliMatch.groupValues[2].toInt()
             val d = jalaliMatch.groupValues[3].toInt()
             parsedDate = if (y in 1300..1500) {
-                JalaliCalendarConverter.jalaliToGregorian(y, m, d)
+                // Validate the day against the month's real length (the same rule
+                // JalaliCalendarConverter applies) instead of letting the converter
+                // silently clamp e.g. 31 Mehr to 30 Mehr; an invalid Jalali date —
+                // including a month outside 1..12, which the converter rejects —
+                // produces no date at all.
+                val maxDay = when {
+                    m in 1..6 -> 31
+                    m in 7..11 -> 30
+                    m == 12 && JalaliCalendarConverter.isJalaliLeapYear(y) -> 30
+                    m == 12 -> 29
+                    else -> 0
+                }
+                if (m in 1..12 && d in 1..maxDay) {
+                    JalaliCalendarConverter.jalaliToGregorian(y, m, d)
+                } else null
             } else if (y >= 2000) {
                 try { LocalDate.of(y, m, d) } catch (e: Exception) { null }
             } else null
@@ -270,8 +285,11 @@ object PersianTaskParser {
             } else if (modifier.isEmpty() && hour in 1..6) {
                 hour += 12
             }
-            parsedTime = LocalTime.of(hour.coerceIn(0, 23), 30)
-            workingText = workingText.replaceFirst(halfMatch.value, " ")
+            // Validate instead of clamping: an out-of-range hour is not a time.
+            if (hour in 0..23) {
+                parsedTime = LocalTime.of(hour, 30)
+                workingText = workingText.replaceFirst(halfMatch.value, " ")
+            }
         }
 
         // Standard time matcher: "ساعت ۵", "ساعت ۱۷:۳۰", "ساعت ۹ شب"
@@ -287,8 +305,12 @@ object PersianTaskParser {
                 } else if (modifier.isEmpty() && hour in 1..6) {
                     hour += 12
                 }
-                parsedTime = LocalTime.of(hour.coerceIn(0, 23), minute.coerceIn(0, 59))
-                workingText = workingText.replaceFirst(timeMatch.value, " ")
+                // Validate instead of clamping: an out-of-range time (e.g. ساعت ۲۵
+                // or minute 75) is not a time at all — leave it unparsed.
+                if (hour in 0..23 && minute in 0..59) {
+                    parsedTime = LocalTime.of(hour, minute)
+                    workingText = workingText.replaceFirst(timeMatch.value, " ")
+                }
             }
         }
 
@@ -347,6 +369,16 @@ object PersianTaskParser {
 
         if (cleanedTitle.isEmpty()) {
             cleanedTitle = rawInput.trim()
+        }
+
+        // A parsed time with no date means today — or tomorrow once that time
+        // has already passed — so the time is never silently dropped on save.
+        if (parsedDate == null && parsedTime != null) {
+            parsedDate = if (now.atTime(parsedTime).isAfter(LocalDateTime.now(clock))) {
+                now
+            } else {
+                now.plusDays(1)
+            }
         }
 
         val dueInstant = if (parsedDate != null) {

@@ -49,6 +49,14 @@ fun TaskDetailScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val task = uiState.task
+
+    val snackbarHostState = remember { SnackbarHostState() }
+    LaunchedEffect(uiState.error) {
+        uiState.error?.let { error ->
+            snackbarHostState.showSnackbar(error)
+            viewModel.onErrorShown()
+        }
+    }
     
     val subtasks by viewModel.subtasks.collectAsStateWithLifecycle(initialValue = emptyList())
     val attachments by viewModel.attachments.collectAsStateWithLifecycle(initialValue = emptyList())
@@ -106,6 +114,7 @@ fun TaskDetailScreen(
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.task_details)) },
@@ -139,11 +148,19 @@ fun TaskDetailScreen(
                 Text(stringResource(R.string.task_not_found))
             }
         } else {
-            Column(
+            // Single scrolling list: header, attachments and checklist are items of one
+            // LazyColumn — the previous outer Column + two nested bounded LazyColumns
+            // clipped content on small screens.
+            val completedCount = subtasks.count { it.isCompleted }
+            val totalCount = subtasks.size
+            val progress = if (totalCount > 0) completedCount.toFloat() / totalCount.toFloat() else 0f
+
+            LazyColumn(
                 modifier = Modifier
                     .padding(padding)
                     .fillMaxSize()
             ) {
+                item {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text(
                         text = task.title,
@@ -210,9 +227,11 @@ fun TaskDetailScreen(
                         )
                     }
                 }
+                }
 
-                HorizontalDivider()
-                
+                item { HorizontalDivider() }
+
+                item {
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -223,26 +242,22 @@ fun TaskDetailScreen(
                         Icon(Icons.Default.AttachFile, stringResource(R.string.cd_attach_file))
                     }
                 }
-
-                LazyColumn(modifier = Modifier.heightIn(max = 200.dp)) {
-                    items(attachments) { attachment ->
-                        AttachmentItem(
-                            attachment = attachment,
-                            onOpen = { openAttachment(context, attachment) },
-                            onDelete = {
-                                releaseAttachmentPermission(context, attachment)
-                                viewModel.onDeleteAttachment(attachment)
-                            }
-                        )
-                    }
                 }
 
-                HorizontalDivider()
+                items(attachments, key = { it.id }) { attachment ->
+                    AttachmentItem(
+                        attachment = attachment,
+                        onOpen = { openAttachment(context, attachment) },
+                        onDelete = {
+                            releaseAttachmentPermission(context, attachment)
+                            viewModel.onDeleteAttachment(attachment)
+                        }
+                    )
+                }
 
-                val completedCount = subtasks.count { it.isCompleted }
-                val totalCount = subtasks.size
-                val progress = if (totalCount > 0) completedCount.toFloat() / totalCount.toFloat() else 0f
+                item { HorizontalDivider() }
 
+                item {
                 Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -287,12 +302,12 @@ fun TaskDetailScreen(
                         )
                     }
                 }
+                }
 
-                LazyColumn(modifier = Modifier.weight(1f)) {
-                    itemsIndexed(
-                        items = subtasks,
-                        key = { _, it -> it.id }
-                    ) { index, subtask ->
+                itemsIndexed(
+                    items = subtasks,
+                    key = { _, it -> it.id }
+                ) { index, subtask ->
                         SubtaskItem(
                             subtask = subtask,
                             onToggle = { viewModel.onToggleSubtask(subtask) },
@@ -354,8 +369,8 @@ fun TaskDetailScreen(
                             )
                         }
                     }
-                }
 
+                item {
                 Button(
                     onClick = { viewModel.onToggleTaskCompletion() },
                     modifier = Modifier
@@ -366,6 +381,7 @@ fun TaskDetailScreen(
                     )
                 ) {
                     Text(if (task.isCompleted) stringResource(R.string.mark_as_pending) else stringResource(R.string.mark_as_done))
+                }
                 }
             }
         }

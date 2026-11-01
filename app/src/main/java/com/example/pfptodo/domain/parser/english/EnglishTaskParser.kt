@@ -9,6 +9,7 @@ import com.example.pfptodo.domain.model.TokenType
 import java.time.Clock
 import java.time.DayOfWeek
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
@@ -89,6 +90,7 @@ object EnglishTaskParser {
 
         // 3. Extract Recurrence
         var recurrenceRule: RecurrenceRule = RecurrenceRule.None
+        var recurrenceWeekday: DayOfWeek? = null
         val dailyRegex = Regex("""\b(every day|daily)\b""", RegexOption.IGNORE_CASE)
         val weeklyRegex = Regex("""\b(every week|weekly|every (monday|tuesday|wednesday|thursday|friday|saturday|sunday))\b""", RegexOption.IGNORE_CASE)
         val monthlyRegex = Regex("""\b(every month|monthly)\b""", RegexOption.IGNORE_CASE)
@@ -99,6 +101,12 @@ object EnglishTaskParser {
             workingText = dailyRegex.replace(workingText, " ")
         } else if (weeklyRegex.containsMatchIn(workingText)) {
             recurrenceRule = RecurrenceRule.Weekly
+            // "every <weekday>" carries a weekday: keep it so the first due date
+            // can be anchored to that weekday below (section 4).
+            val weekdayName = weeklyRegex.find(workingText)?.groupValues?.getOrNull(2)
+            if (!weekdayName.isNullOrEmpty()) {
+                recurrenceWeekday = DayOfWeek.valueOf(weekdayName.uppercase(Locale.US))
+            }
             workingText = weeklyRegex.replace(workingText, " ")
         } else if (monthlyRegex.containsMatchIn(workingText)) {
             recurrenceRule = RecurrenceRule.Monthly
@@ -163,14 +171,27 @@ object EnglishTaskParser {
 
         // English Weekdays
         if (parsedDate == null) {
-            val weekdayRegex = Regex("""\b(?:next\s+|this\s+)?(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b""", RegexOption.IGNORE_CASE)
+            val weekdayRegex = Regex("""\b(next\s+|this\s+)?(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\b""", RegexOption.IGNORE_CASE)
             val match = weekdayRegex.find(workingText)
             if (match != null) {
-                val dowName = match.groupValues[1].uppercase(Locale.US)
+                val dowName = match.groupValues[2].uppercase(Locale.US)
                 val dow = DayOfWeek.valueOf(dowName)
-                parsedDate = now.with(TemporalAdjusters.next(dow))
+                // "this <weekday>" includes today when today is that weekday;
+                // "next <weekday>" and a bare weekday always move forward.
+                val prefix = match.groupValues[1].trim().lowercase(Locale.US)
+                parsedDate = if (prefix == "this") {
+                    now.with(TemporalAdjusters.nextOrSame(dow))
+                } else {
+                    now.with(TemporalAdjusters.next(dow))
+                }
                 workingText = workingText.replaceRange(match.range, " ")
             }
+        }
+
+        // "every <weekday>" recurrence with no explicit date: anchor the first
+        // due date to the next occurrence of that weekday (today counts).
+        if (parsedDate == null && recurrenceWeekday != null) {
+            parsedDate = now.with(TemporalAdjusters.nextOrSame(recurrenceWeekday))
         }
 
         // 5. Extract Time
@@ -187,8 +208,13 @@ object EnglishTaskParser {
             } else if (amPm == "AM" && hour == 12) {
                 hour = 0
             }
-            parsedTime = LocalTime.of(hour.coerceIn(0, 23), minute.coerceIn(0, 59))
-            workingText = workingText.replaceRange(time12Match.range, " ")
+            // Validate instead of clamping: an out-of-range time (e.g. "9:75 AM")
+            // is not a time at all — leave it unparsed rather than silently
+            // shifting it to a different, valid-looking time.
+            if (hour in 0..23 && minute in 0..59) {
+                parsedTime = LocalTime.of(hour, minute)
+                workingText = workingText.replaceRange(time12Match.range, " ")
+            }
         }
 
         // 24h time (e.g. at 17:00)
@@ -197,8 +223,11 @@ object EnglishTaskParser {
             if (time24Match != null) {
                 val hour = time24Match.groupValues[1].toIntOrNull() ?: 0
                 val minute = time24Match.groupValues[2].toIntOrNull() ?: 0
-                parsedTime = LocalTime.of(hour.coerceIn(0, 23), minute.coerceIn(0, 59))
-                workingText = workingText.replaceRange(time24Match.range, " ")
+                // Validate instead of clamping (see the 12h branch above).
+                if (hour in 0..23 && minute in 0..59) {
+                    parsedTime = LocalTime.of(hour, minute)
+                    workingText = workingText.replaceRange(time24Match.range, " ")
+                }
             }
         }
 
@@ -256,6 +285,16 @@ object EnglishTaskParser {
         } else {
             // Capitalize first character
             cleanedTitle = cleanedTitle.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        }
+
+        // A parsed time with no date means today — or tomorrow once that time
+        // has already passed — so the time is never silently dropped on save.
+        if (parsedDate == null && parsedTime != null) {
+            parsedDate = if (now.atTime(parsedTime).isAfter(LocalDateTime.now(clock))) {
+                now
+            } else {
+                now.plusDays(1)
+            }
         }
 
         val dueInstant = if (parsedDate != null) {

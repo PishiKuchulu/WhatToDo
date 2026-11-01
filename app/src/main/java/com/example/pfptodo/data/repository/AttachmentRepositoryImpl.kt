@@ -1,5 +1,7 @@
 package com.example.pfptodo.data.repository
 
+import android.util.Log
+
 import com.example.pfptodo.core.util.Result
 import com.example.pfptodo.data.local.dao.AttachmentDao
 import com.example.pfptodo.data.local.entity.AttachmentEntity
@@ -13,7 +15,10 @@ class AttachmentRepositoryImpl(private val attachmentDao: AttachmentDao) : Attac
     override fun getAttachmentsForTask(taskId: Long): Flow<List<Attachment>> {
         return attachmentDao.getAttachmentsForTask(taskId).map { entities ->
             entities.map { it.toDomain() }
-        }.catch { emit(emptyList()) }
+        }.catch { e ->
+            Log.e(TAG, "Failed to load attachments; falling back to empty list", e)
+            emit(emptyList())
+        }
     }
 
     override suspend fun getAllAttachmentsRaw(): List<Attachment> {
@@ -36,6 +41,10 @@ class AttachmentRepositoryImpl(private val attachmentDao: AttachmentDao) : Attac
         } catch (e: Exception) {
             Result.Error(e)
         }
+    }
+
+    private companion object {
+        const val TAG = "AttachmentRepositoryImpl"
     }
 }
 

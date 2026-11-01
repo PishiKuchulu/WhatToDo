@@ -2,6 +2,7 @@ package com.example.pfptodo.ui.screens.tasklist
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.pfptodo.R
 import com.example.pfptodo.core.repository.ThemeRepository
 import com.example.pfptodo.core.util.Result
 import com.example.pfptodo.domain.model.Category
@@ -83,10 +84,15 @@ class TaskListViewModel(
         _sortOrder,
         calendarTypeFlow
     ) { parsedSearch, filter, sort, calendarType ->
+        // Merge semantics: natural-language intent OVERRIDES the manual filter
+        // field-by-field — but only for fields the parser actually set (a parsed
+        // value that is still the TaskFilter default leaves the manual value
+        // untouched). This applies uniformly to status, priorities, date and
+        // recurrence; there is no union/merge special case for priorities.
         val mergedFilter = filter.copy(
             calendarType = calendarType,
             status = if (parsedSearch.filter.status != TaskFilter.Status.ALL) parsedSearch.filter.status else filter.status,
-            priorities = if (parsedSearch.filter.priorities.isNotEmpty()) filter.priorities + parsedSearch.filter.priorities else filter.priorities,
+            priorities = if (parsedSearch.filter.priorities.isNotEmpty()) parsedSearch.filter.priorities else filter.priorities,
             dateFilter = if (parsedSearch.filter.dateFilter != TaskFilter.DateFilter.ALL) parsedSearch.filter.dateFilter else filter.dateFilter,
             isRecurringOnly = if (parsedSearch.filter.isRecurringOnly) true else filter.isRecurringOnly
         )
@@ -97,6 +103,24 @@ class TaskListViewModel(
     }
 
     private val _dismissedSuggestionIds = MutableStateFlow<Set<String>>(emptySet())
+
+    /**
+     * String resource of the last failed task operation (toggle/snooze/delete), or null.
+     * The screen observes this, shows it once in its snackbar, and calls
+     * [onOperationErrorShown].
+     */
+    private val _operationError = MutableStateFlow<Int?>(null)
+    val operationError = _operationError.asStateFlow()
+
+    fun onOperationErrorShown() {
+        _operationError.value = null
+    }
+
+    private fun reportIfError(result: Result<*>?) {
+        if (result is Result.Error) {
+            _operationError.value = R.string.operation_failed
+        }
+    }
 
     private val allTasksFlow: Flow<List<Task>> = taskUseCases.getFilteredTasks(
         "",
@@ -213,7 +237,7 @@ class TaskListViewModel(
     fun onToggleTaskCompletion(task: Task) {
         viewModelScope.launch {
             toggleMutex.withLock {
-                taskUseCases.toggleTaskCompletion(task)
+                reportIfError(taskUseCases.toggleTaskCompletion(task))
             }
         }
     }
@@ -221,15 +245,18 @@ class TaskListViewModel(
     fun onSnoozeTask(task: Task, days: Long = 1) {
         viewModelScope.launch {
             dueDateMutex.withLock {
-                taskUseCases.rescheduleTask.snoozeDays(task, days)
+                reportIfError(taskUseCases.rescheduleTask.snoozeDays(task, days))
             }
         }
     }
 
     fun onDeleteTask(task: Task) {
         viewModelScope.launch {
-            taskUseCases.deleteTask(task)
-            reminderManager.cancelReminder(task.id)
+            val result = taskUseCases.deleteTask(task)
+            reportIfError(result)
+            if (result is Result.Success) {
+                reminderManager.cancelReminder(task.id)
+            }
         }
     }
 
@@ -327,7 +354,20 @@ class TaskListViewModel(
     }
 
     fun onRemoveSearchChip(chip: com.example.pfptodo.domain.model.SearchFilterChip) {
-        _searchQuery.value = ""
+        val currentQuery = _searchQuery.value
+        if (currentQuery.isBlank()) return
+        // Remove only this chip's contribution: re-parse the current query and
+        // rebuild it from the remaining chips' matched phrases (each chip records
+        // the exact phrase that produced it). Previously this cleared the whole
+        // search, throwing away every other intent and the keyword.
+        val parsed = taskUseCases.parseNaturalLanguageSearch(currentQuery)
+        if (parsed.chips.none { it.id == chip.id }) return
+        val remainingPhrases = parsed.chips
+            .filter { it.id != chip.id }
+            .mapNotNull { it.matchedPhrase ?: it.customLabel }
+        _searchQuery.value = remainingPhrases.joinToString(" ")
+            .replace(Regex("""\s+"""), " ")
+            .trim()
     }
 }
 

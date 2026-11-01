@@ -162,6 +162,12 @@ private fun DeepLinkHandler(
     val uri by deepLink.collectAsStateWithLifecycle()
     LaunchedEffect(uri) {
         uri?.let { u ->
+            // Only the app's own schemes are trusted deep links; an explicit intent
+            // carrying a foreign scheme with a lookalike host must not navigate.
+            if (u.scheme != "wtodo" && u.scheme != "pishitodo") {
+                onConsumed()
+                return@let
+            }
             if (u.host == "task") {
                 extractTaskId(u)?.let { id ->
                     navController.navigate(Screen.TaskDetail.createRoute(id)) {

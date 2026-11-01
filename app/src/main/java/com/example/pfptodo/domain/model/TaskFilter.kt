@@ -19,7 +19,7 @@ data class TaskFilter(
     }
 
     enum class DateFilter {
-        ALL, TODAY, TOMORROW, THIS_WEEK, THIS_MONTH, UPCOMING
+        ALL, TODAY, TOMORROW, DAY_AFTER_TOMORROW, THIS_WEEK, THIS_MONTH, UPCOMING
     }
 
     enum class TagFilterMode {

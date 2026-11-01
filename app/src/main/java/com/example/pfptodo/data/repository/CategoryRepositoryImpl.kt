@@ -1,5 +1,7 @@
 package com.example.pfptodo.data.repository
 
+import android.util.Log
+
 import com.example.pfptodo.core.util.Result
 import com.example.pfptodo.data.local.dao.CategoryDao
 import com.example.pfptodo.data.mapper.toDomain
@@ -14,7 +16,10 @@ class CategoryRepositoryImpl(private val categoryDao: CategoryDao) : CategoryRep
     override fun getAllCategories(): Flow<List<Category>> {
         return categoryDao.getAllCategories().map { entities ->
             entities.map { it.toDomain() }
-        }.catch { emit(emptyList()) }
+        }.catch { e ->
+            Log.e(TAG, "Failed to load categories; falling back to empty list", e)
+            emit(emptyList())
+        }
     }
 
     override suspend fun getAllCategoriesRaw(): List<Category> {
@@ -55,5 +60,9 @@ class CategoryRepositoryImpl(private val categoryDao: CategoryDao) : CategoryRep
         } catch (e: Exception) {
             Result.Error(e)
         }
+    }
+
+    private companion object {
+        const val TAG = "CategoryRepositoryImpl"
     }
 }

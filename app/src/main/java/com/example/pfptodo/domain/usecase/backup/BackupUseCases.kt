@@ -1,6 +1,7 @@
 package com.example.pfptodo.domain.usecase.backup
 
 import com.example.pfptodo.core.util.Result
+import com.example.pfptodo.core.util.isDefaultCategoryAlias
 import com.example.pfptodo.domain.model.*
 import com.example.pfptodo.domain.repository.AttachmentRepository
 import com.example.pfptodo.domain.repository.BackupMaintenance
@@ -65,16 +66,35 @@ class BackupUseCases(
 
     private val gson: Gson = GsonBuilder().setPrettyPrinting().create()
 
+    /** One consistent snapshot of every table, read inside a single transaction (M-27). */
+    private data class ExportSnapshot(
+        val tasks: List<Task>,
+        val categories: List<Category>,
+        val attachments: List<Attachment>,
+        val tags: List<Tag>,
+        val crossRefs: List<Pair<Long, Long>>,
+        val birthdays: List<Birthday>
+    )
+
     /**
      * Exports all tasks, categories, tags, task-tag relations, and attachments to a versioned JSON string.
      */
     suspend fun exportToJson(): String {
-        val tasks = taskRepository.getAllTasksRaw()
-        val categories = categoryRepository.getAllCategoriesRaw()
-        val attachments = attachmentRepository.getAllAttachmentsRaw()
-        val tags = tagRepository.getAllTagsRaw()
-        val crossRefs = tagRepository.getAllTaskTagCrossRefsRaw()
-        val birthdays = birthdayRepository?.getAllBirthdaysRaw() ?: emptyList()
+        // All six reads run inside one transaction so the export is a single
+        // consistent snapshot: without it, an edit landing between the reads
+        // could produce cross-refs/attachments pointing at tasks that are not
+        // in the file (M-27).
+        val (tasks, categories, attachments, tags, crossRefs, birthdays) =
+            transactionRunner.inTransaction {
+                ExportSnapshot(
+                    tasks = taskRepository.getAllTasksRaw(),
+                    categories = categoryRepository.getAllCategoriesRaw(),
+                    attachments = attachmentRepository.getAllAttachmentsRaw(),
+                    tags = tagRepository.getAllTagsRaw(),
+                    crossRefs = tagRepository.getAllTaskTagCrossRefsRaw(),
+                    birthdays = birthdayRepository?.getAllBirthdaysRaw() ?: emptyList()
+                )
+            }
 
         val root = JsonObject()
         root.addProperty(KEY_FORMAT_VERSION, CURRENT_FORMAT_VERSION)
@@ -449,9 +469,15 @@ class BackupUseCases(
         //    Without this every restore would duplicate the default categories.
         val existingCategories = categoryRepository.getAllCategoriesRaw().toMutableList()
         for (category in parsed.categories) {
-            val match = existingCategories.firstOrNull {
-                it.name.trim().equals(category.name.trim(), ignoreCase = true) &&
-                    it.iconName == category.iconName
+            val match = existingCategories.firstOrNull { existing ->
+                (existing.name.trim().equals(category.name.trim(), ignoreCase = true) &&
+                    existing.iconName == category.iconName) ||
+                    // Cross-locale default (M-25): the incoming name is a known alias,
+                    // in some other locale, of the seeded default that uses this icon —
+                    // so it IS the existing row carrying that icon, whatever name that
+                    // row was seeded with in this device's locale.
+                    (isDefaultCategoryAlias(category.name, category.iconName) &&
+                        existing.iconName == category.iconName)
             }
             if (match != null) {
                 categoryIdMap[category.id] = match.id
@@ -520,7 +546,7 @@ class BackupUseCases(
         // 6. Birthdays → new ids (skipping ones already present for the same contact or name+date).
         var importedBirthdays = false
         if (birthdayRepository != null && parsed.birthdays.isNotEmpty()) {
-            val existing = birthdayRepository.getAllBirthdaysRaw()
+            val existing = birthdayRepository.getAllBirthdaysRaw().toMutableList()
             for (birthday in parsed.birthdays) {
                 val duplicate = existing.any {
                     (birthday.contactId != null && it.contactId == birthday.contactId) ||
@@ -528,7 +554,10 @@ class BackupUseCases(
                             it.month == birthday.month && it.day == birthday.day)
                 }
                 if (!duplicate) {
-                    birthdayRepository.insertBirthday(birthday.copy(id = 0L)).unwrap()
+                    val newId = birthdayRepository.insertBirthday(birthday.copy(id = 0L)).unwrap()
+                    // Keep the in-memory snapshot current so duplicates WITHIN this
+                    // one backup are skipped too, not just ones already in the DB (M-26).
+                    existing.add(birthday.copy(id = newId))
                     importedBirthdays = true
                 }
             }

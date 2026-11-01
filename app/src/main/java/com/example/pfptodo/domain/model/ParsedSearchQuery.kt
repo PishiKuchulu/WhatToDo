@@ -17,7 +17,12 @@ data class SearchFilterChip(
     val id: String,
     val labelRes: Int,
     val customLabel: String? = null,
-    val type: SearchChipType
+    val type: SearchChipType,
+    /**
+     * The exact phrase in the raw query that produced this chip. Lets the UI remove
+     * just this chip's contribution from the query instead of clearing the whole search.
+     */
+    val matchedPhrase: String? = null
 )
 
 enum class SearchChipType {

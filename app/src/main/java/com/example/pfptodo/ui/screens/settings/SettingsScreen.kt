@@ -400,7 +400,13 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                 SettingsRow(
                     icon = Icons.Default.Checklist,
                     title = stringResource(R.string.app_name),
-                    subtitle = stringResource(R.string.version_info)
+                    // Runtime version from the installed package — the old
+                    // R.string.version_info was a stale hardcoded "1.1.0".
+                    subtitle = remember(context) {
+                        runCatching {
+                            context.packageManager.getPackageInfo(context.packageName, 0).versionName
+                        }.getOrNull() ?: ""
+                    }
                 )
 
                 HorizontalDivider(

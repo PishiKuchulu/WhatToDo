@@ -103,17 +103,26 @@ class DeleteTask(
         if (reminders != null) {
             try {
                 // Subtasks vanish silently via FK CASCADE, so cancel their reminders
-                // before the parent row is gone. Also cancel the parent's own reminder —
-                // not every delete flow (e.g. calendar, matrix) does this itself.
-                repository.getSubtasksForTask(task.id).firstOrNull()?.forEach { subtask ->
-                    reminders.cancelReminder(subtask.id)
-                }
+                // before the parent row is gone. The walk is recursive: the app
+                // enforces max depth 1 today, but legacy or imported trees can be
+                // deeper, and a surviving grandchild reminder would fire for a
+                // task that no longer exists. Also cancel the parent's own
+                // reminder — not every delete flow (e.g. calendar, matrix) does
+                // this itself.
+                cancelRemindersRecursively(task.id, reminders)
                 reminders.cancelReminder(task.id)
             } catch (_: Exception) {
                 // Reminder cancellation is best-effort; the delete must still proceed.
             }
         }
         return repository.deleteTask(task)
+    }
+
+    private suspend fun cancelRemindersRecursively(parentId: Long, reminders: ReminderManager) {
+        repository.getSubtasksForTask(parentId).firstOrNull()?.forEach { subtask ->
+            cancelRemindersRecursively(subtask.id, reminders)
+            reminders.cancelReminder(subtask.id)
+        }
     }
 }
 

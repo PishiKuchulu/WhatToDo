@@ -2,6 +2,7 @@ package com.example.pfptodo.ui.screens.taskdetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.pfptodo.core.util.Result
 import com.example.pfptodo.domain.model.Attachment
 import com.example.pfptodo.domain.model.Task
 import com.example.pfptodo.domain.repository.AttachmentRepository
@@ -15,6 +16,10 @@ import java.time.Instant
  * ViewModel for the Task Detail screen.
  * Handles loading and display of a specific task's details, including its subtasks and attachments.
  *
+ * Operation failures (subtask toggle/delete, attachment add/remove, reorder, completion)
+ * surface through [TaskDetailUiState.error] instead of being silently discarded; the
+ * screen shows the message once and calls [onErrorShown].
+ *
  * @param taskId The unique ID of the task to display.
  */
 class TaskDetailViewModel(
@@ -24,28 +29,46 @@ class TaskDetailViewModel(
     private val reminderManager: ReminderManager
 ) : ViewModel() {
 
-    val uiState: StateFlow<TaskDetailUiState> = taskUseCases.observeTaskById(taskId)
-        .map { task ->
-            TaskDetailUiState(task = task, isLoading = false)
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = TaskDetailUiState(isLoading = true)
-        )
+    private val _operationError = MutableStateFlow<String?>(null)
+
+    val uiState: StateFlow<TaskDetailUiState> = combine(
+        taskUseCases.observeTaskById(taskId),
+        _operationError
+    ) { task, error ->
+        TaskDetailUiState(task = task, isLoading = false, error = error)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = TaskDetailUiState(isLoading = true)
+    )
 
     val subtasks: Flow<List<Task>> = taskUseCases.getSubtasks(taskId)
     val attachments: Flow<List<Attachment>> = attachmentRepository.getAttachmentsForTask(taskId)
+
+    /** Called by the screen after the error has been displayed. */
+    fun onErrorShown() {
+        _operationError.value = null
+    }
+
+    private fun reportIfError(result: Result<*>?) {
+        if (result is Result.Error) {
+            _operationError.value = result.exception.localizedMessage
+                ?: result.exception.message
+                ?: "Operation failed"
+        }
+    }
 
     fun onToggleSubtask(subtask: Task) {
         viewModelScope.launch {
             val now = Instant.now()
             val isNowCompleted = !subtask.isCompleted
-            taskUseCases.updateTask(
-                subtask.copy(
-                    isCompleted = isNowCompleted,
-                    completedAt = if (isNowCompleted) now else null,
-                    updatedAt = now
+            reportIfError(
+                taskUseCases.updateTask(
+                    subtask.copy(
+                        isCompleted = isNowCompleted,
+                        completedAt = if (isNowCompleted) now else null,
+                        updatedAt = now
+                    )
                 )
             )
         }
@@ -54,7 +77,7 @@ class TaskDetailViewModel(
     fun onDeleteTask() {
         viewModelScope.launch {
             uiState.value.task?.let { task ->
-                taskUseCases.deleteTask(task)
+                reportIfError(taskUseCases.deleteTask(task))
                 reminderManager.cancelReminder(task.id)
             }
         }
@@ -65,41 +88,41 @@ class TaskDetailViewModel(
         if (lines.isEmpty()) return
         viewModelScope.launch {
             if (lines.size > 1) {
-                taskUseCases.createSubtasksBatch(taskId, lines)
+                reportIfError(taskUseCases.createSubtasksBatch(taskId, lines))
             } else {
-                taskUseCases.createSubtask(taskId, lines[0])
+                reportIfError(taskUseCases.createSubtask(taskId, lines[0]))
             }
         }
     }
 
     fun onReorderSubtasks(orderedIds: List<Long>) {
         viewModelScope.launch {
-            taskUseCases.reorderSubtasks(taskId, orderedIds)
+            reportIfError(taskUseCases.reorderSubtasks(taskId, orderedIds))
         }
     }
 
     fun onDeleteSubtask(subtask: Task) {
         viewModelScope.launch {
-            taskUseCases.deleteTask(subtask)
+            reportIfError(taskUseCases.deleteTask(subtask))
         }
     }
 
     fun onAddAttachment(attachment: Attachment) {
         viewModelScope.launch {
-            attachmentRepository.insertAttachment(attachment)
+            reportIfError(attachmentRepository.insertAttachment(attachment))
         }
     }
 
     fun onDeleteAttachment(attachment: Attachment) {
         viewModelScope.launch {
-            attachmentRepository.deleteAttachment(attachment)
+            reportIfError(attachmentRepository.deleteAttachment(attachment))
         }
     }
 
     fun onToggleTaskCompletion() {
         viewModelScope.launch {
             uiState.value.task?.let { task ->
-                taskUseCases.toggleTaskCompletion(task)
+                reportIfError(taskUseCases.toggleTaskCompletion(task))
             }
         }
     }

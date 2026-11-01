@@ -45,11 +45,23 @@ fun EisenhowerMatrixScreen(
     val matrixState by viewModel.matrixState.collectAsStateWithLifecycle()
     var selectedQuadrant by remember { mutableStateOf<Int?>(null) } // null = show all 4, 1..4 = expanded quadrant
 
+    // One-shot operation failures (toggle/snooze/delete) reported by the ViewModel (M-34).
+    val snackbarHostState = remember { SnackbarHostState() }
+    val operationErrorRes by viewModel.operationError.collectAsStateWithLifecycle()
+    val operationErrorMsg = operationErrorRes?.let { stringResource(it) }
+    LaunchedEffect(operationErrorMsg) {
+        if (operationErrorMsg != null) {
+            snackbarHostState.showSnackbar(operationErrorMsg)
+            viewModel.onOperationErrorShown()
+        }
+    }
+
     // Honor the app's own theme override (WToDoTheme(appTheme)), not the system setting:
     // the active MaterialTheme color scheme already reflects the user's LIGHT/DARK/SYSTEM choice.
     val isAppDarkTheme = MaterialTheme.colorScheme.background.luminance() < 0.5f
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {

@@ -256,6 +256,7 @@
     <string name="search_chip_incomplete">انجام نشده</string>
     <string name="search_chip_today">امروز</string>
     <string name="search_chip_tomorrow">فردا</string>
+    <string name="search_chip_day_after_tomorrow">پس‌فردا</string>
     <string name="search_chip_this_week">این هفته</string>
     <string name="search_chip_this_month">این ماه</string>
     <string name="search_chip_recurring">تکرارشونده</string>
@@ -340,6 +341,7 @@
     <string name="calendar_jalali">شمسی (جلالی)</string>
     <string name="smart_filter_priority_medium">اولویت متوسط</string>
     <string name="save_task_failed">ذخیرهٔ کار ناموفق بود</string>
+    <string name="operation_failed">خطا در انجام عملیات</string>
     <string name="error_saving_task">خطا در ذخیرهٔ کار</string>
     <string name="tag_filter_mode_or">یا</string>
     <string name="tag_filter_mode_and">و</string>

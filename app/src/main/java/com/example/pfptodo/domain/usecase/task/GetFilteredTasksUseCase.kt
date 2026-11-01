@@ -1,13 +1,14 @@
 package com.example.pfptodo.domain.usecase.task
 
+import com.example.pfptodo.core.util.dayTickerFlow
 import com.example.pfptodo.domain.model.SortOrder
 import com.example.pfptodo.domain.model.Task
 import com.example.pfptodo.domain.model.TaskFilter
 import com.example.pfptodo.domain.repository.TaskRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -37,14 +38,32 @@ class GetFilteredTasksUseCase(
             repository.getAllMainTasks()
         } else {
             // Normalize the query so Arabic ye/kaf variants match Persian text
-            // (the DAO normalizes stored text the same way).
-            repository.searchTasks(com.example.pfptodo.core.util.PersianNormalizer.normalize(query))
+            // (the DAO normalizes stored text the same way), and escape LIKE
+            // wildcards so user input is matched literally (the DAO query
+            // declares ESCAPE '\').
+            repository.searchTasks(
+                escapeLikeWildcards(com.example.pfptodo.core.util.PersianNormalizer.normalize(query))
+            )
         }
 
-        return tasksFlow.map { tasks ->
+        // Combine with the day ticker so the date boundaries in filterAndSort
+        // are recomputed when local midnight passes, even if the task table
+        // itself does not change (M-14). filterAndSort re-derives "today" from
+        // the clock on every emission, so the ticker value itself is unused.
+        return combine(tasksFlow, dayTickerFlow(clock)) { tasks, _ ->
             filterAndSort(tasks, filter, sortOrder)
         }.flowOn(Dispatchers.Default)
     }
+
+    /**
+     * Escapes the LIKE pattern wildcards (`%`, `_`) and the escape character
+     * itself so a search query is matched literally. Backslash must be escaped
+     * first, before the escapes added for `%` and `_`.
+     */
+    private fun escapeLikeWildcards(value: String): String = value
+        .replace("\\", "\\\\")
+        .replace("%", "\\%")
+        .replace("_", "\\_")
 
     private fun filterAndSort(
         tasks: List<Task>,
@@ -56,6 +75,7 @@ class GetFilteredTasksUseCase(
         val startOfToday = localDate.atStartOfDay(zone).toInstant()
         val startOfTomorrow = localDate.plusDays(1).atStartOfDay(zone).toInstant()
         val startOfDayAfterTomorrow = localDate.plusDays(2).atStartOfDay(zone).toInstant()
+        val startOfThreeDaysFromNow = localDate.plusDays(3).atStartOfDay(zone).toInstant()
 
         // Week boundaries (Saturday-based for Persian / Middle East standard)
         val daysSinceSaturday = ((localDate.dayOfWeek.value % 7) + 1) % 7
@@ -115,6 +135,8 @@ class GetFilteredTasksUseCase(
                     task.dueDate != null && task.dueDate >= startOfToday && task.dueDate < startOfTomorrow
                 TaskFilter.DateFilter.TOMORROW ->
                     task.dueDate != null && task.dueDate >= startOfTomorrow && task.dueDate < startOfDayAfterTomorrow
+                TaskFilter.DateFilter.DAY_AFTER_TOMORROW ->
+                    task.dueDate != null && task.dueDate >= startOfDayAfterTomorrow && task.dueDate < startOfThreeDaysFromNow
                 TaskFilter.DateFilter.THIS_WEEK ->
                     task.dueDate != null && (
                         (filter.calendarType != com.example.pfptodo.core.util.CalendarType.GREGORIAN &&

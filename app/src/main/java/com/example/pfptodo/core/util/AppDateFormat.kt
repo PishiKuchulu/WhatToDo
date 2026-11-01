@@ -115,6 +115,21 @@ object AppDateFormat {
     fun sameMonth(a: LocalDate, b: LocalDate, type: CalendarType): Boolean =
         year(a, type) == year(b, type) && month(a, type) == month(b, type)
 
+    /**
+     * Short Persian weekday names in the digit style Iranian apps use
+     * («۱شنبه» rather than CLDR's «یکشنبه»). Persian-locale presentation only;
+     * other locales should use [DayOfWeek.getDisplayName].
+     */
+    fun persianWeekdayShortName(dayOfWeek: DayOfWeek): String = when (dayOfWeek) {
+        DayOfWeek.SATURDAY -> "شنبه"
+        DayOfWeek.SUNDAY -> "۱شنبه"
+        DayOfWeek.MONDAY -> "۲شنبه"
+        DayOfWeek.TUESDAY -> "۳شنبه"
+        DayOfWeek.WEDNESDAY -> "۴شنبه"
+        DayOfWeek.THURSDAY -> "۵شنبه"
+        DayOfWeek.FRIDAY -> "جمعه"
+    }
+
     /** Persian users see Persian digits; other locales are left untouched. */
     fun localizeDigits(text: String, locale: Locale): String {
         if (!locale.language.equals("fa", ignoreCase = true)) return text

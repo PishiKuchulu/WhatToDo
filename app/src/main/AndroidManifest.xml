@@ -72,6 +72,12 @@
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <!-- Exact-alarm reminders are epoch instants: a timezone or
+                     wall-clock change shifts their local meaning, so re-arm
+                     on those broadcasts too (both are exempt from the
+                     implicit-broadcast restrictions). -->
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.TIME_SET" />
             </intent-filter>
         </receiver>
 

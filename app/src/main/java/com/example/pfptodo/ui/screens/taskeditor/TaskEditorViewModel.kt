@@ -47,6 +47,16 @@ class TaskEditorViewModel(
      */
     private var originalTask: Task? = null
 
+    /**
+     * The task's persisted subtasks as loaded, kept so saving can reconcile the editor's
+     * rows against them (delete removed, rename changed, insert new) instead of blindly
+     * appending the whole list again. [subtasksLoaded] stays false when the load failed —
+     * reconciliation then only appends new rows and never deletes, so a failed load can
+     * never wipe the checklist.
+     */
+    private var originalSubtasks: List<Task> = emptyList()
+    private var subtasksLoaded: Boolean = false
+
     init {
         viewModelScope.launch {
             tagUseCases.getAllTags().collect { tags ->
@@ -77,7 +87,7 @@ class TaskEditorViewModel(
                 dueDate = p.dueDate,
                 recurrenceRule = p.recurrenceRule,
                 reminderTime = if (p.hasReminder) p.dueDate else null,
-                subtasks = p.subtaskTitles
+                subtasks = p.subtaskTitles.map { EditorSubtaskRow(title = it) }
             )
         }
         if (p.tagNames.isNotEmpty()) {
@@ -123,8 +133,28 @@ class TaskEditorViewModel(
                         reminderTime = task.reminderTime,
                         selectedTagIds = selectedIds
                     ) }
+                    loadSubtasks(id)
                 }
             }
+        }
+    }
+
+    /**
+     * Loads the task's existing subtasks into the editor as rows carrying their persisted
+     * ids, so the checklist can be edited (renamed/removed) rather than duplicated on save.
+     */
+    private suspend fun loadSubtasks(taskId: Long) {
+        try {
+            val existing = taskUseCases.getSubtasks(taskId).first()
+            originalSubtasks = existing
+            subtasksLoaded = true
+            _uiState.update {
+                it.copy(subtasks = existing.map { sub -> EditorSubtaskRow(id = sub.id, title = sub.title) })
+            }
+        } catch (e: Exception) {
+            // The editor still works for the task itself; save-time reconciliation stays
+            // append-only (see reconcileSubtasks) so nothing can be lost.
+            subtasksLoaded = false
         }
     }
 
@@ -194,7 +224,7 @@ class TaskEditorViewModel(
     fun onAddSubtask(title: String) {
         val trimmed = title.trim()
         if (trimmed.isNotBlank()) {
-            _uiState.update { it.copy(subtasks = it.subtasks + trimmed) }
+            _uiState.update { it.copy(subtasks = it.subtasks + EditorSubtaskRow(title = trimmed)) }
         }
     }
 
@@ -240,8 +270,9 @@ class TaskEditorViewModel(
                     val result = taskUseCases.addTask(task)
                     if (result is Result.Success) {
                         val newId = result.data
-                        val batchFailed = state.subtasks.isNotEmpty() &&
-                            taskUseCases.createSubtasksBatch(newId, state.subtasks) is Result.Error
+                        val newTitles = state.subtasks.map { it.title }
+                        val batchFailed = newTitles.isNotEmpty() &&
+                            taskUseCases.createSubtasksBatch(newId, newTitles) is Result.Error
                         if (batchFailed) {
                             // Subtask write failed: the save as a whole failed — do not
                             // schedule the reminder or report success.
@@ -261,9 +292,11 @@ class TaskEditorViewModel(
                     if (updateResult is Result.Error) {
                         null
                     } else {
-                        val batchFailed = state.subtasks.isNotEmpty() &&
-                            taskUseCases.createSubtasksBatch(task.id, state.subtasks) is Result.Error
-                        if (batchFailed) {
+                        // Sync the checklist against what was loaded: delete removed rows,
+                        // rename changed rows, insert new rows. Any failure fails the save
+                        // as a whole, exactly like the batch failure did before.
+                        val subtaskSyncError = reconcileSubtasks(task.id, state.subtasks)
+                        if (subtaskSyncError != null) {
                             null
                         } else {
                             // Handle reminder changes on edit
@@ -298,6 +331,43 @@ class TaskEditorViewModel(
     }
 
     /**
+     * Reconciles the editor's subtask rows with the persisted subtasks of [taskId]:
+     * rows whose persisted id is gone are deleted, kept rows with a changed title are
+     * renamed in place (preserving completion state and order), and rows without an id
+     * are batch-inserted. Returns the failure exception, or null when everything synced.
+     *
+     * When the original subtasks never loaded ([subtasksLoaded] is false) only the
+     * inserts run — deleting based on an unknown original state could wipe the checklist.
+     */
+    private suspend fun reconcileSubtasks(taskId: Long, rows: List<EditorSubtaskRow>): Throwable? {
+        if (subtasksLoaded) {
+            val keptIds = rows.mapNotNull { it.id }.toSet()
+            for (original in originalSubtasks) {
+                if (original.id !in keptIds) {
+                    val deleteResult = taskUseCases.deleteTask(original)
+                    if (deleteResult is Result.Error) return deleteResult.exception
+                }
+            }
+            for (row in rows) {
+                val rowId = row.id ?: continue
+                val original = originalSubtasks.firstOrNull { it.id == rowId } ?: continue
+                if (original.title != row.title) {
+                    val renameResult = taskUseCases.updateTask(
+                        original.copy(title = row.title, updatedAt = Instant.now())
+                    )
+                    if (renameResult is Result.Error) return renameResult.exception
+                }
+            }
+        }
+        val newTitles = rows.filter { it.id == null }.map { it.title }.filter { it.isNotBlank() }
+        if (newTitles.isNotEmpty()) {
+            val batchResult = taskUseCases.createSubtasksBatch(taskId, newTitles)
+            if (batchResult is Result.Error) return batchResult.exception
+        }
+        return null
+    }
+
+    /**
      * Series anchor: kept while the series is unchanged, re-based on the due date when the
      * rule is newly set or the due date moves, and cleared when the task stops repeating.
      */
@@ -313,6 +383,15 @@ class TaskEditorViewModel(
     }
 }
 
+/**
+ * One checklist row in the editor. [id] is the persisted subtask id, or null for a row
+ * typed in this session that has not been saved yet.
+ */
+data class EditorSubtaskRow(
+    val id: Long? = null,
+    val title: String = ""
+)
+
 data class TaskEditorUiState(
     val isEditing: Boolean = false,
     val title: String = "",
@@ -326,7 +405,7 @@ data class TaskEditorUiState(
     val availableCategories: List<Category> = emptyList(),
     val availableTags: List<Tag> = emptyList(),
     val selectedTagIds: Set<Long> = emptySet(),
-    val subtasks: List<String> = emptyList(),
+    val subtasks: List<EditorSubtaskRow> = emptyList(),
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
     val saveError: String? = null,

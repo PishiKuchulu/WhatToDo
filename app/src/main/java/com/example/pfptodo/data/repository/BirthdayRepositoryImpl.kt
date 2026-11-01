@@ -1,5 +1,7 @@
 package com.example.pfptodo.data.repository
 
+import android.util.Log
+
 import com.example.pfptodo.core.util.Result
 import com.example.pfptodo.data.local.dao.BirthdayDao
 import com.example.pfptodo.data.mapper.toDomain
@@ -15,7 +17,10 @@ class BirthdayRepositoryImpl(private val birthdayDao: BirthdayDao) : BirthdayRep
     override fun getAllBirthdays(): Flow<List<Birthday>> =
         birthdayDao.getAllBirthdays()
             .map { entities -> entities.map { it.toDomain() } }
-            .catch { emit(emptyList()) }
+            .catch { e ->
+                Log.e(TAG, "Failed to load birthdays; falling back to empty list", e)
+                emit(emptyList())
+            }
 
     override suspend fun getAllBirthdaysRaw(): List<Birthday> =
         birthdayDao.getAllBirthdaysNow().map { it.toDomain() }
@@ -33,7 +38,26 @@ class BirthdayRepositoryImpl(private val birthdayDao: BirthdayDao) : BirthdayRep
     }
 
     override suspend fun insertBirthday(birthday: Birthday): Result<Long> = try {
-        Result.Success(birthdayDao.insertBirthday(birthday.toEntity()))
+        // One birthday per contact (M-18): when a NEW record carries a contactId
+        // that already has a birthday, refresh that row (keeping its id and
+        // createdAt) instead of inserting a duplicate. This insert is the single
+        // write path shared by manual add and contact import (both reach it via
+        // ViewModel.save -> AddBirthday) and by backup import, so the check
+        // lives here rather than in any one caller.
+        val contactId = birthday.contactId
+        val existing = if (birthday.id == 0L && contactId != null) {
+            birthdayDao.getByContactId(contactId)
+        } else {
+            null
+        }
+        if (existing != null) {
+            birthdayDao.updateBirthday(
+                birthday.copy(id = existing.id, createdAt = existing.createdAt).toEntity()
+            )
+            Result.Success(existing.id)
+        } else {
+            Result.Success(birthdayDao.insertBirthday(birthday.toEntity()))
+        }
     } catch (e: Exception) {
         Result.Error(e)
     }
@@ -57,5 +81,9 @@ class BirthdayRepositoryImpl(private val birthdayDao: BirthdayDao) : BirthdayRep
         Result.Success(Unit)
     } catch (e: Exception) {
         Result.Error(e)
+    }
+
+    private companion object {
+        const val TAG = "BirthdayRepositoryImpl"
     }
 }

@@ -52,7 +52,7 @@ class ParseNaturalLanguageSearchUseCase(
         for (phrase in highPriorityMatches) {
             if (containsWordOrPhrase(workingText, phrase)) {
                 priority = Priority.HIGH
-                chips.add(SearchFilterChip("priority_high", R.string.search_chip_important, null, SearchChipType.PRIORITY))
+                chips.add(SearchFilterChip("priority_high", R.string.search_chip_important, null, SearchChipType.PRIORITY, matchedPhrase = phrase))
                 workingText = removePhrase(workingText, phrase)
                 break
             }
@@ -61,7 +61,7 @@ class ParseNaturalLanguageSearchUseCase(
             for (phrase in lowPriorityMatches) {
                 if (containsWordOrPhrase(workingText, phrase)) {
                     priority = Priority.LOW
-                    chips.add(SearchFilterChip("priority_low", R.string.search_chip_low_priority, null, SearchChipType.PRIORITY))
+                    chips.add(SearchFilterChip("priority_low", R.string.search_chip_low_priority, null, SearchChipType.PRIORITY, matchedPhrase = phrase))
                     workingText = removePhrase(workingText, phrase)
                     break
                 }
@@ -76,7 +76,7 @@ class ParseNaturalLanguageSearchUseCase(
         for (phrase in overdueMatches) {
             if (containsWordOrPhrase(workingText, phrase)) {
                 status = TaskFilter.Status.OVERDUE
-                chips.add(SearchFilterChip("status_overdue", R.string.search_chip_overdue, null, SearchChipType.STATUS))
+                chips.add(SearchFilterChip("status_overdue", R.string.search_chip_overdue, null, SearchChipType.STATUS, matchedPhrase = phrase))
                 workingText = removePhrase(workingText, phrase)
                 break
             }
@@ -85,7 +85,7 @@ class ParseNaturalLanguageSearchUseCase(
             for (phrase in incompleteMatches) {
                 if (containsWordOrPhrase(workingText, phrase)) {
                     status = TaskFilter.Status.ACTIVE
-                    chips.add(SearchFilterChip("status_incomplete", R.string.search_chip_incomplete, null, SearchChipType.STATUS))
+                    chips.add(SearchFilterChip("status_incomplete", R.string.search_chip_incomplete, null, SearchChipType.STATUS, matchedPhrase = phrase))
                     workingText = removePhrase(workingText, phrase)
                     break
                 }
@@ -95,7 +95,7 @@ class ParseNaturalLanguageSearchUseCase(
             for (phrase in completedMatches) {
                 if (containsWordOrPhrase(workingText, phrase)) {
                     status = TaskFilter.Status.COMPLETED
-                    chips.add(SearchFilterChip("status_completed", R.string.search_chip_completed, null, SearchChipType.STATUS))
+                    chips.add(SearchFilterChip("status_completed", R.string.search_chip_completed, null, SearchChipType.STATUS, matchedPhrase = phrase))
                     workingText = removePhrase(workingText, phrase)
                     break
                 }
@@ -103,24 +103,38 @@ class ParseNaturalLanguageSearchUseCase(
         }
 
         // 3. Date Scope
+        // Longest-first: «پس‌فردا» / «پس فردا» (day after tomorrow) must be matched
+        // BEFORE «فردا», otherwise it is misread as TOMORROW with a residual «پس»
+        // keyword. It maps to the real DAY_AFTER_TOMORROW filter.
+        val dayAfterTomorrowMatches = listOf("پس‌فردا", "پس فردا")
         val thisWeekMatches = listOf("این هفته", "هفته جاری", "هفته فعلی")
         val thisMonthMatches = listOf("این ماه", "ماه جاری", "ماه فعلی")
-        val tomorrowMatches = listOf("فردا", "پس فردا", "پس‌فردا")
+        val tomorrowMatches = listOf("فردا")
         val todayMatches = listOf("امروز", "امروزها", "امروزی")
 
-        for (phrase in thisWeekMatches) {
+        for (phrase in dayAfterTomorrowMatches) {
             if (containsWordOrPhrase(workingText, phrase)) {
-                dateFilter = TaskFilter.DateFilter.THIS_WEEK
-                chips.add(SearchFilterChip("date_this_week", R.string.search_chip_this_week, null, SearchChipType.DATE))
+                dateFilter = TaskFilter.DateFilter.DAY_AFTER_TOMORROW
+                chips.add(SearchFilterChip("date_day_after_tomorrow", R.string.search_chip_day_after_tomorrow, null, SearchChipType.DATE, matchedPhrase = phrase))
                 workingText = removePhrase(workingText, phrase)
                 break
+            }
+        }
+        if (dateFilter == TaskFilter.DateFilter.ALL) {
+            for (phrase in thisWeekMatches) {
+                if (containsWordOrPhrase(workingText, phrase)) {
+                    dateFilter = TaskFilter.DateFilter.THIS_WEEK
+                    chips.add(SearchFilterChip("date_this_week", R.string.search_chip_this_week, null, SearchChipType.DATE, matchedPhrase = phrase))
+                    workingText = removePhrase(workingText, phrase)
+                    break
+                }
             }
         }
         if (dateFilter == TaskFilter.DateFilter.ALL) {
             for (phrase in thisMonthMatches) {
                 if (containsWordOrPhrase(workingText, phrase)) {
                     dateFilter = TaskFilter.DateFilter.THIS_MONTH
-                    chips.add(SearchFilterChip("date_this_month", R.string.search_chip_this_month, null, SearchChipType.DATE))
+                    chips.add(SearchFilterChip("date_this_month", R.string.search_chip_this_month, null, SearchChipType.DATE, matchedPhrase = phrase))
                     workingText = removePhrase(workingText, phrase)
                     break
                 }
@@ -130,7 +144,7 @@ class ParseNaturalLanguageSearchUseCase(
             for (phrase in tomorrowMatches) {
                 if (containsWordOrPhrase(workingText, phrase)) {
                     dateFilter = TaskFilter.DateFilter.TOMORROW
-                    chips.add(SearchFilterChip("date_tomorrow", R.string.search_chip_tomorrow, null, SearchChipType.DATE))
+                    chips.add(SearchFilterChip("date_tomorrow", R.string.search_chip_tomorrow, null, SearchChipType.DATE, matchedPhrase = phrase))
                     workingText = removePhrase(workingText, phrase)
                     break
                 }
@@ -140,7 +154,7 @@ class ParseNaturalLanguageSearchUseCase(
             for (phrase in todayMatches) {
                 if (containsWordOrPhrase(workingText, phrase)) {
                     dateFilter = TaskFilter.DateFilter.TODAY
-                    chips.add(SearchFilterChip("date_today", R.string.search_chip_today, null, SearchChipType.DATE))
+                    chips.add(SearchFilterChip("date_today", R.string.search_chip_today, null, SearchChipType.DATE, matchedPhrase = phrase))
                     workingText = removePhrase(workingText, phrase)
                     break
                 }
@@ -152,7 +166,7 @@ class ParseNaturalLanguageSearchUseCase(
         for (phrase in recurringMatches) {
             if (containsWordOrPhrase(workingText, phrase)) {
                 isRecurringOnly = true
-                chips.add(SearchFilterChip("recurring", R.string.search_chip_recurring, null, SearchChipType.RECURRING))
+                chips.add(SearchFilterChip("recurring", R.string.search_chip_recurring, null, SearchChipType.RECURRING, matchedPhrase = phrase))
                 workingText = removePhrase(workingText, phrase)
                 break
             }
@@ -172,7 +186,7 @@ class ParseNaturalLanguageSearchUseCase(
 
         // If structured chips were found or container phrases were stripped, attach a keyword chip
         if (cleanKeyword.isNotBlank() && (chips.isNotEmpty() || trimmed != cleanKeyword)) {
-            chips.add(SearchFilterChip("keyword_$cleanKeyword", 0, cleanKeyword, SearchChipType.KEYWORD))
+            chips.add(SearchFilterChip("keyword_$cleanKeyword", 0, cleanKeyword, SearchChipType.KEYWORD, matchedPhrase = cleanKeyword))
         }
 
         val taskFilter = TaskFilter(
@@ -205,11 +219,11 @@ class ParseNaturalLanguageSearchUseCase(
 
         if (highPriorityRegex.containsMatchIn(workingText)) {
             priority = Priority.HIGH
-            chips.add(SearchFilterChip("priority_high", R.string.search_chip_important, null, SearchChipType.PRIORITY))
+            chips.add(SearchFilterChip("priority_high", R.string.search_chip_important, null, SearchChipType.PRIORITY, matchedPhrase = highPriorityRegex.find(workingText)?.value))
             workingText = highPriorityRegex.replace(workingText, " ")
         } else if (lowPriorityRegex.containsMatchIn(workingText)) {
             priority = Priority.LOW
-            chips.add(SearchFilterChip("priority_low", R.string.search_chip_low_priority, null, SearchChipType.PRIORITY))
+            chips.add(SearchFilterChip("priority_low", R.string.search_chip_low_priority, null, SearchChipType.PRIORITY, matchedPhrase = lowPriorityRegex.find(workingText)?.value))
             workingText = lowPriorityRegex.replace(workingText, " ")
         }
 
@@ -220,39 +234,46 @@ class ParseNaturalLanguageSearchUseCase(
 
         if (overdueRegex.containsMatchIn(workingText)) {
             status = TaskFilter.Status.OVERDUE
-            chips.add(SearchFilterChip("status_overdue", R.string.search_chip_overdue, null, SearchChipType.STATUS))
+            chips.add(SearchFilterChip("status_overdue", R.string.search_chip_overdue, null, SearchChipType.STATUS, matchedPhrase = overdueRegex.find(workingText)?.value))
             workingText = overdueRegex.replace(workingText, " ")
         } else if (incompleteRegex.containsMatchIn(workingText)) {
             status = TaskFilter.Status.ACTIVE
-            chips.add(SearchFilterChip("status_incomplete", R.string.search_chip_incomplete, null, SearchChipType.STATUS))
+            chips.add(SearchFilterChip("status_incomplete", R.string.search_chip_incomplete, null, SearchChipType.STATUS, matchedPhrase = incompleteRegex.find(workingText)?.value))
             workingText = incompleteRegex.replace(workingText, " ")
         } else if (completedRegex.containsMatchIn(workingText)) {
             status = TaskFilter.Status.COMPLETED
-            chips.add(SearchFilterChip("status_completed", R.string.search_chip_completed, null, SearchChipType.STATUS))
+            chips.add(SearchFilterChip("status_completed", R.string.search_chip_completed, null, SearchChipType.STATUS, matchedPhrase = completedRegex.find(workingText)?.value))
             workingText = completedRegex.replace(workingText, " ")
         }
 
         // 3. Date Scope
+        // Longest-first: "day after tomorrow" is checked before "tomorrow" and
+        // maps to the real DAY_AFTER_TOMORROW filter.
+        val dayAfterTomorrowRegex = Regex("""\bday after tomorrow\b""", RegexOption.IGNORE_CASE)
         val thisWeekRegex = Regex("""\b(this week|current week)\b""", RegexOption.IGNORE_CASE)
         val thisMonthRegex = Regex("""\b(this month|current month)\b""", RegexOption.IGNORE_CASE)
         val tomorrowRegex = Regex("""\b(tomorrow's|tomorrow)\b""", RegexOption.IGNORE_CASE)
         val todayRegex = Regex("""\b(today's|today|tonight)\b""", RegexOption.IGNORE_CASE)
 
-        if (thisWeekRegex.containsMatchIn(workingText)) {
+        if (dayAfterTomorrowRegex.containsMatchIn(workingText)) {
+            dateFilter = TaskFilter.DateFilter.DAY_AFTER_TOMORROW
+            chips.add(SearchFilterChip("date_day_after_tomorrow", R.string.search_chip_day_after_tomorrow, null, SearchChipType.DATE, matchedPhrase = dayAfterTomorrowRegex.find(workingText)?.value))
+            workingText = dayAfterTomorrowRegex.replace(workingText, " ")
+        } else if (thisWeekRegex.containsMatchIn(workingText)) {
             dateFilter = TaskFilter.DateFilter.THIS_WEEK
-            chips.add(SearchFilterChip("date_this_week", R.string.search_chip_this_week, null, SearchChipType.DATE))
+            chips.add(SearchFilterChip("date_this_week", R.string.search_chip_this_week, null, SearchChipType.DATE, matchedPhrase = thisWeekRegex.find(workingText)?.value))
             workingText = thisWeekRegex.replace(workingText, " ")
         } else if (thisMonthRegex.containsMatchIn(workingText)) {
             dateFilter = TaskFilter.DateFilter.THIS_MONTH
-            chips.add(SearchFilterChip("date_this_month", R.string.search_chip_this_month, null, SearchChipType.DATE))
+            chips.add(SearchFilterChip("date_this_month", R.string.search_chip_this_month, null, SearchChipType.DATE, matchedPhrase = thisMonthRegex.find(workingText)?.value))
             workingText = thisMonthRegex.replace(workingText, " ")
         } else if (tomorrowRegex.containsMatchIn(workingText)) {
             dateFilter = TaskFilter.DateFilter.TOMORROW
-            chips.add(SearchFilterChip("date_tomorrow", R.string.search_chip_tomorrow, null, SearchChipType.DATE))
+            chips.add(SearchFilterChip("date_tomorrow", R.string.search_chip_tomorrow, null, SearchChipType.DATE, matchedPhrase = tomorrowRegex.find(workingText)?.value))
             workingText = tomorrowRegex.replace(workingText, " ")
         } else if (todayRegex.containsMatchIn(workingText)) {
             dateFilter = TaskFilter.DateFilter.TODAY
-            chips.add(SearchFilterChip("date_today", R.string.search_chip_today, null, SearchChipType.DATE))
+            chips.add(SearchFilterChip("date_today", R.string.search_chip_today, null, SearchChipType.DATE, matchedPhrase = todayRegex.find(workingText)?.value))
             workingText = todayRegex.replace(workingText, " ")
         }
 
@@ -260,7 +281,7 @@ class ParseNaturalLanguageSearchUseCase(
         val recurringRegex = Regex("""\b(recurring|repeating|periodic|daily|weekly|monthly)\b""", RegexOption.IGNORE_CASE)
         if (recurringRegex.containsMatchIn(workingText)) {
             isRecurringOnly = true
-            chips.add(SearchFilterChip("recurring", R.string.search_chip_recurring, null, SearchChipType.RECURRING))
+            chips.add(SearchFilterChip("recurring", R.string.search_chip_recurring, null, SearchChipType.RECURRING, matchedPhrase = recurringRegex.find(workingText)?.value))
             workingText = recurringRegex.replace(workingText, " ")
         }
 
@@ -272,7 +293,7 @@ class ParseNaturalLanguageSearchUseCase(
         val cleanKeyword = sanitizeKeyword(workingText)
 
         if (cleanKeyword.isNotBlank() && (chips.isNotEmpty() || trimmed != cleanKeyword)) {
-            chips.add(SearchFilterChip("keyword_$cleanKeyword", 0, cleanKeyword, SearchChipType.KEYWORD))
+            chips.add(SearchFilterChip("keyword_$cleanKeyword", 0, cleanKeyword, SearchChipType.KEYWORD, matchedPhrase = cleanKeyword))
         }
 
         val taskFilter = TaskFilter(

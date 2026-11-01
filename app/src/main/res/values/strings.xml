@@ -256,6 +256,7 @@
     <string name="search_chip_incomplete">Incomplete</string>
     <string name="search_chip_today">Today</string>
     <string name="search_chip_tomorrow">Tomorrow</string>
+    <string name="search_chip_day_after_tomorrow">Day after tomorrow</string>
     <string name="search_chip_this_week">This Week</string>
     <string name="search_chip_this_month">This Month</string>
     <string name="search_chip_recurring">Recurring</string>
@@ -340,6 +341,7 @@
     <string name="calendar_jalali">Jalali (Solar Hijri)</string>
     <string name="smart_filter_priority_medium">Medium Priority</string>
     <string name="save_task_failed">Failed to save task</string>
+    <string name="operation_failed">Operation failed</string>
     <string name="error_saving_task">Error saving task</string>
     <string name="tag_filter_mode_or">OR</string>
     <string name="tag_filter_mode_and">AND</string>
