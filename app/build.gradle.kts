@@ -19,6 +19,15 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    testOptions {
+        unitTests {
+            // Domain code logs via android.util.Log on failure paths; local unit
+            // tests run against the stubbed android.jar, so return defaults
+            // instead of throwing "not mocked" RuntimeExceptions.
+            isReturnDefaultValues = true
+        }
+    }
+
     // Release signing comes from environment variables (CI secrets) — never
     // commit a keystore or passwords to version control. The keystore is a
     // PKCS#12 file decoded from the KEYSTORE_BASE64 GitHub secret by the

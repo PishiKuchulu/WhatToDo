@@ -25,7 +25,7 @@ class AddTaskTest {
     }
 
     @Test
-    fun `top-level task is inserted directly`() = runBlocking {
+    fun `top-level task is inserted directly`(): Unit = runBlocking {
         whenever(repository.insertTask(any())).thenReturn(Result.Success(1L))
 
         val result = useCase(Task(title = "Top level"))
@@ -36,7 +36,7 @@ class AddTaskTest {
     }
 
     @Test
-    fun `subtask under a top-level parent is inserted`() = runBlocking {
+    fun `subtask under a top-level parent is inserted`(): Unit = runBlocking {
         val parentTask = Task(id = 10, title = "Parent", parentTaskId = null)
         whenever(repository.getTaskById(10)).thenReturn(Result.Success(parentTask))
         whenever(repository.insertTask(any())).thenReturn(Result.Success(11L))
@@ -49,7 +49,7 @@ class AddTaskTest {
     }
 
     @Test
-    fun `enforces 1-level depth limit by rejecting subtask under another subtask`() = runBlocking {
+    fun `enforces 1-level depth limit by rejecting subtask under another subtask`(): Unit = runBlocking {
         val childTask = Task(id = 20, title = "Child Subtask", parentTaskId = 10L)
         whenever(repository.getTaskById(20)).thenReturn(Result.Success(childTask))
 
@@ -61,7 +61,7 @@ class AddTaskTest {
     }
 
     @Test
-    fun `rejects subtask when parent task not found`() = runBlocking {
+    fun `rejects subtask when parent task not found`(): Unit = runBlocking {
         whenever(repository.getTaskById(999)).thenReturn(Result.Success(null))
 
         val result = useCase(Task(title = "Subtask", parentTaskId = 999))
@@ -71,7 +71,7 @@ class AddTaskTest {
     }
 
     @Test
-    fun `propagates parent lookup error`() = runBlocking {
+    fun `propagates parent lookup error`(): Unit = runBlocking {
         val failure = RuntimeException("db gone")
         whenever(repository.getTaskById(10)).thenReturn(Result.Error(failure))
 
